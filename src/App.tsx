@@ -1,34 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import CardEditor from './routes/CardEditor'
+import DeckDashboard from './routes/DeckDashboard'
+import Home from './routes/Home'
+import ImportExport from './routes/ImportExport'
+import Library from './routes/Library'
+import ReviewSession from './routes/ReviewSession'
+import Settings from './routes/Settings'
+import Stats from './routes/Stats'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/deck/:deckId" element={<DeckDashboard />} />
+        <Route path="/deck/:deckId/review" element={<ReviewSession />} />
+        <Route path="/deck/:deckId/library" element={<Library />} />
+        <Route path="/deck/:deckId/card/new" element={<CardEditor />} />
+        <Route path="/deck/:deckId/card/:cardId/edit" element={<CardEditor />} />
+        <Route path="/deck/:deckId/stats" element={<Stats />} />
+        <Route path="/deck/:deckId/settings" element={<Settings />} />
+        <Route path="/deck/:deckId/import-export" element={<ImportExport />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
