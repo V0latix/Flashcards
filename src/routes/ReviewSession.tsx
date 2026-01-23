@@ -83,12 +83,20 @@ function ReviewSession() {
             </button>
           )}
           {showBack ? (
-            <div>
-              <button type="button" onClick={() => handleAnswer('good')}>
-                Bon
-              </button>
-              <button type="button" onClick={() => handleAnswer('bad')}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+              <button
+                type="button"
+                style={{ order: 1, flex: 1 }}
+                onClick={() => handleAnswer('bad')}
+              >
                 Faux
+              </button>
+              <button
+                type="button"
+                style={{ order: 2, flex: 1 }}
+                onClick={() => handleAnswer('good')}
+              >
+                Bon
               </button>
             </div>
           ) : null}
