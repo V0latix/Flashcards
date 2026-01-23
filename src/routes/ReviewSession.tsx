@@ -13,6 +13,15 @@ function ReviewSession() {
   const [goodCount, setGoodCount] = useState(0)
   const [badCount, setBadCount] = useState(0)
 
+  const shuffle = <T,>(input: T[]): T[] => {
+    const result = [...input]
+    for (let i = result.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[result[i], result[j]] = [result[j], result[i]]
+    }
+    return result
+  }
+
   useEffect(() => {
     const loadSession = async () => {
       const session = await buildDailySession(today)
@@ -21,7 +30,8 @@ function ReviewSession() {
         front: entry.card.front_md,
         back: entry.card.back_md
       }))
-      setCards(queue.filter((item) => item.cardId !== 0))
+      const filtered = queue.filter((item) => item.cardId !== 0)
+      setCards(shuffle(filtered))
       setIsLoading(false)
     }
 

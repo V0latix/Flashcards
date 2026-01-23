@@ -6,9 +6,9 @@ import type { Card, ReviewState } from '../db/types'
 function Library() {
   const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<'tags' | 'cards'>('tags')
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [query, setQuery] = useState('')
-  const [boxFilter, setBoxFilter] = useState('all')
-  const [tagFilter, setTagFilter] = useState('')
 
   const loadCards = async () => {
     const data = await listCardsWithReviewState(0)
@@ -32,13 +32,28 @@ function Library() {
     await loadCards()
   }
 
+  const tagsWithCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    cards.forEach(({ card }) => {
+      card.tags.forEach((tag) => {
+        const normalized = tag.trim()
+        if (!normalized) {
+          return
+        }
+        counts.set(normalized, (counts.get(normalized) ?? 0) + 1)
+      })
+    })
+    return Array.from(counts.entries())
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => a.tag.localeCompare(b.tag))
+  }, [cards])
+
   const filteredCards = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
-    const normalizedTag = tagFilter.trim().toLowerCase()
-
-    return cards.filter(({ card, reviewState }) => {
-      if (boxFilter !== 'all') {
-        if (!reviewState || reviewState.box !== Number(boxFilter)) {
+    return cards.filter(({ card }) => {
+      if (selectedTag) {
+        const hasTag = card.tags.some((tag) => tag.trim() === selectedTag)
+        if (!hasTag) {
           return false
         }
       }
@@ -50,16 +65,17 @@ function Library() {
         }
       }
 
-      if (normalizedTag) {
-        const tags = card.tags.map((tag) => tag.toLowerCase())
-        if (!tags.some((tag) => tag.includes(normalizedTag))) {
-          return false
-        }
-      }
-
       return true
     })
-  }, [boxFilter, cards, query, tagFilter])
+  }, [cards, query, selectedTag])
+
+  const renderSnippet = (value: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      return 'Carte sans titre'
+    }
+    return trimmed.length > 80 ? `${trimmed.slice(0, 80)}…` : trimmed
+  }
 
   return (
     <main>
@@ -67,58 +83,71 @@ function Library() {
       <p>
         <Link to="/card/new">Ajouter une carte</Link>
       </p>
-      <section>
-        <label htmlFor="search">Recherche</label>
-        <input
-          id="search"
-          type="text"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        <label htmlFor="box-filter">Box</label>
-        <select
-          id="box-filter"
-          value={boxFilter}
-          onChange={(event) => setBoxFilter(event.target.value)}
-        >
-          <option value="all">Toutes</option>
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-        <label htmlFor="tag-filter">Tag</label>
-        <input
-          id="tag-filter"
-          type="text"
-          placeholder="ex: math"
-          value={tagFilter}
-          onChange={(event) => setTagFilter(event.target.value)}
-        />
-      </section>
       {isLoading ? (
         <p>Chargement...</p>
-      ) : filteredCards.length === 0 ? (
-        <p>Aucune carte pour le moment.</p>
+      ) : viewMode === 'tags' ? (
+        <section>
+          <h2>Tags</h2>
+          {tagsWithCounts.length === 0 ? (
+            <p>Aucun tag pour le moment.</p>
+          ) : (
+            <ul>
+              {tagsWithCounts.map(({ tag, count }) => (
+                <li key={tag}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedTag(tag)
+                      setViewMode('cards')
+                    }}
+                  >
+                    {tag} ({count})
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedTag(null)
+              setViewMode('cards')
+            }}
+          >
+            Voir toutes les cartes
+          </button>
+        </section>
       ) : (
-        <ul>
-          {filteredCards.map(({ card, reviewState }) => (
-            <li key={card.id}>
-              <Link to={`/card/${card.id}/edit`}>
-                {card.front_md || 'Carte sans titre'}
-              </Link>{' '}
-              <span>
-                Box {reviewState?.box ?? 0} · Due{' '}
-                {reviewState?.due_date ?? '—'}
-              </span>
-              <button type="button" onClick={() => handleDelete(card)}>
-                Supprimer
-              </button>
-            </li>
-          ))}
-        </ul>
+        <section>
+          <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Toutes les cartes'}</h2>
+          <label htmlFor="search">Recherche</label>
+          <input
+            id="search"
+            type="text"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          {filteredCards.length === 0 ? (
+            <p>Aucune carte pour le moment.</p>
+          ) : (
+            <ul>
+              {filteredCards.map(({ card, reviewState }) => (
+                <li key={card.id}>
+                  <Link to={`/card/${card.id}/edit`}>
+                    {renderSnippet(card.front_md)}
+                  </Link>{' '}
+                  <span>
+                    Box {reviewState?.box ?? 0} · Due{' '}
+                    {reviewState?.due_date ?? '—'}
+                  </span>
+                  <button type="button" onClick={() => handleDelete(card)}>
+                    Supprimer
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       )}
       <nav>
         <ul>
