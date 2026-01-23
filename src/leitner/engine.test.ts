@@ -64,7 +64,7 @@ describe('autoFillBox1', () => {
     expect(box0States).toHaveLength(0)
   })
 
-  it('promotes box0 cards by FIFO created_at', async () => {
+  it('selects a random sample from box0 without replacement', async () => {
     const today = '2024-02-01'
 
     for (let i = 0; i < 8; i += 1) {
@@ -99,15 +99,24 @@ describe('autoFillBox1', () => {
       dueDate: null
     })
 
+    const originalRandom = Math.random
+    Math.random = () => 0
+
     await autoFillBox1(1, today)
+
+    Math.random = originalRandom
 
     const firstState = await db.reviewStates.get(firstId)
     const secondState = await db.reviewStates.get(secondId)
     const thirdState = await db.reviewStates.get(thirdId)
 
-    expect(firstState?.box).toBe(1)
-    expect(secondState?.box).toBe(1)
-    expect(thirdState?.box).toBe(0)
+    const promoted = [firstState, secondState, thirdState]
+      .filter((state) => state?.box === 1)
+      .map((state) => state?.card_id)
+
+    expect(promoted).toHaveLength(2)
+    expect(promoted).toEqual(expect.arrayContaining([secondId, thirdId]))
+    expect(firstState?.box).toBe(0)
   })
 })
 

@@ -49,6 +49,15 @@ const loadSessionCards = async (states: ReviewState[]): Promise<SessionCard[]> =
     .filter((entry): entry is SessionCard => Boolean(entry))
 }
 
+const shuffle = <T,>(items: T[]): T[] => {
+  const result = [...items]
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
 export async function autoFillBox1(today: string): Promise<void>
 export async function autoFillBox1(_deckId: number, today: string): Promise<void>
 export async function autoFillBox1(
@@ -76,21 +85,16 @@ export async function autoFillBox1(
 
     const box0CardIds = box0States.map((state) => state.card_id)
     const cards = await loadCardsByIds(box0CardIds)
-    const cardById = new Map(cards.map((card) => [card.id, card]))
+    const cardIds = cards.map((card) => card.id)
 
-    const fifoCardIds = box0States
-      .map((state) => cardById.get(state.card_id))
-      .filter((card): card is Card => Boolean(card))
-      .sort((a, b) => a.created_at.localeCompare(b.created_at))
-      .slice(0, missing)
-      .map((card) => card.id)
+    const selectedCardIds = shuffle(cardIds).slice(0, missing)
 
-    if (fifoCardIds.length === 0) {
+    if (selectedCardIds.length === 0) {
       return
     }
 
     await db.reviewStates.bulkPut(
-      fifoCardIds.map((cardId) => ({
+      selectedCardIds.map((cardId) => ({
         card_id: cardId,
         box: 1,
         due_date: today
