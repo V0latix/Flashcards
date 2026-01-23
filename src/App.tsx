@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import db from './db'
 import CardEditor from './routes/CardEditor'
 import Home from './routes/Home'
 import ImportExport from './routes/ImportExport'
@@ -8,6 +10,20 @@ import Settings from './routes/Settings'
 import Stats from './routes/Stats'
 
 function App() {
+  useEffect(() => {
+    const runDbCheck = async () => {
+      try {
+        await db.open()
+        const count = await db.cards.count()
+        console.log('DB OK, cards=', count)
+      } catch (error) {
+        console.error('DB ERROR', error)
+      }
+    }
+
+    void runDbCheck()
+  }, [])
+
   return (
     <BrowserRouter>
       <Routes>

@@ -22,7 +22,7 @@ export type ReviewState = {
   card_id: number
   box: number
   due_date: string | null
-  last_reviewed_at?: string
+  last_reviewed_at?: string | null
 }
 
 export type ReviewLog = {

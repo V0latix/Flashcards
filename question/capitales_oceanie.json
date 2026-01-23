@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "cards": [
+    { "front_md": "Quelle est la capitale de l'Australie ?", "back_md": "Canberra", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale de la Nouvelle-Zélande ?", "back_md": "Wellington", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale de la Papouasie-Nouvelle-Guinée ?", "back_md": "Port Moresby", "tags": ["Géographie", "Capitales"] },
+
+    { "front_md": "Quelle est la capitale des Fidji ?", "back_md": "Suva", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale des Îles Salomon ?", "back_md": "Honiara", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale du Vanuatu ?", "back_md": "Port-Vila", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale de Samoa ?", "back_md": "Apia", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale des Tonga ?", "back_md": "Nukuʻalofa", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale de Kiribati ?", "back_md": "Tarawa-Sud", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale de Tuvalu ?", "back_md": "Funafuti", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale de Nauru ?", "back_md": "Yaren (district)", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale des États fédérés de Micronésie ?", "back_md": "Palikir", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale des Palaos ?", "back_md": "Ngerulmud", "tags": ["Géographie", "Capitales"] },
+    { "front_md": "Quelle est la capitale des Îles Marshall ?", "back_md": "Majuro", "tags": ["Géographie", "Capitales"] }
+  ]
+}
