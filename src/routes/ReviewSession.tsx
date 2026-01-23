@@ -61,20 +61,22 @@ function ReviewSession() {
   const isDone = !isLoading && index >= cards.length
 
   return (
-    <main>
+    <main className="container">
       <h1>Review Session</h1>
       {isLoading ? (
         <p>Chargement...</p>
       ) : isDone ? (
-        <section>
+        <section className="card section">
           <h2>Session terminee</h2>
           <p>
             Total: {cards.length} · Bon: {goodCount} · Faux: {badCount}
           </p>
-          <Link to="/">Retour a l'accueil</Link>
+          <Link to="/" className="btn btn-primary">
+            Retour a l'accueil
+          </Link>
         </section>
       ) : currentCard ? (
-        <section>
+        <section className="card section">
           <p>
             Carte {index + 1} / {cards.length}
           </p>
@@ -88,15 +90,16 @@ function ReviewSession() {
               <p>{currentCard.back || '—'}</p>
             </div>
           ) : (
-            <button type="button" onClick={handleReveal}>
+            <button type="button" className="btn btn-primary" onClick={handleReveal}>
               Revealer le verso
             </button>
           )}
           {showBack ? (
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+            <div className="button-row">
               <button
                 type="button"
                 style={{ order: 1, flex: 1 }}
+                className="btn btn-secondary"
                 onClick={() => handleAnswer('bad')}
               >
                 Faux
@@ -104,6 +107,7 @@ function ReviewSession() {
               <button
                 type="button"
                 style={{ order: 2, flex: 1 }}
+                className="btn btn-primary"
                 onClick={() => handleAnswer('good')}
               >
                 Bon

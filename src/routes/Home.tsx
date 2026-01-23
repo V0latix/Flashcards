@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom'
 
 function Home() {
   return (
-    <main>
+    <main className="container">
       <h1>Home</h1>
-      <section>
+      <section className="card section">
         <h2>Pool global</h2>
         <ul>
           <li>

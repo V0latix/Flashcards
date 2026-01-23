@@ -78,15 +78,17 @@ function Library() {
   }
 
   return (
-    <main>
+    <main className="container">
       <h1>Library</h1>
       <p>
-        <Link to="/card/new">Ajouter une carte</Link>
+        <Link to="/card/new" className="btn btn-primary">
+          Ajouter une carte
+        </Link>
       </p>
       {isLoading ? (
         <p>Chargement...</p>
       ) : viewMode === 'tags' ? (
-        <section>
+        <section className="card section">
           <h2>Tags</h2>
           {tagsWithCounts.length === 0 ? (
             <p>Aucun tag pour le moment.</p>
@@ -96,6 +98,7 @@ function Library() {
                 <li key={tag}>
                   <button
                     type="button"
+                    className="btn btn-secondary"
                     onClick={() => {
                       setSelectedTag(tag)
                       setViewMode('cards')
@@ -109,6 +112,7 @@ function Library() {
           )}
           <button
             type="button"
+            className="btn btn-primary"
             onClick={() => {
               setSelectedTag(null)
               setViewMode('cards')
@@ -118,13 +122,14 @@ function Library() {
           </button>
         </section>
       ) : (
-        <section>
+        <section className="card section">
           <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Toutes les cartes'}</h2>
           <label htmlFor="search">Recherche</label>
           <input
             id="search"
             type="text"
             value={query}
+            className="input"
             onChange={(event) => setQuery(event.target.value)}
           />
           {filteredCards.length === 0 ? (
@@ -140,7 +145,11 @@ function Library() {
                     Box {reviewState?.box ?? 0} · Due{' '}
                     {reviewState?.due_date ?? '—'}
                   </span>
-                  <button type="button" onClick={() => handleDelete(card)}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => handleDelete(card)}
+                  >
                     Supprimer
                   </button>
                 </li>

@@ -62,19 +62,20 @@ function CardEditor() {
   }
 
   return (
-    <main>
+    <main className="container">
       <h1>Card Editor</h1>
       <p>{modeLabel}</p>
       {isLoading ? (
         <p>Chargement...</p>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="card section">
           <div>
             <label htmlFor="front">Front</label>
             <textarea
               id="front"
               rows={6}
               value={front}
+              className="textarea"
               onChange={(event) => setFront(event.target.value)}
             />
           </div>
@@ -84,6 +85,7 @@ function CardEditor() {
               id="back"
               rows={6}
               value={back}
+              className="textarea"
               onChange={(event) => setBack(event.target.value)}
             />
           </div>
@@ -93,13 +95,16 @@ function CardEditor() {
               id="tags"
               type="text"
               value={tagsInput}
+              className="input"
               onChange={(event) => setTagsInput(event.target.value)}
             />
           </div>
-          <button type="submit">Save</button>
+          <button type="submit" className="btn btn-primary">
+            Save
+          </button>
         </form>
       )}
-      <section>
+      <section className="card section">
         <h2>Preview</h2>
         <div>
           <h3>Front</h3>
