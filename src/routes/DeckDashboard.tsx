@@ -35,6 +35,9 @@ function DeckDashboard() {
       ) : (
         <p>Deck introuvable.</p>
       )}
+      <p>
+        <Link to={`${basePath}/review`}>Demarrer la session du jour</Link>
+      </p>
       <nav>
         <ul>
           <li>
