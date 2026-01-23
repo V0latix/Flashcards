@@ -6,8 +6,7 @@ import rehypeKatex from 'rehype-katex'
 import { createCard, getCardById, updateCard } from '../db/queries'
 
 function CardEditor() {
-  const { deckId = 'demo', cardId } = useParams()
-  const basePath = `/deck/${deckId}`
+  const { cardId } = useParams()
   const navigate = useNavigate()
   const [front, setFront] = useState('')
   const [back, setBack] = useState('')
@@ -59,13 +58,12 @@ function CardEditor() {
         tags: parsedTags
       })
     }
-    navigate(`${basePath}/library`)
+    navigate('/library')
   }
 
   return (
     <main>
       <h1>Card Editor</h1>
-      <p>Deck: {deckId}</p>
       <p>{modeLabel}</p>
       {isLoading ? (
         <p>Chargement...</p>
@@ -122,28 +120,25 @@ function CardEditor() {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to={basePath}>Deck dashboard</Link>
+            <Link to="/review">Review session</Link>
           </li>
           <li>
-            <Link to={`${basePath}/review`}>Review session</Link>
+            <Link to="/library">Library</Link>
           </li>
           <li>
-            <Link to={`${basePath}/library`}>Library</Link>
+            <Link to="/card/new">New card</Link>
           </li>
           <li>
-            <Link to={`${basePath}/card/new`}>New card</Link>
+            <Link to="/card/1/edit">Edit card (demo)</Link>
           </li>
           <li>
-            <Link to={`${basePath}/card/1/edit`}>Edit card (demo)</Link>
+            <Link to="/stats">Stats</Link>
           </li>
           <li>
-            <Link to={`${basePath}/stats`}>Stats</Link>
+            <Link to="/settings">Settings</Link>
           </li>
           <li>
-            <Link to={`${basePath}/settings`}>Settings</Link>
-          </li>
-          <li>
-            <Link to={`${basePath}/import-export`}>Import/Export</Link>
+            <Link to="/import-export">Import/Export</Link>
           </li>
         </ul>
       </nav>

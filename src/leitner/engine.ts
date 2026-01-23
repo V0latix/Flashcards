@@ -49,7 +49,17 @@ const loadSessionCards = async (states: ReviewState[]): Promise<SessionCard[]> =
     .filter((entry): entry is SessionCard => Boolean(entry))
 }
 
-export const autoFillBox1 = async (_deckId: number, today: string): Promise<void> => {
+export async function autoFillBox1(today: string): Promise<void>
+export async function autoFillBox1(_deckId: number, today: string): Promise<void>
+export async function autoFillBox1(
+  todayOrDeckId: string | number,
+  maybeToday?: string
+): Promise<void> {
+  const today =
+    typeof todayOrDeckId === 'string'
+      ? normalizeToday(todayOrDeckId)
+      : normalizeToday(maybeToday ?? '')
+
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates.where({ box: 1 }).toArray()
 
@@ -89,13 +99,21 @@ export const autoFillBox1 = async (_deckId: number, today: string): Promise<void
   })
 }
 
-export const buildDailySession = async (
-  deckId: number,
+export async function buildDailySession(todayInput: string): Promise<DailySession>
+export async function buildDailySession(
+  _deckId: number,
   todayInput: string
-): Promise<DailySession> => {
-  const today = normalizeToday(todayInput)
+): Promise<DailySession>
+export async function buildDailySession(
+  todayOrDeckId: string | number,
+  maybeToday?: string
+): Promise<DailySession> {
+  const today =
+    typeof todayOrDeckId === 'string'
+      ? normalizeToday(todayOrDeckId)
+      : normalizeToday(maybeToday ?? '')
 
-  await autoFillBox1(deckId, today)
+  await autoFillBox1(today)
 
   const reviewStates = await db.reviewStates.toArray()
 

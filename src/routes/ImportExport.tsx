@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import db from '../db'
 import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 
 function ImportExport() {
-  const { deckId = 'demo' } = useParams()
-  const basePath = `/deck/${deckId}`
   const [status, setStatus] = useState<string>('')
 
   type ExportMedia = {
@@ -208,14 +206,13 @@ function ImportExport() {
   return (
     <main>
       <h1>Import/Export</h1>
-      <p>Deck: {deckId}</p>
       <section>
         <button type="button" onClick={handleExport}>
-          Exporter le deck
+          Exporter le pool
         </button>
       </section>
       <section>
-        <label htmlFor="import-json">Importer un deck</label>
+        <label htmlFor="import-json">Importer un pool</label>
         <input id="import-json" type="file" accept="application/json" onChange={handleImport} />
       </section>
       {status ? <p>{status}</p> : null}
@@ -225,22 +222,19 @@ function ImportExport() {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to={basePath}>Deck dashboard</Link>
+            <Link to="/review">Review session</Link>
           </li>
           <li>
-            <Link to={`${basePath}/review`}>Review session</Link>
+            <Link to="/library">Library</Link>
           </li>
           <li>
-            <Link to={`${basePath}/library`}>Library</Link>
+            <Link to="/card/new">New card</Link>
           </li>
           <li>
-            <Link to={`${basePath}/card/new`}>New card</Link>
+            <Link to="/stats">Stats</Link>
           </li>
           <li>
-            <Link to={`${basePath}/stats`}>Stats</Link>
-          </li>
-          <li>
-            <Link to={`${basePath}/settings`}>Settings</Link>
+            <Link to="/settings">Settings</Link>
           </li>
         </ul>
       </nav>

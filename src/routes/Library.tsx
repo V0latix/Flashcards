@@ -1,32 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { deleteCard, listCardsWithReviewState } from '../db/queries'
 import type { Card, ReviewState } from '../db/types'
 
 function Library() {
-  const { deckId = 'demo' } = useParams()
   const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
   const [isLoading, setIsLoading] = useState(true)
   const [query, setQuery] = useState('')
   const [boxFilter, setBoxFilter] = useState('all')
   const [tagFilter, setTagFilter] = useState('')
-  const numericDeckId = Number(deckId)
-  const basePath = `/deck/${deckId}`
 
   const loadCards = async () => {
-    if (!Number.isFinite(numericDeckId)) {
-      setCards([])
-      setIsLoading(false)
-      return
-    }
-    const data = await listCardsWithReviewState(numericDeckId)
+    const data = await listCardsWithReviewState(0)
     setCards(data)
     setIsLoading(false)
   }
 
   useEffect(() => {
     void loadCards()
-  }, [numericDeckId])
+  }, [])
 
   const handleDelete = async (card: Card) => {
     if (!card.id) {
@@ -72,9 +64,8 @@ function Library() {
   return (
     <main>
       <h1>Library</h1>
-      <p>Deck: {deckId}</p>
       <p>
-        <Link to={`${basePath}/card/new`}>Ajouter une carte</Link>
+        <Link to="/card/new">Ajouter une carte</Link>
       </p>
       <section>
         <label htmlFor="search">Recherche</label>
@@ -115,7 +106,7 @@ function Library() {
         <ul>
           {filteredCards.map(({ card, reviewState }) => (
             <li key={card.id}>
-              <Link to={`${basePath}/card/${card.id}/edit`}>
+              <Link to={`/card/${card.id}/edit`}>
                 {card.front_md || 'Carte sans titre'}
               </Link>{' '}
               <span>
@@ -135,22 +126,22 @@ function Library() {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to={basePath}>Deck dashboard</Link>
+            <Link to="/review">Review session</Link>
           </li>
           <li>
-            <Link to={`${basePath}/review`}>Review session</Link>
+            <Link to="/library">Library</Link>
           </li>
           <li>
-            <Link to={`${basePath}/card/new`}>New card</Link>
+            <Link to="/card/new">New card</Link>
           </li>
           <li>
-            <Link to={`${basePath}/stats`}>Stats</Link>
+            <Link to="/stats">Stats</Link>
           </li>
           <li>
-            <Link to={`${basePath}/settings`}>Settings</Link>
+            <Link to="/settings">Settings</Link>
           </li>
           <li>
-            <Link to={`${basePath}/import-export`}>Import/Export</Link>
+            <Link to="/import-export">Import/Export</Link>
           </li>
         </ul>
       </nav>

@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import db from '../db'
 
 function Stats() {
-  const { deckId = 'demo' } = useParams()
-  const basePath = `/deck/${deckId}`
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const [isLoading, setIsLoading] = useState(true)
   const [boxCounts, setBoxCounts] = useState<Record<number, number>>({})
@@ -55,7 +53,6 @@ function Stats() {
   return (
     <main>
       <h1>Stats</h1>
-      <p>Deck: {deckId}</p>
       {isLoading ? (
         <p>Chargement...</p>
       ) : (
@@ -80,22 +77,19 @@ function Stats() {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to={basePath}>Deck dashboard</Link>
+            <Link to="/review">Review session</Link>
           </li>
           <li>
-            <Link to={`${basePath}/review`}>Review session</Link>
+            <Link to="/library">Library</Link>
           </li>
           <li>
-            <Link to={`${basePath}/library`}>Library</Link>
+            <Link to="/card/new">New card</Link>
           </li>
           <li>
-            <Link to={`${basePath}/card/new`}>New card</Link>
+            <Link to="/settings">Settings</Link>
           </li>
           <li>
-            <Link to={`${basePath}/settings`}>Settings</Link>
-          </li>
-          <li>
-            <Link to={`${basePath}/import-export`}>Import/Export</Link>
+            <Link to="/import-export">Import/Export</Link>
           </li>
         </ul>
       </nav>

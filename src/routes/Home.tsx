@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
-const globalDeckId = 1
 
 function Home() {
-
   return (
     <main>
       <h1>Home</h1>
@@ -10,25 +8,22 @@ function Home() {
         <h2>Pool global</h2>
         <ul>
           <li>
-            <Link to={`/deck/${globalDeckId}`}>Dashboard</Link>
+            <Link to="/review">Demarrer la session</Link>
           </li>
           <li>
-            <Link to={`/deck/${globalDeckId}/review`}>Demarrer la session</Link>
+            <Link to="/library">Library</Link>
           </li>
           <li>
-            <Link to={`/deck/${globalDeckId}/library`}>Library</Link>
+            <Link to="/card/new">Nouvelle carte</Link>
           </li>
           <li>
-            <Link to={`/deck/${globalDeckId}/card/new`}>Nouvelle carte</Link>
+            <Link to="/stats">Stats</Link>
           </li>
           <li>
-            <Link to={`/deck/${globalDeckId}/stats`}>Stats</Link>
+            <Link to="/settings">Settings</Link>
           </li>
           <li>
-            <Link to={`/deck/${globalDeckId}/settings`}>Settings</Link>
-          </li>
-          <li>
-            <Link to={`/deck/${globalDeckId}/import-export`}>Import/Export</Link>
+            <Link to="/import-export">Import/Export</Link>
           </li>
         </ul>
       </section>

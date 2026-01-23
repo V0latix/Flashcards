@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
 
 function ReviewSession() {
-  const { deckId = 'demo' } = useParams()
-  const basePath = `/deck/${deckId}`
-  const numericDeckId = Number(deckId)
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const [isLoading, setIsLoading] = useState(true)
   const [cards, setCards] = useState<
@@ -18,12 +15,7 @@ function ReviewSession() {
 
   useEffect(() => {
     const loadSession = async () => {
-      if (!Number.isFinite(numericDeckId)) {
-        setCards([])
-        setIsLoading(false)
-        return
-      }
-      const session = await buildDailySession(numericDeckId, today)
+      const session = await buildDailySession(today)
       const queue = [...session.box1, ...session.due].map((entry) => ({
         cardId: entry.card.id ?? 0,
         front: entry.card.front_md,
@@ -34,7 +26,7 @@ function ReviewSession() {
     }
 
     void loadSession()
-  }, [numericDeckId, today])
+  }, [today])
 
   const currentCard = cards[index]
 
@@ -61,7 +53,6 @@ function ReviewSession() {
   return (
     <main>
       <h1>Review Session</h1>
-      <p>Deck: {deckId}</p>
       {isLoading ? (
         <p>Chargement...</p>
       ) : isDone ? (
@@ -70,7 +61,7 @@ function ReviewSession() {
           <p>
             Total: {cards.length} · Bon: {goodCount} · Faux: {badCount}
           </p>
-          <Link to={basePath}>Retour au dashboard</Link>
+          <Link to="/">Retour a l'accueil</Link>
         </section>
       ) : currentCard ? (
         <section>

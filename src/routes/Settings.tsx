@@ -1,35 +1,28 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 function Settings() {
-  const { deckId = 'demo' } = useParams()
-  const basePath = `/deck/${deckId}`
-
   return (
     <main>
       <h1>Settings</h1>
-      <p>Deck: {deckId}</p>
       <nav>
         <ul>
           <li>
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to={basePath}>Deck dashboard</Link>
+            <Link to="/review">Review session</Link>
           </li>
           <li>
-            <Link to={`${basePath}/review`}>Review session</Link>
+            <Link to="/library">Library</Link>
           </li>
           <li>
-            <Link to={`${basePath}/library`}>Library</Link>
+            <Link to="/card/new">New card</Link>
           </li>
           <li>
-            <Link to={`${basePath}/card/new`}>New card</Link>
+            <Link to="/stats">Stats</Link>
           </li>
           <li>
-            <Link to={`${basePath}/stats`}>Stats</Link>
-          </li>
-          <li>
-            <Link to={`${basePath}/import-export`}>Import/Export</Link>
+            <Link to="/import-export">Import/Export</Link>
           </li>
         </ul>
       </nav>
