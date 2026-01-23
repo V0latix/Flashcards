@@ -49,7 +49,7 @@ const loadSessionCards = async (states: ReviewState[]): Promise<SessionCard[]> =
     .filter((entry): entry is SessionCard => Boolean(entry))
 }
 
-const ensureBox1Target = async (deckId: number, today: string): Promise<void> => {
+export const autoFillBox1 = async (deckId: number, today: string): Promise<void> => {
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates
       .where({ deck_id: deckId, box: 1 })
@@ -100,7 +100,7 @@ export const buildDailySession = async (
 ): Promise<DailySession> => {
   const today = normalizeToday(todayInput)
 
-  await ensureBox1Target(deckId, today)
+  await autoFillBox1(deckId, today)
 
   const reviewStates = await db.reviewStates.where('deck_id').equals(deckId).toArray()
 
