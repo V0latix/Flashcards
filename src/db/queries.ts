@@ -1,8 +1,18 @@
 import db from './index'
-import type { Card, ReviewState } from './types'
+import type { Card, ReviewLog, ReviewState } from './types'
+
+export type CardFilter = {
+  text?: string
+  box?: number | null
+  tags?: string[]
+}
+
+export async function listCards(): Promise<Card[]> {
+  return db.cards.toArray()
+}
 
 export async function listCardsByDeck(_deckId: number): Promise<Card[]> {
-  return db.cards.toArray()
+  return listCards()
 }
 
 export async function listCardsWithReviewState(
@@ -21,6 +31,43 @@ export async function listCardsWithReviewState(
     card,
     reviewState: reviewStateByCardId.get(card.id ?? -1)
   }))
+}
+
+export async function listCardsFiltered(
+  filter: CardFilter
+): Promise<Array<{ card: Card; reviewState: ReviewState | undefined }>> {
+  const { text, box, tags } = filter
+  const normalizedText = text?.trim().toLowerCase() ?? ''
+  const normalizedTags = (tags ?? []).map((tag) => tag.trim().toLowerCase()).filter(Boolean)
+
+  const entries = await listCardsWithReviewState(0)
+
+  return entries.filter(({ card, reviewState }) => {
+    if (typeof box === 'number') {
+      if (!reviewState || reviewState.box !== box) {
+        return false
+      }
+    }
+
+    if (normalizedText) {
+      const haystack = `${card.front_md} ${card.back_md}`.toLowerCase()
+      if (!haystack.includes(normalizedText)) {
+        return false
+      }
+    }
+
+    if (normalizedTags.length > 0) {
+      const cardTags = card.tags.map((tag) => tag.toLowerCase())
+      const hasAnyTag = normalizedTags.some((tag) =>
+        cardTags.some((cardTag) => cardTag.includes(tag))
+      )
+      if (!hasAnyTag) {
+        return false
+      }
+    }
+
+    return true
+  })
 }
 
 export async function getCardById(id: number): Promise<Card | undefined> {
@@ -72,4 +119,22 @@ export async function deleteCard(id: number): Promise<void> {
     await db.cards.delete(id)
     await db.reviewStates.delete(id)
   })
+}
+
+export async function getReviewState(cardId: number): Promise<ReviewState | undefined> {
+  return db.reviewStates.get(cardId)
+}
+
+export async function upsertReviewState(state: ReviewState): Promise<number> {
+  return db.reviewStates.put(state)
+}
+
+export async function addReviewLog(entry: ReviewLog): Promise<number> {
+  return db.reviewLogs.add(entry)
+}
+
+export async function listReviewLogsSince(
+  sinceIso: string
+): Promise<ReviewLog[]> {
+  return db.reviewLogs.where('timestamp').aboveOrEqual(sinceIso).toArray()
 }
