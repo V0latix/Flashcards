@@ -1,5 +1,5 @@
 import db from './index'
-import type { Card, Deck, DeckSettings } from './types'
+import type { Card, Deck, DeckSettings, ReviewState } from './types'
 
 const defaultSettings: DeckSettings = {
   box1_target: 10,
@@ -41,6 +41,24 @@ export async function deleteDeck(id: number): Promise<void> {
 
 export async function listCardsByDeck(deckId: number): Promise<Card[]> {
   return db.cards.where('deck_id').equals(deckId).toArray()
+}
+
+export async function listCardsWithReviewState(
+  deckId: number
+): Promise<Array<{ card: Card; reviewState: ReviewState | undefined }>> {
+  const [cards, reviewStates] = await Promise.all([
+    db.cards.where('deck_id').equals(deckId).toArray(),
+    db.reviewStates.where('deck_id').equals(deckId).toArray()
+  ])
+
+  const reviewStateByCardId = new Map(
+    reviewStates.map((state) => [state.card_id, state])
+  )
+
+  return cards.map((card) => ({
+    card,
+    reviewState: reviewStateByCardId.get(card.id ?? -1)
+  }))
 }
 
 export async function getCardById(id: number): Promise<Card | undefined> {
