@@ -1,67 +1,73 @@
-# Flashcards Leitner
+# React + TypeScript + Vite
 
-Application personnelle de flashcards basee sur la methode de Leitner, pensee pour des revisions quotidiennes rapides avec support des formules LaTeX et des images.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Vision
-- Centraliser des flashcards complexes (formules, definitions, images)
-- Utilisation quotidienne sans friction (sessions courtes de 5 a 10 minutes)
-- Experience fiable sur le long terme (5 a 10 ans)
+Currently, two official plugins are available:
 
-## Contenus vises
-- Mathematiques (definitions, formules, raisonnements)
-- Actuariat / finance
-- Informatique
-- Culture generale
-- Langues
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-Types de cartes :
-- simples (question -> reponse)
-- formelles (definition mathematique)
-- composites (texte + image + formule)
+## React Compiler
 
-## Methode Leitner (regles)
-- 2 reponses possibles : `Bon` (promotion) ou `Faux` (retour en Box 1)
-- Methode deterministe, aucune logique de machine learning
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### Boites et intervalles
-| Box | Intervalle (jours) |
-|----:|--------------------:|
-| 1 | 1 |
-| 2 | 3 |
-| 3 | 7 |
-| 4 | 15 |
-| 5 | 30 |
+## Expanding the ESLint configuration
 
-### Transitions
-- **Bon** : `new_box = min(box + 1, 5)` ; `due_date = today + interval[new_box]`
-- **Faux** : `new_box = 1` ; `due_date = today + 1`
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-### Remplissage quotidien de la Box 1
-Objectif : **garantir 10 cartes en Box 1 chaque jour**.
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-Si la Box 1 contient moins de 10 cartes et qu'il reste des cartes en Box 0 :
-- introduire `min(10 - current_box1, count(Box 0))` cartes
-- `box = 1`
-- `due_date = today`
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-### Session du jour
-- Les 10 cartes de la Box 1
-- Toutes les cartes dues aujourd'hui des Box 2 a 5
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-## Modele de donnees (cible)
-- **Deck** : id, name, created_at, updated_at, settings
-- **Card** : id, deck_id, front_md, back_md, tags[], created_at, updated_at, suspended?
-- **Media** : id, card_id, side, mime, blob
-- **ReviewState** : card_id, box (0..5), due_date, last_reviewed_at
-- **ReviewLog** : id, card_id, timestamp, result (good|bad), previous_box, new_box
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-## Criteres de reussite v1
-- Creer et editer des cartes
-- Voir les cartes par box
-- Avoir 10 cartes en Box 1 chaque jour
-- Reviser les cartes dues des autres box
-- Voir les statistiques
-- Exporter / importer les donnees
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## Statut
-Spec initiale dans `BMAD.md`.
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
