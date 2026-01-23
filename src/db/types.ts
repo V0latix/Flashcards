@@ -36,7 +36,7 @@ export type ReviewState = {
   card_id: number
   deck_id: number
   box: number
-  due_date: string
+  due_date: string | null
   last_reviewed_at?: string
 }
 
