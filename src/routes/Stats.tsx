@@ -5,7 +5,6 @@ import db from '../db'
 function Stats() {
   const { deckId = 'demo' } = useParams()
   const basePath = `/deck/${deckId}`
-  const numericDeckId = Number(deckId)
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const [isLoading, setIsLoading] = useState(true)
   const [boxCounts, setBoxCounts] = useState<Record<number, number>>({})
@@ -14,15 +13,7 @@ function Stats() {
 
   useEffect(() => {
     const loadStats = async () => {
-      if (!Number.isFinite(numericDeckId)) {
-        setIsLoading(false)
-        return
-      }
-
-      const reviewStates = await db.reviewStates
-        .where('deck_id')
-        .equals(numericDeckId)
-        .toArray()
+      const reviewStates = await db.reviewStates.toArray()
 
       const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
       let due = 0
@@ -35,7 +26,7 @@ function Stats() {
         }
       }
 
-      const cards = await db.cards.where('deck_id').equals(numericDeckId).toArray()
+      const cards = await db.cards.toArray()
       const cardIds = new Set(cards.map((card) => card.id).filter(Boolean) as number[])
 
       const sevenDaysAgo = new Date()
@@ -59,7 +50,7 @@ function Stats() {
     }
 
     void loadStats()
-  }, [numericDeckId, today])
+  }, [today])
 
   return (
     <main>

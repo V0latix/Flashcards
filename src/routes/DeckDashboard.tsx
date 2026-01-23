@@ -1,40 +1,13 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getDeckById } from '../db/queries'
-import type { Deck } from '../db/types'
 
 function DeckDashboard() {
   const { deckId = 'demo' } = useParams()
-  const [deck, setDeck] = useState<Deck | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const numericDeckId = Number(deckId)
   const basePath = `/deck/${deckId}`
-
-  useEffect(() => {
-    const loadDeck = async () => {
-      if (!Number.isFinite(numericDeckId)) {
-        setDeck(null)
-        setIsLoading(false)
-        return
-      }
-      const data = await getDeckById(numericDeckId)
-      setDeck(data ?? null)
-      setIsLoading(false)
-    }
-
-    void loadDeck()
-  }, [numericDeckId])
 
   return (
     <main>
       <h1>Deck Dashboard</h1>
-      {isLoading ? (
-        <p>Chargement...</p>
-      ) : deck ? (
-        <p>Deck: {deck.name}</p>
-      ) : (
-        <p>Deck introuvable.</p>
-      )}
+      <p>Pool global</p>
       <p>
         <Link to={`${basePath}/review`}>Demarrer la session du jour</Link>
       </p>

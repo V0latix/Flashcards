@@ -49,20 +49,16 @@ const loadSessionCards = async (states: ReviewState[]): Promise<SessionCard[]> =
     .filter((entry): entry is SessionCard => Boolean(entry))
 }
 
-export const autoFillBox1 = async (deckId: number, today: string): Promise<void> => {
+export const autoFillBox1 = async (_deckId: number, today: string): Promise<void> => {
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
-    const box1States = await db.reviewStates
-      .where({ deck_id: deckId, box: 1 })
-      .toArray()
+    const box1States = await db.reviewStates.where({ box: 1 }).toArray()
 
     const missing = BOX1_TARGET - box1States.length
     if (missing <= 0) {
       return
     }
 
-    const box0States = await db.reviewStates
-      .where({ deck_id: deckId, box: 0 })
-      .toArray()
+    const box0States = await db.reviewStates.where({ box: 0 }).toArray()
 
     if (box0States.length === 0) {
       return
@@ -86,7 +82,6 @@ export const autoFillBox1 = async (deckId: number, today: string): Promise<void>
     await db.reviewStates.bulkPut(
       fifoCardIds.map((cardId) => ({
         card_id: cardId,
-        deck_id: deckId,
         box: 1,
         due_date: today
       }))
@@ -102,7 +97,7 @@ export const buildDailySession = async (
 
   await autoFillBox1(deckId, today)
 
-  const reviewStates = await db.reviewStates.where('deck_id').equals(deckId).toArray()
+  const reviewStates = await db.reviewStates.toArray()
 
   const box1States = reviewStates.filter((state) => state.box === 1)
   const dueStates = reviewStates.filter((state) => {

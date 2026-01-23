@@ -1,54 +1,16 @@
 import db from './index'
-import type { Card, Deck, DeckSettings, ReviewState } from './types'
+import type { Card, ReviewState } from './types'
 
-const defaultSettings: DeckSettings = {
-  box1_target: 10,
-  interval_days: {
-    1: 1,
-    2: 3,
-    3: 7,
-    4: 15,
-    5: 30
-  }
-}
-
-export async function listDecks(): Promise<Deck[]> {
-  return db.decks.orderBy('updated_at').reverse().toArray()
-}
-
-export async function getDeckById(id: number): Promise<Deck | undefined> {
-  return db.decks.get(id)
-}
-
-export async function createDeck(name: string): Promise<number> {
-  const now = new Date().toISOString()
-  return db.decks.add({
-    name,
-    created_at: now,
-    updated_at: now,
-    settings: defaultSettings
-  })
-}
-
-export async function renameDeck(id: number, name: string): Promise<number> {
-  const now = new Date().toISOString()
-  return db.decks.update(id, { name, updated_at: now })
-}
-
-export async function deleteDeck(id: number): Promise<void> {
-  await db.decks.delete(id)
-}
-
-export async function listCardsByDeck(deckId: number): Promise<Card[]> {
-  return db.cards.where('deck_id').equals(deckId).toArray()
+export async function listCardsByDeck(_deckId: number): Promise<Card[]> {
+  return db.cards.toArray()
 }
 
 export async function listCardsWithReviewState(
-  deckId: number
+  _deckId: number
 ): Promise<Array<{ card: Card; reviewState: ReviewState | undefined }>> {
   const [cards, reviewStates] = await Promise.all([
-    db.cards.where('deck_id').equals(deckId).toArray(),
-    db.reviewStates.where('deck_id').equals(deckId).toArray()
+    db.cards.toArray(),
+    db.reviewStates.toArray()
   ])
 
   const reviewStateByCardId = new Map(
@@ -66,7 +28,6 @@ export async function getCardById(id: number): Promise<Card | undefined> {
 }
 
 export async function createCard(input: {
-  deck_id: number
   front_md: string
   back_md: string
   tags?: string[]
@@ -76,7 +37,6 @@ export async function createCard(input: {
 
   return db.transaction('rw', db.cards, db.reviewStates, async () => {
     const cardId = await db.cards.add({
-      deck_id: input.deck_id,
       front_md: input.front_md,
       back_md: input.back_md,
       tags,
@@ -86,7 +46,6 @@ export async function createCard(input: {
 
     await db.reviewStates.add({
       card_id: cardId,
-      deck_id: input.deck_id,
       box: 0,
       due_date: null
     })

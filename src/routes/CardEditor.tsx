@@ -13,7 +13,6 @@ function CardEditor() {
   const [back, setBack] = useState('')
   const [tagsInput, setTagsInput] = useState('')
   const [isLoading, setIsLoading] = useState(Boolean(cardId))
-  const numericDeckId = Number(deckId)
   const numericCardId = cardId ? Number(cardId) : null
   const modeLabel = cardId ? `Edit card ${cardId}` : 'New card'
 
@@ -47,9 +46,6 @@ function CardEditor() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!Number.isFinite(numericDeckId)) {
-      return
-    }
     if (numericCardId && !Number.isNaN(numericCardId)) {
       await updateCard(numericCardId, {
         front_md: front,
@@ -58,7 +54,6 @@ function CardEditor() {
       })
     } else {
       await createCard({
-        deck_id: numericDeckId,
         front_md: front,
         back_md: back,
         tags: parsedTags

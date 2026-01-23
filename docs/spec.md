@@ -137,20 +137,10 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 
 ---
 
-### 7) Modèle de données
-
-#### Deck
-- `id`
-- `name`
-- `created_at`
-- `updated_at`
-- `settings`
-  - `box1_target = 10`
-  - `interval_days = {1:1, 2:3, 3:7, 4:15, 5:30}`
+### 7) Modèle de données (pool global, tags-first)
 
 #### Card
 - `id`
-- `deck_id`
 - `front_md`
 - `back_md`
 - `tags[]`
@@ -183,11 +173,27 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 
 ### 8) Invariants
 
-- Chaque carte appartient à un seul deck
+- Toutes les cartes appartiennent au pool global
 - Chaque carte a un ReviewState unique
 - `box = 0` ⇒ carte non introduite
 - Toute réponse génère une entrée ReviewLog
 - Les règles Leitner sont explicites et déterministes
+
+## R — Routes (sans deck)
+
+- `/` Home
+- `/review` ReviewSession
+- `/library` Library
+- `/card/new` CardEditor
+- `/card/:cardId/edit` CardEditor
+- `/stats` Stats
+- `/settings` Settings
+- `/import-export` ImportExport
+
+## L — Logique (pool global)
+
+- La session du jour s'applique au pool global, sans `deck_id`
+- Le remplissage de la Box 1, la sélection des cartes dues et les transitions Bon/Faux s'appliquent a toutes les cartes
 
 ---
 

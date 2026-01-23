@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import db from '../db'
-import type { Card, Deck, MediaSide, ReviewLog, ReviewState } from '../db/types'
+import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 
 function ImportExport() {
   const { deckId = 'demo' } = useParams()
   const basePath = `/deck/${deckId}`
-  const numericDeckId = Number(deckId)
   const [status, setStatus] = useState<string>('')
 
   type ExportMedia = {
@@ -18,7 +17,6 @@ function ImportExport() {
 
   type ExportPayload = {
     schema_version: number
-    deck: Deck
     cards: Card[]
     reviewStates: ReviewState[]
     media: ExportMedia[]
@@ -57,25 +55,16 @@ function ImportExport() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `deck-${payload.deck.id ?? 'export'}.json`
+    link.download = 'cards-export.json'
     link.click()
     URL.revokeObjectURL(url)
   }
 
   const handleExport = async () => {
-    if (!Number.isFinite(numericDeckId)) {
-      setStatus('Deck invalide.')
-      return
-    }
     setStatus('Export en cours...')
-    const deck = await db.decks.get(numericDeckId)
-    if (!deck) {
-      setStatus('Deck introuvable.')
-      return
-    }
     const [cards, reviewStates, media, reviewLogs] = await Promise.all([
-      db.cards.where('deck_id').equals(numericDeckId).toArray(),
-      db.reviewStates.where('deck_id').equals(numericDeckId).toArray(),
+      db.cards.toArray(),
+      db.reviewStates.toArray(),
       db.media.toArray(),
       db.reviewLogs.toArray()
     ])
@@ -98,7 +87,6 @@ function ImportExport() {
 
     const payload: ExportPayload = {
       schema_version: 1,
-      deck,
       cards,
       reviewStates,
       media: exportMedia,
@@ -118,43 +106,28 @@ function ImportExport() {
     try {
       const text = await file.text()
       const payload = JSON.parse(text) as ExportPayload
-      const now = new Date().toISOString()
-
       if (payload.schema_version !== 1) {
         throw new Error('Schema version non supportee')
       }
 
       await db.transaction(
         'rw',
-        db.decks,
         db.cards,
         db.reviewStates,
         db.media,
         db.reviewLogs,
         async () => {
-          const deckData = payload.deck
-          const newDeckId = await db.decks.add({
-            name: deckData?.name ?? 'Imported deck',
-            created_at: deckData?.created_at ?? now,
-            updated_at: deckData?.updated_at ?? now,
-            settings: deckData?.settings ?? {
-              box1_target: 10,
-              interval_days: { 1: 1, 2: 3, 3: 7, 4: 15, 5: 30 }
-            }
-          })
-
           const idMap = new Map<number, number>()
           for (const card of payload.cards ?? []) {
             if (!card.id) {
               continue
             }
             const newCardId = await db.cards.add({
-              deck_id: newDeckId,
               front_md: card.front_md,
               back_md: card.back_md,
               tags: card.tags ?? [],
-              created_at: card.created_at ?? now,
-              updated_at: card.updated_at ?? now,
+              created_at: card.created_at,
+              updated_at: card.updated_at,
               suspended: card.suspended
             })
             idMap.set(card.id, newCardId)
@@ -168,7 +141,6 @@ function ImportExport() {
               }
               return {
                 card_id: newCardId,
-                deck_id: newDeckId,
                 box: state.box,
                 due_date: state.due_date ?? null,
                 last_reviewed_at: state.last_reviewed_at
