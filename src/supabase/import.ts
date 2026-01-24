@@ -1,0 +1,51 @@
+import db from '../db'
+import { listPublicCardsByPackSlug } from './api'
+
+export async function importPackToLocal(
+  packSlug: string
+): Promise<{ imported: number; alreadyPresent: number }> {
+  const cards = await listPublicCardsByPackSlug(packSlug)
+  const source = 'supabase'
+
+  const existing = await db.cards.where('source').equals(source).toArray()
+  const existingIds = new Set(
+    existing
+      .map((card) => card.source_id)
+      .filter((value): value is string => typeof value === 'string')
+  )
+
+  let imported = 0
+  let alreadyPresent = 0
+
+  await db.transaction('rw', db.cards, db.reviewStates, async () => {
+    for (const card of cards) {
+      const sourceId = card.id
+      if (existingIds.has(sourceId)) {
+        alreadyPresent += 1
+        continue
+      }
+
+      const now = new Date().toISOString()
+      const newCardId = await db.cards.add({
+        front_md: card.front_md,
+        back_md: card.back_md,
+        tags: card.tags ?? [],
+        created_at: now,
+        updated_at: now,
+        source,
+        source_id: sourceId
+      })
+
+      await db.reviewStates.add({
+        card_id: newCardId,
+        box: 0,
+        due_date: null,
+        last_reviewed_at: null
+      })
+
+      imported += 1
+    }
+  })
+
+  return { imported, alreadyPresent }
+}

@@ -6,6 +6,8 @@ export type Card = {
   created_at: string
   updated_at: string
   suspended?: boolean
+  source?: string | null
+  source_id?: string | null
 }
 
 export type MediaSide = 'front' | 'back' | 'both'
