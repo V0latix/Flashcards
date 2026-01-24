@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import db from './db'
 import AppShell from './components/AppShell'
 import { healthCheckSupabase } from './supabase/health'
+import { supabaseClient } from './utils/supabase'
 import CardEditor from './routes/CardEditor'
 import DebugMedia from './routes/DebugMedia'
 import DebugSupabase from './routes/DebugSupabase'
@@ -28,6 +29,21 @@ function App() {
     }
 
     void runDbCheck()
+
+    const runSupabaseCheck = async () => {
+      try {
+        const { error } = await supabaseClient.from('packs').select('slug').limit(1)
+        if (error) {
+          console.error('Supabase check error', error.message)
+          return
+        }
+        console.log('Supabase check ok')
+      } catch (error) {
+        console.error('Supabase check failed', error)
+      }
+    }
+
+    void runSupabaseCheck()
 
     if (import.meta.env.DEV) {
       void healthCheckSupabase()

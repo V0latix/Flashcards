@@ -22,6 +22,7 @@
 - Maintenance learned: passage learned en Box 5 + retour périodique configurable.
 - Reverse Q/R configurable via reverse_probability + log was_reversed.
 - Suppression avec confirmation: session, par tag, et suppression totale (danger zone).
+- Client Supabase frontend dans `src/utils/supabase.ts` + check simple au montage.
 
 ### Changed
 - AutoFill Box 1 par tirage aleatoire uniforme depuis Box 0.

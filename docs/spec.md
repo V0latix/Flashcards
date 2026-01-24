@@ -247,6 +247,7 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Health check au demarrage en mode dev uniquement
 - Variables attendues : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
 - Packs et cartes publiques exposes via Supabase (`packs`, `public_cards`)
+- Client Supabase frontend centralise dans `src/utils/supabase.ts` (anon key)
 
 ## V — Verification
 

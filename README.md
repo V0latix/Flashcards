@@ -41,6 +41,8 @@ VITE_SUPABASE_ANON_KEY=<ta-cle-anon>
 Les valeurs se trouvent dans Supabase :
 Project Settings -> API -> Project URL + anon/public key.
 
+Le client frontend est dans `src/utils/supabase.ts` (anon key uniquement).
+
 ## Scripts utiles
 - `npm run dev` : demarrer l'app
 - `npm run build` : build production
