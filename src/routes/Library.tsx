@@ -14,6 +14,7 @@ function Library() {
   const [query, setQuery] = useState('')
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [openHints, setOpenHints] = useState<Record<number, boolean>>({})
+  const [visibleCount, setVisibleCount] = useState(100)
 
   const loadCards = async () => {
     const data = await listCardsWithReviewState(0)
@@ -24,6 +25,10 @@ function Library() {
   useEffect(() => {
     void loadCards()
   }, [])
+
+  useEffect(() => {
+    setVisibleCount(100)
+  }, [query, selectedTag])
 
   const handleDelete = async (card: Card) => {
     if (!card.id) {
@@ -68,6 +73,11 @@ function Library() {
       return true
     })
   }, [cards, query, selectedTag])
+
+  const visibleCards = useMemo(
+    () => filteredCards.slice(0, visibleCount),
+    [filteredCards, visibleCount]
+  )
 
   const renderTagNodes = (nodes: TagNode[], depth = 0) => {
     if (nodes.length === 0) {
@@ -214,7 +224,7 @@ function Library() {
             {filteredCards.length === 0 ? <p>Aucune carte pour le moment.</p> : null}
             {filteredCards.length > 0 ? (
               <ul className="card-list">
-                {filteredCards.map(({ card, reviewState }) => (
+                {visibleCards.map(({ card, reviewState }) => (
                   <li key={card.id} className="card list-item">
                     <Link to={`/card/${card.id}/edit`}>
                       {renderSnippet(card.front_md)}
@@ -251,6 +261,15 @@ function Library() {
                   </li>
                 ))}
               </ul>
+            ) : null}
+            {filteredCards.length > visibleCount ? (
+              <button
+                type="button"
+                className="btn btn-secondary section"
+                onClick={() => setVisibleCount((prev) => prev + 100)}
+              >
+                Charger plus
+              </button>
             ) : null}
           </div>
         </section>

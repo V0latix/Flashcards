@@ -1,19 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import db from '../db'
 import type { Card, ReviewLog, ReviewState } from '../db/types'
+import { getLeitnerSettings } from '../leitner/settings'
 import {
-  calculateCardInsights,
-  calculateGlobalStats,
-  calculateLeitnerStats,
-  calculateReviewSeries,
-  calculateTagStats,
-  getTodayKey,
-  type CardInsights,
-  type DailyReviewStats,
-  type GlobalStats,
-  type LeitnerStats,
-  type TagStatsResult
-} from './calculations'
+  calcBoxDistribution,
+  calcDailyReviews,
+  calcGlobalSummary,
+  calcTagTreeAgg
+} from './calc'
+import type { BoxDistribution, DailyReviewAgg, TagAgg } from './types'
 
 type StatsState = {
   cards: Card[]
@@ -24,30 +19,40 @@ type StatsState = {
 export type UseStatsResult = {
   isLoading: boolean
   error: string | null
-  global: GlobalStats
-  reviewSeries: DailyReviewStats[]
-  tagStats: TagStatsResult
-  leitner: LeitnerStats
-  insights: CardInsights
+  cards: Card[]
+  reviewStates: ReviewState[]
+  reviewLogs: ReviewLog[]
+  global: {
+    totalCards: number
+    dueToday: number
+    learnedCount: number
+    reviewsToday: number
+    successRate7d: number | null
+  }
+  dailyReviews: DailyReviewAgg[]
+  boxDistribution: BoxDistribution
+  tagAgg: Record<string, TagAgg>
 }
 
 const emptyStats: UseStatsResult = {
   isLoading: true,
   error: null,
+  cards: [],
+  reviewStates: [],
+  reviewLogs: [],
   global: {
     totalCards: 0,
-    boxCounts: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
     dueToday: 0,
-    reviewsTotal: 0,
-    reviewsToday: 0
+    learnedCount: 0,
+    reviewsToday: 0,
+    successRate7d: null
   },
-  reviewSeries: [],
-  tagStats: { statsByPath: {}, rootTags: [] },
-  leitner: { transitions: [], avgDaysToPromote: null, relapseRate: null },
-  insights: { neverReviewed: [], mostFailed: [], stuckLowBox: [] }
+  dailyReviews: [],
+  boxDistribution: { counts: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, total: 0 },
+  tagAgg: {}
 }
 
-export const useStats = (periodDays: number): UseStatsResult => {
+export const useStats = (periodDays: 7 | 30 | 90): UseStatsResult => {
   const [state, setState] = useState<StatsState>({
     cards: [],
     reviewStates: [],
@@ -80,31 +85,35 @@ export const useStats = (periodDays: number): UseStatsResult => {
       return { ...emptyStats, isLoading, error }
     }
 
-    const todayKey = getTodayKey()
-    const global = calculateGlobalStats(
+    const todayKey = new Date().toISOString().slice(0, 10)
+    const { learnedReviewIntervalDays } = getLeitnerSettings()
+    const global = calcGlobalSummary(
       state.cards,
       state.reviewStates,
       state.reviewLogs,
-      todayKey
+      todayKey,
+      learnedReviewIntervalDays
     )
-    const reviewSeries = calculateReviewSeries(state.reviewLogs, periodDays, todayKey)
-    const tagStats = calculateTagStats(state.cards, state.reviewStates, state.reviewLogs)
-    const leitner = calculateLeitnerStats(state.reviewLogs)
-    const insights = calculateCardInsights(
+    const dailyReviews = calcDailyReviews(state.reviewLogs, periodDays, todayKey)
+    const boxDistribution = calcBoxDistribution(state.reviewStates)
+    const tagAgg = calcTagTreeAgg(
       state.cards,
       state.reviewStates,
       state.reviewLogs,
-      todayKey
+      todayKey,
+      learnedReviewIntervalDays
     )
 
     return {
       isLoading,
       error,
+      cards: state.cards,
+      reviewStates: state.reviewStates,
+      reviewLogs: state.reviewLogs,
       global,
-      reviewSeries,
-      tagStats,
-      leitner,
-      insights
+      dailyReviews,
+      boxDistribution,
+      tagAgg
     }
   }, [error, isLoading, periodDays, state])
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
 
@@ -13,6 +13,9 @@ function ReviewSession() {
   const [showBack, setShowBack] = useState(false)
   const [goodCount, setGoodCount] = useState(0)
   const [badCount, setBadCount] = useState(0)
+  const [searchParams] = useSearchParams()
+
+  const tagFilter = searchParams.get('tag')?.trim() || null
 
   const shuffle = <T,>(input: T[]): T[] => {
     const result = [...input]
@@ -27,7 +30,15 @@ function ReviewSession() {
     const loadSession = async () => {
       const session = await buildDailySession(today)
       const { reverseProbability } = getLeitnerSettings()
-      const queue = [...session.box1, ...session.due].map((entry) => {
+      const baseQueue = [...session.box1, ...session.due]
+      const filteredQueue = tagFilter
+        ? baseQueue.filter((entry) =>
+            entry.card.tags.some(
+              (tag) => tag === tagFilter || tag.startsWith(`${tagFilter}/`)
+            )
+          )
+        : baseQueue
+      const queue = filteredQueue.map((entry) => {
         const isReversed = Math.random() < reverseProbability
         return {
           cardId: entry.card.id ?? 0,
@@ -42,7 +53,7 @@ function ReviewSession() {
     }
 
     void loadSession()
-  }, [today])
+  }, [tagFilter, today])
 
   const currentCard = cards[index]
 
@@ -83,6 +94,7 @@ function ReviewSession() {
         </section>
       ) : currentCard ? (
         <section className="card section">
+          {tagFilter ? <p>Filtre tag: {tagFilter}</p> : null}
           <p>
             Carte {index + 1} / {cards.length}
           </p>
