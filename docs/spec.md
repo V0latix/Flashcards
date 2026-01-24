@@ -210,6 +210,7 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Library en vue tags-first + recherche dans le scope courant
 - Tags hierarchiques affiches en arbre (separateur `/`)
 - Packs Explorer avec tags arborescents et filtrage par prefixe
+- Dashboard Stats avec sections globales, progression et tags
 
 ## I — Import/Export
 
@@ -240,6 +241,8 @@ Checks manuels :
 - Import debug depuis `/import-export` (resume + logs console)
 - Session `/review` : ordre des cartes melange au demarrage
 - Library `/library` : tags-first + recherche dans le scope courant
+- Stats `/stats` : vue globale + graphiques + tags
+- Settings `/settings` : box1_target + intervalles
 
 ## A — Act (à venir)
 

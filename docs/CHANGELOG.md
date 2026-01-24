@@ -11,6 +11,8 @@
 - Module API Supabase pour lire packs et cartes publiques.
 - Pages Packs et PackDetail basees sur Supabase.
 - Import d'un pack Supabase vers la base locale (idempotent).
+- Dashboard Stats avec metriques globales, progression, tags, Leitner, insights.
+- Page Settings pour box1_target et intervalles (localStorage).
 - Tests unitaires Vitest pour la logique Leitner.
 - Donnees de packs de capitales dans `packs/` (tags hierarchiques possibles).
 

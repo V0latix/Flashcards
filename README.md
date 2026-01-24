@@ -9,6 +9,8 @@ Application de flashcards personnelle basee sur la methode de Leitner, avec supp
 - Library tags-first avec explorateur d'arbre
 - Import/Export JSON tolerant + diagnostic d'import
 - Packs publics (Supabase) + import idempotent vers la base locale
+- Dashboard Stats (global, progression, tags, Leitner, insights)
+- Settings pour box1_target + intervalles
 
 ## Tech
 - React + TypeScript + Vite
@@ -48,6 +50,8 @@ Project Settings -> API -> Project URL + anon/public key.
 - `/packs` Packs (Supabase)
 - `/packs/:slug` PackDetail
 - `/import-export` Import/Export
+- `/stats` Stats (dashboard)
+- `/settings` Settings
 
 ## Import/Export JSON
 Formats acceptes :
@@ -71,6 +75,8 @@ Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absen
 1) `npm run dev`
 2) Importer un pack public, puis ouvrir `/library`
 3) Lancer une session `/review`
+4) Ouvrir `/stats` pour le dashboard
+5) Ouvrir `/settings` et ajuster box1_target/intervalles
 
 ## Structure rapide
 - `src/leitner/` : moteur Leitner
