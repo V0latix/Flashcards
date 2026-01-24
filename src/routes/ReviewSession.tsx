@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
+import MarkdownRenderer from '../components/MarkdownRenderer'
 
 function ReviewSession() {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
@@ -100,12 +101,16 @@ function ReviewSession() {
           </p>
           <div>
             <h2>Recto</h2>
-            <p>{currentCard.front || '—'}</p>
+            <div className="markdown">
+              <MarkdownRenderer value={currentCard.front || '—'} />
+            </div>
           </div>
           {showBack ? (
             <div>
               <h2>Verso</h2>
-              <p>{currentCard.back || '—'}</p>
+              <div className="markdown">
+                <MarkdownRenderer value={currentCard.back || '—'} />
+              </div>
             </div>
           ) : (
             <button type="button" className="btn btn-primary" onClick={handleReveal}>

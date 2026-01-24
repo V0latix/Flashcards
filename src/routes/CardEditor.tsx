@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import ReactMarkdown from 'react-markdown'
-import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
 import { createCard, getCardById, updateCard } from '../db/queries'
+import MarkdownRenderer from '../components/MarkdownRenderer'
 
 function CardEditor() {
   const { cardId } = useParams()
@@ -124,33 +122,13 @@ function CardEditor() {
         <div>
           <h3>Front</h3>
           <div className="markdown">
-            <ReactMarkdown
-              remarkPlugins={[remarkMath]}
-              rehypePlugins={[rehypeKatex]}
-              components={{
-                img({ alt, ...props }) {
-                  return <img alt={alt || 'Image'} loading="lazy" {...props} />
-                }
-              }}
-            >
-              {front || '*Rien a afficher*'}
-            </ReactMarkdown>
+            <MarkdownRenderer value={front || '*Rien a afficher*'} />
           </div>
         </div>
         <div>
           <h3>Back</h3>
           <div className="markdown">
-            <ReactMarkdown
-              remarkPlugins={[remarkMath]}
-              rehypePlugins={[rehypeKatex]}
-              components={{
-                img({ alt, ...props }) {
-                  return <img alt={alt || 'Image'} loading="lazy" {...props} />
-                }
-              }}
-            >
-              {back || '*Rien a afficher*'}
-            </ReactMarkdown>
+            <MarkdownRenderer value={back || '*Rien a afficher*'} />
           </div>
         </div>
       </section>

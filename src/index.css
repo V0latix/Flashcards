@@ -464,6 +464,15 @@ ul {
   margin: 12px 0;
 }
 
+.img-error {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 @media (max-width: 900px) {
   .split {
     flex-direction: column;

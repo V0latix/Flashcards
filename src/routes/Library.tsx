@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import ReactMarkdown from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
+import MarkdownRenderer from '../components/MarkdownRenderer'
 import { deleteCard, listCardsWithReviewState } from '../db/queries'
 import type { Card, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
@@ -140,27 +138,7 @@ function Library() {
     setSelectedTag(parts.slice(0, -1).join('/'))
   }
 
-  const renderSnippet = (value: string) => {
-    const trimmed = value.trim()
-    if (!trimmed) {
-      return 'Carte sans titre'
-    }
-    return trimmed.length > 80 ? `${trimmed.slice(0, 80)}…` : trimmed
-  }
-
-  const renderMarkdown = (value: string) => (
-    <ReactMarkdown
-      remarkPlugins={[remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-      components={{
-        img({ alt, ...props }) {
-          return <img alt={alt || 'Image'} loading="lazy" {...props} />
-        }
-      }}
-    >
-      {value}
-    </ReactMarkdown>
-  )
+  const renderMarkdown = (value: string) => <MarkdownRenderer value={value} />
 
   return (
     <main className="container page">
@@ -226,8 +204,8 @@ function Library() {
               <ul className="card-list">
                 {visibleCards.map(({ card, reviewState }) => (
                   <li key={card.id} className="card list-item">
-                    <Link to={`/card/${card.id}/edit`}>
-                      {renderSnippet(card.front_md)}
+                    <Link to={`/card/${card.id}/edit`} className="markdown">
+                      <MarkdownRenderer value={card.front_md || '*Sans front*'} />
                     </Link>
                     <p>
                       Box {reviewState?.box ?? 0} · Due {reviewState?.due_date ?? '—'}
