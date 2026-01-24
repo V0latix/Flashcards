@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
 import MarkdownRenderer from '../components/MarkdownRenderer'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { deleteCard } from '../db/queries'
 
 function ReviewSession() {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
@@ -14,6 +16,8 @@ function ReviewSession() {
   const [showBack, setShowBack] = useState(false)
   const [goodCount, setGoodCount] = useState(0)
   const [badCount, setBadCount] = useState(0)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [searchParams] = useSearchParams()
 
   const tagFilter = searchParams.get('tag')?.trim() || null
@@ -74,6 +78,23 @@ function ReviewSession() {
     } else {
       setBadCount((prev) => prev + 1)
     }
+  }
+
+  const handleDelete = async () => {
+    if (!currentCard || isDeleting) {
+      return
+    }
+    setIsDeleting(true)
+    const targetId = currentCard.cardId
+    await deleteCard(targetId)
+    setCards((prev) => {
+      const next = prev.filter((card) => card.cardId !== targetId)
+      setIndex((prevIndex) => Math.min(prevIndex, Math.max(0, next.length - 1)))
+      return next
+    })
+    setShowBack(false)
+    setIsDeleting(false)
+    setIsDeleteOpen(false)
   }
 
   const isDone = !isLoading && index >= cards.length
@@ -137,6 +158,25 @@ function ReviewSession() {
               </button>
             </div>
           ) : null}
+          <div className="section">
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => setIsDeleteOpen(true)}
+            >
+              Supprimer la carte
+            </button>
+          </div>
+          <ConfirmDialog
+            open={isDeleteOpen}
+            title="Suppression"
+            message="Supprimer definitivement cette carte ? Cette action est irreversible."
+            confirmLabel="Supprimer"
+            onConfirm={handleDelete}
+            onCancel={() => setIsDeleteOpen(false)}
+            isDanger
+            confirmDisabled={isDeleting}
+          />
         </section>
       ) : (
         <p>Aucune carte a reviser.</p>

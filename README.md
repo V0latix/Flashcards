@@ -9,6 +9,7 @@ Application de flashcards personnelle basee sur la methode de Leitner, avec supp
 - Cards avec Markdown + KaTeX + tags hierarchiques (format `A/B/C`)
 - Champs optionnels cartes: `hint_md`, `source_type`, `source_id`
 - Library tags-first avec explorateur d'arbre
+- Suppression avec confirmation (session, par tag, suppression totale)
 - Import/Export JSON tolerant + diagnostic d'import
 - Packs publics (Supabase) + import idempotent vers la base locale
 - Dashboard Stats (global, progression, tags, Leitner, insights)

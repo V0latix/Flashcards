@@ -144,10 +144,61 @@ export async function updateCard(
 }
 
 export async function deleteCard(id: number): Promise<void> {
-  await db.transaction('rw', db.cards, db.reviewStates, async () => {
+  await db.transaction('rw', db.cards, db.reviewStates, db.reviewLogs, db.media, async () => {
     await db.cards.delete(id)
     await db.reviewStates.delete(id)
+    await db.reviewLogs.where('card_id').equals(id).delete()
+    await db.media.where('card_id').equals(id).delete()
   })
+  if (import.meta.env.DEV) {
+    console.log('[DELETE] card', id)
+  }
+}
+
+const matchesTag = (tags: string[], tag: string, includeDescendants: boolean) => {
+  if (includeDescendants) {
+    return tags.some((entry) => entry === tag || entry.startsWith(`${tag}/`))
+  }
+  return tags.some((entry) => entry === tag)
+}
+
+export async function deleteCardsByTag(
+  tag: string,
+  includeDescendants: boolean
+): Promise<number> {
+  const cards = await db.cards.toArray()
+  const targetIds = cards
+    .filter((card) => card.id && matchesTag(card.tags, tag, includeDescendants))
+    .map((card) => card.id as number)
+
+  if (targetIds.length === 0) {
+    return 0
+  }
+
+  await db.transaction('rw', db.cards, db.reviewStates, db.reviewLogs, db.media, async () => {
+    await db.cards.bulkDelete(targetIds)
+    await db.reviewStates.bulkDelete(targetIds)
+    await db.reviewLogs.where('card_id').anyOf(targetIds).delete()
+    await db.media.where('card_id').anyOf(targetIds).delete()
+  })
+
+  if (import.meta.env.DEV) {
+    console.log('[DELETE] tag', tag, { includeDescendants, count: targetIds.length })
+  }
+
+  return targetIds.length
+}
+
+export async function deleteAllCards(): Promise<void> {
+  await db.transaction('rw', db.cards, db.reviewStates, db.reviewLogs, db.media, async () => {
+    await db.cards.clear()
+    await db.reviewStates.clear()
+    await db.reviewLogs.clear()
+    await db.media.clear()
+  })
+  if (import.meta.env.DEV) {
+    console.log('[DELETE] all cards')
+  }
 }
 
 export async function getReviewState(cardId: number): Promise<ReviewState | undefined> {

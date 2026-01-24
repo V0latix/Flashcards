@@ -223,6 +223,7 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Styles reutilisables (container, card, button, input) dans `src/index.css`
 - Library en vue tags-first + recherche dans le scope courant
 - Tags hierarchiques affiches en arbre (separateur `/`)
+- Suppressions confirmees (session, par tag, tout supprimer)
 - Packs Explorer avec tags arborescents et filtrage par prefixe
 - Dashboard Stats avec sections globales, progression et tags
 - Header global sticky avec bouton Home
@@ -257,6 +258,9 @@ Checks manuels :
 - Import debug depuis `/import-export` (resume + logs console)
 - Session `/review` : ordre des cartes melange au demarrage
 - Library `/library` : tags-first + recherche dans le scope courant
+- Library `/library` : suppression par tag (avec/sans sous-tags)
+- Session `/review` : suppression d'une carte avec confirmation
+- Settings `/settings` : danger zone "Supprimer toutes les cartes"
 - Stats `/stats` : vue globale + graphiques + tags
 - Settings `/settings` : box1_target + intervalles
 - Settings `/settings` : learned_review_interval_days (defaut 90)

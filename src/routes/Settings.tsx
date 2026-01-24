@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { deleteAllCards } from '../db/queries'
 import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
 
 function Settings() {
@@ -26,6 +28,10 @@ function Settings() {
   const [learnedReviewIntervalDays, setLearnedReviewIntervalDays] = useState(90)
   const [reverseProbability, setReverseProbability] = useState(0)
   const [status, setStatus] = useState<string | null>(null)
+  const [dangerOpen, setDangerOpen] = useState(false)
+  const [dangerText, setDangerText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const data = getLeitnerSettings()
@@ -151,28 +157,48 @@ function Settings() {
         </button>
         {status ? <p>{status}</p> : null}
       </form>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/review">Review session</Link>
-          </li>
-          <li>
-            <Link to="/library">Library</Link>
-          </li>
-          <li>
-            <Link to="/card/new">New card</Link>
-          </li>
-          <li>
-            <Link to="/stats">Stats</Link>
-          </li>
-          <li>
-            <Link to="/import-export">Import/Export</Link>
-          </li>
-        </ul>
-      </nav>
+      <section className="card section">
+        <h2>Danger zone</h2>
+        <p>Suppression totale des cartes et de toutes les donnees locales.</p>
+        <button type="button" className="btn btn-danger" onClick={() => setDangerOpen(true)}>
+          Supprimer toutes les cartes
+        </button>
+      </section>
+      <ConfirmDialog
+        open={dangerOpen}
+        title="Suppression totale"
+        message="Toutes les cartes, sessions, statistiques et progressions seront supprimees."
+        confirmLabel="Supprimer"
+        onConfirm={async () => {
+          if (isDeleting || dangerText !== 'SUPPRIMER') {
+            return
+          }
+          setIsDeleting(true)
+          await deleteAllCards()
+          setStatus('Suppression terminee.')
+          setIsDeleting(false)
+          setDangerOpen(false)
+          setDangerText('')
+          setTimeout(() => navigate('/'), 300)
+        }}
+        onCancel={() => {
+          setDangerOpen(false)
+          setDangerText('')
+        }}
+        isDanger
+        confirmDisabled={isDeleting || dangerText !== 'SUPPRIMER'}
+      >
+        <div className="section">
+          <label htmlFor="dangerInput">Tapez "SUPPRIMER" pour confirmer</label>
+          <input
+            id="dangerInput"
+            type="text"
+            className="input"
+            value={dangerText}
+            onChange={(event) => setDangerText(event.target.value)}
+          />
+        </div>
+      </ConfirmDialog>
     </main>
   )
 }

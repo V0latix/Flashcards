@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import MarkdownRenderer from '../components/MarkdownRenderer'
-import { deleteCard, listCardsWithReviewState } from '../db/queries'
+import { deleteCard, deleteCardsByTag, listCardsWithReviewState } from '../db/queries'
 import type { Card, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 function Library() {
   const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
@@ -13,6 +14,11 @@ function Library() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [openHints, setOpenHints] = useState<Record<number, boolean>>({})
   const [visibleCount, setVisibleCount] = useState(100)
+  const [tagDeleteOpen, setTagDeleteOpen] = useState(false)
+  const [includeSubTags, setIncludeSubTags] = useState(true)
+  const [isTagDeleting, setIsTagDeleting] = useState(false)
+  const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
+  const [isCardDeleting, setIsCardDeleting] = useState(false)
 
   const loadCards = async () => {
     const data = await listCardsWithReviewState(0)
@@ -28,16 +34,51 @@ function Library() {
     setVisibleCount(100)
   }, [query, selectedTag])
 
-  const handleDelete = async (card: Card) => {
+  const handleDelete = (card: Card) => {
     if (!card.id) {
       return
     }
-    const confirmed = window.confirm('Supprimer cette carte ?')
-    if (!confirmed) {
+    setCardToDelete(card)
+  }
+
+  const tagDeleteCount = useMemo(() => {
+    if (!selectedTag) {
+      return 0
+    }
+    return cards.filter(({ card }) =>
+      includeSubTags
+        ? card.tags.some((tag) => tag === selectedTag || tag.startsWith(`${selectedTag}/`))
+        : card.tags.some((tag) => tag === selectedTag)
+    ).length
+  }, [cards, includeSubTags, selectedTag])
+
+  const openTagDelete = () => {
+    if (!selectedTag) {
       return
     }
-    await deleteCard(card.id)
+    setTagDeleteOpen(true)
+  }
+
+  const handleDeleteByTag = async () => {
+    if (!selectedTag || isTagDeleting) {
+      return
+    }
+    setIsTagDeleting(true)
+    await deleteCardsByTag(selectedTag, includeSubTags)
     await loadCards()
+    setIsTagDeleting(false)
+    setTagDeleteOpen(false)
+  }
+
+  const confirmDeleteCard = async () => {
+    if (!cardToDelete?.id || isCardDeleting) {
+      return
+    }
+    setIsCardDeleting(true)
+    await deleteCard(cardToDelete.id)
+    await loadCards()
+    setIsCardDeleting(false)
+    setCardToDelete(null)
   }
 
   const tagTree = useMemo(
@@ -176,6 +217,13 @@ function Library() {
                 </button>
               ) : null}
             </div>
+            {selectedTag ? (
+              <div className="section">
+                <button type="button" className="btn btn-danger" onClick={openTagDelete}>
+                  Supprimer toutes les cartes de ce tag
+                </button>
+              </div>
+            ) : null}
             {breadcrumbParts.length > 0 ? (
               <div className="breadcrumb">
                 {breadcrumbParts.map((part, index) => (
@@ -252,6 +300,44 @@ function Library() {
           </div>
         </section>
       )}
+      <ConfirmDialog
+        open={tagDeleteOpen}
+        title="Suppression par tag"
+        message={
+          selectedTag
+            ? `Supprimer toutes les cartes avec le tag "${selectedTag}" ?`
+            : 'Supprimer les cartes selectionnees ?'
+        }
+        confirmLabel="Supprimer"
+        onConfirm={handleDeleteByTag}
+        onCancel={() => setTagDeleteOpen(false)}
+        isDanger
+        confirmDisabled={isTagDeleting || tagDeleteCount === 0}
+      >
+        {selectedTag ? (
+          <div className="section">
+            <label>
+              <input
+                type="checkbox"
+                checked={includeSubTags}
+                onChange={(event) => setIncludeSubTags(event.target.checked)}
+              />{' '}
+              Inclure les sous-tags
+            </label>
+            <p>Cartes concernees: {tagDeleteCount}</p>
+          </div>
+        ) : null}
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={Boolean(cardToDelete)}
+        title="Suppression"
+        message="Supprimer definitivement cette carte ? Cette action est irreversible."
+        confirmLabel="Supprimer"
+        onConfirm={confirmDeleteCard}
+        onCancel={() => setCardToDelete(null)}
+        isDanger
+        confirmDisabled={isCardDeleting}
+      />
     </main>
   )
 }
