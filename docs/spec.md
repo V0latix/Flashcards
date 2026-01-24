@@ -105,7 +105,7 @@ Règle quotidienne (au calcul de la session du jour) :
 
 2. Si `current_box1 < box1_target` et s’il reste des cartes en Box 0 :
    - `to_introduce = min(box1_target - current_box1, count(Box 0))`
-   - sélectionner `to_introduce` cartes de Box 0
+   - sélectionner `to_introduce` cartes de Box 0 (tirage aleatoire uniforme, sans remise)
    - pour chacune :
      - `box = 1`
      - `due_date = today`
@@ -133,6 +133,8 @@ La session quotidienne contient :
 1. Les **10 cartes de la Box 1**
 2. **Toutes les cartes dues aujourd’hui** des Box 2 à 5
 
+La liste finale est melangee une seule fois au demarrage de la session.
+
 La session n’impose aucune limite stricte sur le nombre total de cartes.
 
 ---
@@ -159,7 +161,7 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - `card_id`
 - `box` ∈ {0..5}
 - `due_date`
-- `last_reviewed_at`
+- `last_reviewed_at` (nullable)
 
 #### ReviewLog
 - `id`
@@ -196,6 +198,40 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Le remplissage de la Box 1, la sélection des cartes dues et les transitions Bon/Faux s'appliquent a toutes les cartes
 
 ---
+
+## U — UI (minimal)
+
+- Layout centre avec largeur max + padding
+- Styles reutilisables (container, card, button, input) dans `src/index.css`
+- Library en vue tags-first + recherche dans le scope courant
+
+## I — Import/Export
+
+- Export JSON du pool global (schema_version=1)
+- Import tolerant aux formats :
+  - `{ "schema_version": 1, "cards": [ ... ] }`
+  - `{ "cards": [ ... ] }`
+  - `[ ... ]` (tableau racine)
+- Champs acceptes : `front_md`/`back_md` ou `front`/`back`
+- Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absent
+- Bouton debug pour importer un echantillon et logs de diagnostic
+
+## S — Services externes
+
+- Supabase en lecture seule (client dans `src/supabase/`)
+- Health check au demarrage en mode dev uniquement
+- Variables attendues : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+
+## V — Verification
+
+Commandes :
+- `npm run dev`
+- `npm test`
+
+Checks manuels :
+- Import debug depuis `/import-export` (resume + logs console)
+- Session `/review` : ordre des cartes melange au demarrage
+- Library `/library` : tags-first + recherche dans le scope courant
 
 ## A — Act (à venir)
 
