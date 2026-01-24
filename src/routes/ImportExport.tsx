@@ -295,7 +295,8 @@ function ImportExport() {
                 timestamp: log.timestamp,
                 result: log.result,
                 previous_box: log.previous_box,
-                new_box: log.new_box
+                new_box: log.new_box,
+                was_learned_before: log.was_learned_before
               }
             })
             .filter(Boolean) as ReviewLog[]

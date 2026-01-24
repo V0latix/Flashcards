@@ -8,6 +8,8 @@ const addCardWithState = async (input: {
   createdAt: string
   box: number
   dueDate: string | null
+  isLearned?: boolean
+  learnedAt?: string | null
 }) => {
   const cardId = await db.cards.add({
     front_md: input.front,
@@ -20,7 +22,9 @@ const addCardWithState = async (input: {
   await db.reviewStates.add({
     card_id: cardId,
     box: input.box,
-    due_date: input.dueDate
+    due_date: input.dueDate,
+    is_learned: input.isLearned ?? false,
+    learned_at: input.learnedAt ?? null
   })
 
   return cardId
@@ -164,6 +168,66 @@ describe('applyReviewResult', () => {
     expect(logs[0].previous_box).toBe(4)
     expect(logs[0].new_box).toBe(1)
   })
+
+  it('marks box 5 good cards as learned', async () => {
+    const cardId = await addCardWithState({
+      front: 'Front',
+      back: 'Back',
+      createdAt: '2024-01-01',
+      box: 5,
+      dueDate: '2024-01-05'
+    })
+
+    await applyReviewResult(cardId, 'good', '2024-01-10')
+
+    const state = await db.reviewStates.get(cardId)
+    expect(state?.box).toBe(5)
+    expect(state?.is_learned).toBe(true)
+    expect(state?.learned_at).toBeTruthy()
+    expect(state?.due_date).toBeNull()
+
+    const logs = await db.reviewLogs.where('card_id').equals(cardId).toArray()
+    expect(logs[0].was_learned_before).toBe(false)
+  })
+
+  it('demotes learned cards on bad answers', async () => {
+    const cardId = await addCardWithState({
+      front: 'Front',
+      back: 'Back',
+      createdAt: '2024-01-01',
+      box: 5,
+      dueDate: null,
+      isLearned: true,
+      learnedAt: '2024-01-01T10:00:00.000Z'
+    })
+
+    await applyReviewResult(cardId, 'bad', '2024-01-10')
+
+    const state = await db.reviewStates.get(cardId)
+    expect(state?.box).toBe(1)
+    expect(state?.is_learned).toBe(false)
+    expect(state?.learned_at).toBeNull()
+    expect(state?.due_date).toBe('2024-01-11')
+  })
+
+  it('keeps learned cards learned on good maintenance', async () => {
+    const cardId = await addCardWithState({
+      front: 'Front',
+      back: 'Back',
+      createdAt: '2024-01-01',
+      box: 5,
+      dueDate: null,
+      isLearned: true,
+      learnedAt: '2023-12-01T10:00:00.000Z'
+    })
+
+    await applyReviewResult(cardId, 'good', '2024-01-10')
+
+    const state = await db.reviewStates.get(cardId)
+    expect(state?.is_learned).toBe(true)
+    expect(state?.learned_at).toBeTruthy()
+    expect(state?.due_date).toBeNull()
+  })
 })
 
 describe('buildDailySession', () => {
@@ -214,12 +278,22 @@ describe('buildDailySession', () => {
       dueDate: '2024-02-28'
     })
 
+    const learnedDueId = await addCardWithState({
+      front: 'Learned due',
+      back: 'Learned due',
+      createdAt: '2023-10-10',
+      box: 5,
+      dueDate: null,
+      isLearned: true,
+      learnedAt: '2023-12-01T10:00:00.000Z'
+    })
+
     const session = await buildDailySession(1, today)
 
     expect(session.box1).toHaveLength(10)
-    expect(session.due).toHaveLength(2)
+    expect(session.due).toHaveLength(3)
 
     const dueIds = session.due.map((entry) => entry.card.id)
-    expect(dueIds).toEqual(expect.arrayContaining([dueCardId, pastDueId]))
+    expect(dueIds).toEqual(expect.arrayContaining([dueCardId, pastDueId, learnedDueId]))
   })
 })

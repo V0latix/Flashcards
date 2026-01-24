@@ -5,6 +5,7 @@ Application de flashcards personnelle basee sur la methode de Leitner, avec supp
 ## Fonctionnalites
 - Leitner strict (Box 0..5, intervalles 1/3/7/15/30, box1_target=10)
 - Session quotidienne avec cartes Box 1 + cartes dues (Box 2..5)
+- Cartes "learned" apres Box 5 + maintenance periodique (defaut 90 jours)
 - Cards avec Markdown + KaTeX + tags hierarchiques (format `A/B/C`)
 - Champs optionnels cartes: `hint_md`, `source_type`, `source_id`
 - Library tags-first avec explorateur d'arbre

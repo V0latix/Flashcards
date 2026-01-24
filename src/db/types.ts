@@ -38,4 +38,5 @@ export type ReviewLog = {
   result: 'good' | 'bad'
   previous_box: number
   new_box: number
+  was_learned_before?: boolean
 }

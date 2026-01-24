@@ -84,9 +84,18 @@ Priorité :
 - `new_box = min(box + 1, 5)`
 - `due_date = today + interval[new_box]`
 
+Si la carte est en Box 5 et répondue "Bon" :
+- `is_learned = true`
+- `learned_at = now()`
+- la carte sort du flux normal (maintenance via learned_review_interval_days)
+
 #### Réponse "Faux"
 - `new_box = 1`
 - `due_date = today + 1`
+
+Si la carte etait "learned" :
+- `is_learned = false`
+- `learned_at = null`
 
 ---
 
@@ -131,7 +140,8 @@ Effet :
 
 La session quotidienne contient :
 1. Les **10 cartes de la Box 1**
-2. **Toutes les cartes dues aujourd’hui** des Box 2 à 5
+2. **Toutes les cartes dues aujourd’hui** des Box 2 à 5 (hors learned)
+3. **Toutes les cartes learned dues** (today >= learned_at + learned_review_interval_days)
 
 La liste finale est melangee une seule fois au demarrage de la session.
 

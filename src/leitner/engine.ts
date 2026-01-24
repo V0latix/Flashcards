@@ -122,9 +122,13 @@ export async function buildDailySession(
   await autoFillBox1(today)
 
   const reviewStates = await db.reviewStates.toArray()
+  const { learnedReviewIntervalDays } = getLeitnerSettings()
 
   const box1States = reviewStates.filter((state) => state.box === 1)
   const dueStates = reviewStates.filter((state) => {
+    if (state.is_learned) {
+      return false
+    }
     if (state.box <= 1) {
       return false
     }
@@ -134,9 +138,28 @@ export async function buildDailySession(
     return state.due_date <= today
   })
 
+  const learnedDueStates = reviewStates.filter((state) => {
+    if (!state.is_learned || !state.learned_at) {
+      return false
+    }
+    const learnedDate = toIsoDate(new Date(state.learned_at))
+    const learnedDueDate = addDays(learnedDate, learnedReviewIntervalDays)
+    return learnedDueDate <= today
+  })
+
+  const dueStateByCard = new Map<number, ReviewState>()
+  for (const state of dueStates) {
+    dueStateByCard.set(state.card_id, state)
+  }
+  for (const state of learnedDueStates) {
+    if (!dueStateByCard.has(state.card_id)) {
+      dueStateByCard.set(state.card_id, state)
+    }
+  }
+
   const [box1, due] = await Promise.all([
     loadSessionCards(box1States),
-    loadSessionCards(dueStates)
+    loadSessionCards([...dueStateByCard.values()])
   ])
 
   return { box1, due }
@@ -157,27 +180,52 @@ export const applyReviewResult = async (
     }
 
     const previousBox = reviewState.box
+    const wasLearned = Boolean(reviewState.is_learned)
+    const nowIso = new Date().toISOString()
     let nextBox = 1
     let nextDueDate = addDays(today, 1)
+    let nextIsLearned = false
+    let nextLearnedAt: string | null = null
 
     if (result === 'good') {
-      nextBox = Math.min(previousBox + 1, LEITNER_BOX_COUNT)
-      const interval = intervalDays[nextBox] ?? 1
-      nextDueDate = addDays(today, interval)
+      if (wasLearned) {
+        nextBox = previousBox
+        nextDueDate = null
+        nextIsLearned = true
+        nextLearnedAt = nowIso
+      } else {
+        nextBox = Math.min(previousBox + 1, LEITNER_BOX_COUNT)
+        if (previousBox === LEITNER_BOX_COUNT) {
+          nextIsLearned = true
+          nextLearnedAt = nowIso
+          nextDueDate = null
+        } else {
+          const interval = intervalDays[nextBox] ?? 1
+          nextDueDate = addDays(today, interval)
+        }
+      }
+    } else if (wasLearned) {
+      nextBox = 1
+      nextDueDate = addDays(today, 1)
+      nextIsLearned = false
+      nextLearnedAt = null
     }
 
     await db.reviewStates.update(cardId, {
       box: nextBox,
       due_date: nextDueDate,
-      last_reviewed_at: today
+      last_reviewed_at: today,
+      is_learned: nextIsLearned,
+      learned_at: nextLearnedAt
     })
 
     const logEntry: ReviewLog = {
       card_id: cardId,
-      timestamp: new Date().toISOString(),
+      timestamp: nowIso,
       result,
       previous_box: previousBox,
-      new_box: nextBox
+      new_box: nextBox,
+      was_learned_before: wasLearned
     }
 
     await db.reviewLogs.add(logEntry)
