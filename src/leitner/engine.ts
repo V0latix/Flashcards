@@ -1,6 +1,7 @@
 import db from '../db'
 import type { Card, ReviewLog, ReviewState } from '../db/types'
-import { BOX1_TARGET, INTERVAL_DAYS, LEITNER_BOX_COUNT } from './config'
+import { LEITNER_BOX_COUNT } from './config'
+import { getLeitnerSettings } from './settings'
 
 type SessionCard = { card: Card; reviewState: ReviewState }
 
@@ -68,11 +69,12 @@ export async function autoFillBox1(
     typeof todayOrDeckId === 'string'
       ? normalizeToday(todayOrDeckId)
       : normalizeToday(maybeToday ?? '')
+  const { box1Target } = getLeitnerSettings()
 
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates.where({ box: 1 }).toArray()
 
-    const missing = BOX1_TARGET - box1States.length
+    const missing = box1Target - box1States.length
     if (missing <= 0) {
       return
     }
@@ -146,6 +148,7 @@ export const applyReviewResult = async (
   todayInput: string
 ): Promise<void> => {
   const today = normalizeToday(todayInput)
+  const { intervalDays } = getLeitnerSettings()
 
   await db.transaction('rw', db.reviewStates, db.reviewLogs, async () => {
     const reviewState = await db.reviewStates.get(cardId)
@@ -159,7 +162,7 @@ export const applyReviewResult = async (
 
     if (result === 'good') {
       nextBox = Math.min(previousBox + 1, LEITNER_BOX_COUNT)
-      const interval = INTERVAL_DAYS[nextBox] ?? 1
+      const interval = intervalDays[nextBox] ?? 1
       nextDueDate = addDays(today, interval)
     }
 

@@ -10,7 +10,7 @@ import PackDetail from './routes/PackDetail'
 import Packs from './routes/Packs'
 import ReviewSession from './routes/ReviewSession'
 import Settings from './routes/Settings'
-import Stats from './routes/Stats'
+import StatsPage from './routes/StatsPage'
 
 function App() {
   useEffect(() => {
@@ -41,7 +41,7 @@ function App() {
         <Route path="/card/:cardId/edit" element={<CardEditor />} />
         <Route path="/packs" element={<Packs />} />
         <Route path="/packs/:slug" element={<PackDetail />} />
-        <Route path="/stats" element={<Stats />} />
+        <Route path="/stats" element={<StatsPage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/import-export" element={<ImportExport />} />
         <Route path="*" element={<Navigate to="/" replace />} />
