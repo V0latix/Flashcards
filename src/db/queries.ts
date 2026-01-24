@@ -12,12 +12,14 @@ export async function listCards(): Promise<Card[]> {
 }
 
 export async function listCardsByDeck(_deckId: number): Promise<Card[]> {
+  void _deckId
   return listCards()
 }
 
 export async function listCardsWithReviewState(
   _deckId: number
 ): Promise<Array<{ card: Card; reviewState: ReviewState | undefined }>> {
+  void _deckId
   const [cards, reviewStates] = await Promise.all([
     db.cards.toArray(),
     db.reviewStates.toArray()

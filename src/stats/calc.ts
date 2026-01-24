@@ -159,10 +159,11 @@ export const calcTagTreeAgg = (
 
   const prefixesByCard = new Map<number, string[]>()
   cards.forEach((card) => {
-    if (!card.id) {
+    const cardId = card.id
+    if (!cardId) {
       return
     }
-    prefixesByCard.set(card.id, buildPrefixes(card.tags))
+    prefixesByCard.set(cardId, buildPrefixes(card.tags))
   })
 
   const aggMap = new Map<
@@ -195,11 +196,12 @@ export const calcTagTreeAgg = (
   }
 
   cards.forEach((card) => {
-    if (!card.id) {
+    const cardId = card.id
+    if (!cardId) {
       return
     }
-    const prefixes = prefixesByCard.get(card.id) ?? []
-    const state = stateByCard.get(card.id)
+    const prefixes = prefixesByCard.get(cardId) ?? []
+    const state = stateByCard.get(cardId)
     const box = state?.box ?? 0
     const isLearned = Boolean(state?.is_learned)
     let isDue = false
@@ -214,8 +216,8 @@ export const calcTagTreeAgg = (
     }
     prefixes.forEach((prefix) => {
       const agg = ensureAgg(prefix)
-      if (!agg.cardIds.has(card.id)) {
-        agg.cardIds.add(card.id)
+      if (!agg.cardIds.has(cardId)) {
+        agg.cardIds.add(cardId)
         agg.boxSum += box
         if (isDue) {
           agg.dueCount += 1

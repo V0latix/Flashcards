@@ -142,7 +142,7 @@ function ReviewSession() {
             <div className="button-row">
               <button
                 type="button"
-                style={{ order: 1, flex: 1 }}
+                style={{ order: 2, flex: 1 }}
                 className="btn btn-primary"
                 onClick={() => handleAnswer('good')}
               >
@@ -150,7 +150,7 @@ function ReviewSession() {
               </button>
               <button
                 type="button"
-                style={{ order: 2, flex: 1 }}
+                style={{ order: 1, flex: 1 }}
                 className="btn btn-secondary"
                 onClick={() => handleAnswer('bad')}
               >

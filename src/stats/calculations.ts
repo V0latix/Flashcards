@@ -192,15 +192,16 @@ export const calculateTagStats = (
   }
 
   cards.forEach((card) => {
-    if (!card.id) {
+    const cardId = card.id
+    if (!cardId) {
       return
     }
-    const prefixes = cardPrefixes.get(card.id) ?? []
-    const box = stateByCard.get(card.id)?.box ?? 0
+    const prefixes = cardPrefixes.get(cardId) ?? []
+    const box = stateByCard.get(cardId)?.box ?? 0
     prefixes.forEach((prefix) => {
       const stat = ensureStat(prefix)
-      if (!stat.cardIds.has(card.id)) {
-        stat.cardIds.add(card.id)
+      if (!stat.cardIds.has(cardId)) {
+        stat.cardIds.add(cardId)
         stat.boxSum += box
       }
     })

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteAllCards } from '../db/queries'
@@ -17,29 +17,22 @@ function Settings() {
   const minLearnedInterval = 7
   const maxLearnedInterval = 3650
 
-  const [box1Target, setBox1Target] = useState(10)
+  const initialSettings = useMemo(() => getLeitnerSettings(), [])
+  const [box1Target, setBox1Target] = useState(initialSettings.box1Target)
   const [intervals, setIntervals] = useState<Record<number, number>>({
-    1: 1,
-    2: 3,
-    3: 7,
-    4: 15,
-    5: 30
+    ...initialSettings.intervalDays
   })
-  const [learnedReviewIntervalDays, setLearnedReviewIntervalDays] = useState(90)
-  const [reverseProbability, setReverseProbability] = useState(0)
+  const [learnedReviewIntervalDays, setLearnedReviewIntervalDays] = useState(
+    initialSettings.learnedReviewIntervalDays
+  )
+  const [reverseProbability, setReverseProbability] = useState(
+    initialSettings.reverseProbability
+  )
   const [status, setStatus] = useState<string | null>(null)
   const [dangerOpen, setDangerOpen] = useState(false)
   const [dangerText, setDangerText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    const data = getLeitnerSettings()
-    setBox1Target(data.box1Target)
-    setIntervals({ ...data.intervalDays })
-    setLearnedReviewIntervalDays(data.learnedReviewIntervalDays)
-    setReverseProbability(data.reverseProbability)
-  }, [])
 
   const handleSave = (event: React.FormEvent) => {
     event.preventDefault()

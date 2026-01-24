@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { TagAgg } from '../stats/types'
 import { useStats } from '../stats/hooks'
@@ -102,7 +102,7 @@ function StatsPage() {
   const [periodDays, setPeriodDays] = useState<7 | 30 | 90>(7)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
-  const [tagRowsLimit, setTagRowsLimit] = useState(50)
+  const [tagRowsLimitByKey, setTagRowsLimitByKey] = useState<Record<string, number>>({})
   const stats = useStats(periodDays)
   const minReviewsForWeakTag = 10
 
@@ -179,10 +179,8 @@ function StatsPage() {
       .filter((item): item is TagAgg => Boolean(item))
   }, [selectedTag, stats.tagAgg, tagTree])
 
-  useEffect(() => {
-    setTagRowsLimit(50)
-  }, [selectedTag])
-
+  const tagKey = selectedTag ?? '__root__'
+  const tagRowsLimit = tagRowsLimitByKey[tagKey] ?? 50
   const visibleTagRows = useMemo(
     () => tagRows.slice(0, tagRowsLimit),
     [tagRows, tagRowsLimit]
@@ -283,7 +281,7 @@ function StatsPage() {
       <section className="card section">
         <h2>Progression (revisions)</h2>
         <div className="panel-header">
-          {[7, 30, 90].map((days) => (
+          {([7, 30, 90] as const).map((days) => (
             <button
               key={days}
               type="button"
@@ -381,7 +379,12 @@ function StatsPage() {
               <button
                 type="button"
                 className="btn btn-secondary section"
-                onClick={() => setTagRowsLimit((prev) => prev + 50)}
+                onClick={() =>
+                  setTagRowsLimitByKey((prev) => ({
+                    ...prev,
+                    [tagKey]: tagRowsLimit + 50
+                  }))
+                }
               >
                 Charger plus
               </button>

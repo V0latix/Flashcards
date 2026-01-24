@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import db from '../db'
 import { applyReviewResult, autoFillBox1, buildDailySession } from './engine'
 
@@ -33,6 +33,10 @@ const addCardWithState = async (input: {
 beforeEach(async () => {
   await db.delete()
   await db.open()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
 })
 
 describe('autoFillBox1', () => {
@@ -121,6 +125,12 @@ describe('autoFillBox1', () => {
     expect(promoted).toHaveLength(2)
     expect(promoted).toEqual(expect.arrayContaining([secondId, thirdId]))
     expect(firstState?.box).toBe(0)
+  })
+
+  it('returns empty session when no cards exist', async () => {
+    const session = await buildDailySession(1, '2024-03-01')
+    expect(session.box1).toHaveLength(0)
+    expect(session.due).toHaveLength(0)
   })
 })
 

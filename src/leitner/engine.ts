@@ -87,7 +87,7 @@ export async function autoFillBox1(
 
     const box0CardIds = box0States.map((state) => state.card_id)
     const cards = await loadCardsByIds(box0CardIds)
-    const cardIds = cards.map((card) => card.id)
+    const cardIds = cards.map((card) => card.id).filter((id): id is number => typeof id === 'number')
 
     const selectedCardIds = shuffle(cardIds).slice(0, missing)
 
@@ -184,7 +184,7 @@ export const applyReviewResult = async (
     const wasLearned = Boolean(reviewState.is_learned)
     const nowIso = new Date().toISOString()
     let nextBox = 1
-    let nextDueDate = addDays(today, 1)
+    let nextDueDate: string | null = addDays(today, 1)
     let nextIsLearned = false
     let nextLearnedAt: string | null = null
 

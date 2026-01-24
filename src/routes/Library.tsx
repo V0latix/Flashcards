@@ -27,18 +27,20 @@ function Library() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadCards()
   }, [])
-
-  useEffect(() => {
-    setVisibleCount(100)
-  }, [query, selectedTag])
 
   const handleDelete = (card: Card) => {
     if (!card.id) {
       return
     }
     setCardToDelete(card)
+  }
+
+  const handleSelectTag = (tag: string | null) => {
+    setSelectedTag(tag)
+    setVisibleCount(100)
   }
 
   const tagDeleteCount = useMemo(() => {
@@ -146,13 +148,13 @@ function Library() {
                 ) : (
                   <span className="tree-spacer" />
                 )}
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setSelectedTag(node.path)}
-                >
-                  {node.name} ({node.count})
-                </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => handleSelectTag(node.path)}
+              >
+                {node.name} ({node.count})
+              </button>
               </div>
               {!isCollapsed ? renderTagNodes(node.children, depth + 1) : null}
             </li>
@@ -173,10 +175,10 @@ function Library() {
     }
     const parts = selectedTag.split('/')
     if (parts.length <= 1) {
-      setSelectedTag(null)
+      handleSelectTag(null)
       return
     }
-    setSelectedTag(parts.slice(0, -1).join('/'))
+    handleSelectTag(parts.slice(0, -1).join('/'))
   }
 
   const renderMarkdown = (value: string) => <MarkdownRenderer value={value} />
@@ -201,7 +203,7 @@ function Library() {
             <button
               type="button"
               className="btn btn-primary"
-              onClick={() => setSelectedTag(null)}
+              onClick={() => handleSelectTag(null)}
             >
               Toutes les cartes
             </button>
@@ -231,7 +233,7 @@ function Library() {
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      onClick={() => setSelectedTag(breadcrumbPaths[index])}
+                      onClick={() => handleSelectTag(breadcrumbPaths[index])}
                     >
                       {part}
                     </button>
@@ -245,7 +247,10 @@ function Library() {
               type="text"
               value={query}
               className="input"
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value)
+                setVisibleCount(100)
+              }}
             />
             {filteredCards.length === 0 ? <p>Aucune carte pour le moment.</p> : null}
             {filteredCards.length > 0 ? (
