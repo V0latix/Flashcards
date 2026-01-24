@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import db from './db'
+import AppShell from './components/AppShell'
 import { healthCheckSupabase } from './supabase/health'
 import CardEditor from './routes/CardEditor'
 import Home from './routes/Home'
@@ -33,26 +34,21 @@ function App() {
 
   return (
     <BrowserRouter>
-      <header className="app-header">
-        <div className="app-header-inner">
-          <Link className="btn btn-secondary" to="/">
-            Home
-          </Link>
-        </div>
-      </header>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/review" element={<ReviewSession />} />
-        <Route path="/library" element={<Library />} />
-        <Route path="/card/new" element={<CardEditor />} />
-        <Route path="/card/:cardId/edit" element={<CardEditor />} />
-        <Route path="/packs" element={<Packs />} />
-        <Route path="/packs/:slug" element={<PackDetail />} />
-        <Route path="/stats" element={<StatsPage />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/import-export" element={<ImportExport />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AppShell>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/review" element={<ReviewSession />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/card/new" element={<CardEditor />} />
+          <Route path="/card/:cardId/edit" element={<CardEditor />} />
+          <Route path="/packs" element={<Packs />} />
+          <Route path="/packs/:slug" element={<PackDetail />} />
+          <Route path="/stats" element={<StatsPage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/import-export" element={<ImportExport />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AppShell>
     </BrowserRouter>
   )
 }

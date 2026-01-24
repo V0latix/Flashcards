@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import db from '../db'
 import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 
@@ -392,28 +391,6 @@ function ImportExport() {
           ) : null}
         </section>
       ) : null}
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/review">Review session</Link>
-          </li>
-          <li>
-            <Link to="/library">Library</Link>
-          </li>
-          <li>
-            <Link to="/card/new">New card</Link>
-          </li>
-          <li>
-            <Link to="/stats">Stats</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-        </ul>
-      </nav>
     </main>
   )
 }

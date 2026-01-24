@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "cards": [
+    {
+      "front_md": "Formule de dérivation d’une puissance",
+      "back_md": "$$\\frac{d}{dx} x^n = n x^{n-1}$$",
+      "tags": ["Mathématiques/Analyse/Dérivées"]
+    },
+    {
+      "front_md": "Dérivée de la fonction exponentielle",
+      "back_md": "$$\\frac{d}{dx} e^x = e^x$$",
+      "tags": ["Mathématiques/Analyse/Dérivées"]
+    },
+    {
+      "front_md": "Dérivée du logarithme népérien",
+      "back_md": "$$\\frac{d}{dx} \\ln(x) = \\frac{1}{x} \\quad (x>0)$$",
+      "tags": ["Mathématiques/Analyse/Dérivées"]
+    },
+    {
+      "front_md": "Intégrale d’une puissance",
+      "back_md": "$$\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)$$",
+      "tags": ["Mathématiques/Analyse/Intégrales"]
+    },
+    {
+      "front_md": "Intégrale de l’exponentielle",
+      "back_md": "$$\\int e^x\\,dx = e^x + C$$",
+      "tags": ["Mathématiques/Analyse/Intégrales"]
+    },
+    {
+      "front_md": "Formule du binôme de Newton",
+      "back_md": "$$(a+b)^n = \\sum_{k=0}^n \\binom{n}{k} a^{n-k} b^k$$",
+      "tags": ["Mathématiques/Algèbre/Binôme"]
+    },
+    {
+      "front_md": "Formule de la variance",
+      "back_md": "$$\\mathrm{Var}(X) = \\mathbb{E}[X^2] - (\\mathbb{E}[X])^2$$",
+      "tags": ["Mathématiques/Probabilités/Statistiques"]
+    },
+    {
+      "front_md": "Espérance d’une variable aléatoire discrète",
+      "back_md": "$$\\mathbb{E}[X] = \\sum_i x_i\\,\\mathbb{P}(X=x_i)$$",
+      "tags": ["Mathématiques/Probabilités/Espérance"]
+    },
+    {
+      "front_md": "Espérance d’une variable aléatoire continue",
+      "back_md": "$$\\mathbb{E}[X] = \\int_{-\\infty}^{+\\infty} x f_X(x)\\,dx$$",
+      "tags": ["Mathématiques/Probabilités/Espérance"]
+    },
+    {
+      "front_md": "Fonction de densité de la loi normale",
+      "back_md": "$$f(x)=\\frac{1}{\\sigma\\sqrt{2\\pi}}\\exp\\left(-\\frac{(x-\\mu)^2}{2\\sigma^2}\\right)$$",
+      "tags": ["Mathématiques/Probabilités/Lois"]
+    },
+    {
+      "front_md": "Inégalité de Markov",
+      "back_md": "$$\\mathbb{P}(X \\ge a) \\le \\frac{\\mathbb{E}[X]}{a} \\quad (a>0)$$",
+      "tags": ["Mathématiques/Probabilités/Inégalités"]
+    },
+    {
+      "front_md": "Inégalité de Bienaymé-Tchebychev",
+      "back_md": "$$\\mathbb{P}(|X-\\mathbb{E}[X]| \\ge a) \\le \\frac{\\mathrm{Var}(X)}{a^2}$$",
+      "tags": ["Mathématiques/Probabilités/Inégalités"]
+    },
+    {
+      "front_md": "Formule de Bayes",
+      "back_md": "$$\\mathbb{P}(A\\mid B)=\\frac{\\mathbb{P}(B\\mid A)\\,\\mathbb{P}(A)}{\\mathbb{P}(B)}$$",
+      "tags": ["Mathématiques/Probabilités/Bayes"]
+    }
+  ]
+}

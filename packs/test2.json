@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "cards": [
+    {
+      "front_md": "Test image — Drapeau de la France",
+      "back_md": "Voici le drapeau :\n\n![Drapeau de la France](https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg)\n\nCapitale : **Paris**",
+      "tags": ["Géographie/Drapeaux/Test"]
+    },
+    {
+      "front_md": "Test image — Drapeau du Japon",
+      "back_md": "Voici le drapeau :\n\n![Drapeau du Japon](https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg)\n\nCapitale : **Tokyo**",
+      "tags": ["Géographie/Drapeaux/Test"]
+    },
+    {
+      "front_md": "Test image — Formule en LaTeX + image",
+      "back_md": "Formule :\n\n$$\\int_0^1 x\\,dx = \\frac{1}{2}$$\n\nImage test :\n\n![Triangle](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Right_triangle_with_notations.svg/512px-Right_triangle_with_notations.svg.png)",
+      "tags": ["Mathématiques/Test/Media"]
+    }
+  ]
+}
