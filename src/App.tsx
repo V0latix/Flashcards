@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
 import db from './db'
 import { healthCheckSupabase } from './supabase/health'
 import CardEditor from './routes/CardEditor'
@@ -33,6 +33,13 @@ function App() {
 
   return (
     <BrowserRouter>
+      <header className="app-header">
+        <div className="app-header-inner">
+          <Link className="btn btn-secondary" to="/">
+            Home
+          </Link>
+        </div>
+      </header>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/review" element={<ReviewSession />} />

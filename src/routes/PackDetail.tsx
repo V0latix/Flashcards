@@ -44,7 +44,7 @@ function PackDetail() {
   }, [cards, query])
 
   return (
-    <main className="container">
+    <main className="container page">
       <h1>Pack</h1>
       <p>Slug: {slug}</p>
       <button

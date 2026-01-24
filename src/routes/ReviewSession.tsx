@@ -61,7 +61,7 @@ function ReviewSession() {
   const isDone = !isLoading && index >= cards.length
 
   return (
-    <main className="container">
+    <main className="container page">
       <h1>Review Session</h1>
       {isLoading ? (
         <p>Chargement...</p>
@@ -99,18 +99,18 @@ function ReviewSession() {
               <button
                 type="button"
                 style={{ order: 1, flex: 1 }}
-                className="btn btn-secondary"
-                onClick={() => handleAnswer('bad')}
-              >
-                Faux
-              </button>
-              <button
-                type="button"
-                style={{ order: 2, flex: 1 }}
                 className="btn btn-primary"
                 onClick={() => handleAnswer('good')}
               >
                 Bon
+              </button>
+              <button
+                type="button"
+                style={{ order: 2, flex: 1 }}
+                className="btn btn-secondary"
+                onClick={() => handleAnswer('bad')}
+              >
+                Faux
               </button>
             </div>
           ) : null}

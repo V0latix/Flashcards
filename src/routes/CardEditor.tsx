@@ -62,7 +62,7 @@ function CardEditor() {
   }
 
   return (
-    <main className="container">
+    <main className="container page">
       <h1>Card Editor</h1>
       <p>{modeLabel}</p>
       {isLoading ? (

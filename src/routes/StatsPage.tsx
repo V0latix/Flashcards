@@ -151,7 +151,7 @@ function StatsPage() {
   }, [stats.tagStats])
 
   return (
-    <main className="container">
+    <main className="container page">
       <div className="page-header">
         <h1>Stats</h1>
         <p>Suivi global, progression, tags et performance Leitner.</p>

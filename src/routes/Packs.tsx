@@ -2,13 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listPacks } from '../supabase/api'
 import type { Pack } from '../supabase/types'
-
-type TagNode = {
-  name: string
-  path: string
-  count: number
-  children: TagNode[]
-}
+import { buildTagTree, type TagNode } from '../utils/tagTree'
 
 function Packs() {
   const [packs, setPacks] = useState<Pack[]>([])
@@ -32,65 +26,10 @@ function Packs() {
     void loadPacks()
   }, [])
 
-  const tagTree = useMemo(() => {
-    const root: TagNode = { name: '', path: '', count: 0, children: [] }
-    const nodeByPath = new Map<string, TagNode>()
-    nodeByPath.set('', root)
-
-    const ensureNode = (path: string, name: string): TagNode => {
-      const existing = nodeByPath.get(path)
-      if (existing) {
-        return existing
-      }
-      const node: TagNode = { name, path, count: 0, children: [] }
-      nodeByPath.set(path, node)
-      return node
-    }
-
-    packs.forEach((pack) => {
-      const tags = pack.tags ?? []
-      const prefixes = new Set<string>()
-      tags.forEach((tag) => {
-        const parts = tag
-          .split('/')
-          .map((part) => part.trim())
-          .filter(Boolean)
-        if (parts.length === 0) {
-          return
-        }
-        for (let i = 0; i < parts.length; i += 1) {
-          prefixes.add(parts.slice(0, i + 1).join('/'))
-        }
-      })
-
-      prefixes.forEach((prefix) => {
-        const segments = prefix.split('/')
-        let currentPath = ''
-        let parent = root
-        for (const segment of segments) {
-          currentPath = currentPath ? `${currentPath}/${segment}` : segment
-          const node = ensureNode(currentPath, segment)
-          if (!parent.children.some((child) => child.path === node.path)) {
-            parent.children.push(node)
-          }
-          parent = node
-        }
-
-        const node = nodeByPath.get(prefix)
-        if (node) {
-          node.count += 1
-        }
-      })
-    })
-
-    const sortTree = (node: TagNode) => {
-      node.children.sort((a, b) => a.name.localeCompare(b.name))
-      node.children.forEach(sortTree)
-    }
-    sortTree(root)
-
-    return root
-  }, [packs])
+  const tagTree = useMemo(
+    () => buildTagTree(packs.map((pack) => pack.tags ?? [])),
+    [packs]
+  )
 
   const filteredPacks = useMemo(() => {
     if (!selectedTag) {
@@ -113,9 +52,9 @@ function Packs() {
       return null
     }
     return (
-      <ul className="tree">
+      <ul className="tree" style={{ paddingLeft: depth * 16 }}>
         {nodes.map((node) => {
-          const isCollapsed = collapsed[node.path] ?? false
+          const isCollapsed = collapsed[node.path] ?? true
           const hasChildren = node.children.length > 0
           return (
             <li key={node.path}>
@@ -153,7 +92,7 @@ function Packs() {
   }
 
   return (
-    <main className="container">
+    <main className="container page">
       <div className="page-header">
         <h1>Packs</h1>
         <p>Parcours les packs publics par dossier de tags.</p>

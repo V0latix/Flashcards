@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 function Home() {
   return (
-    <main className="container">
+    <main className="container page">
       <h1>Home</h1>
       <section className="card section">
         <h2>Pool global</h2>

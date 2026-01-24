@@ -72,6 +72,29 @@ ul {
   padding: 28px 18px 48px;
 }
 
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.app-header-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page {
+  padding-top: 12px;
+}
+
 .page-header {
   margin-bottom: 24px;
 }
@@ -174,10 +197,6 @@ ul {
   list-style: none;
   padding-left: 0;
   margin: 12px 0 0;
-}
-
-.tree .tree {
-  padding-left: 16px;
 }
 
 .tree-row {

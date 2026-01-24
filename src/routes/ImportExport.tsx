@@ -361,7 +361,7 @@ function ImportExport() {
   }
 
   return (
-    <main>
+    <main className="container page">
       <h1>Import/Export</h1>
       <section>
         <button type="button" onClick={handleExport}>

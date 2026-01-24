@@ -34,7 +34,7 @@ function Settings() {
   }
 
   return (
-    <main className="container">
+    <main className="container page">
       <div className="page-header">
         <h1>Settings</h1>
         <p>Configurer la taille de la Box 1 et les intervalles Leitner.</p>

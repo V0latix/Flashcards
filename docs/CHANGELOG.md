@@ -15,6 +15,7 @@
 - Page Settings pour box1_target et intervalles (localStorage).
 - Tests unitaires Vitest pour la logique Leitner.
 - Donnees de packs de capitales dans `packs/` (tags hierarchiques possibles).
+- Header global sticky avec bouton Home.
 
 ### Changed
 - AutoFill Box 1 par tirage aleatoire uniforme depuis Box 0.

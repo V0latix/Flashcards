@@ -211,6 +211,7 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Tags hierarchiques affiches en arbre (separateur `/`)
 - Packs Explorer avec tags arborescents et filtrage par prefixe
 - Dashboard Stats avec sections globales, progression et tags
+- Header global sticky avec bouton Home
 
 ## I — Import/Export
 
