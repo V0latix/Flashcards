@@ -39,4 +39,5 @@ export type ReviewLog = {
   previous_box: number
   new_box: number
   was_learned_before?: boolean
+  was_reversed?: boolean
 }

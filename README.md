@@ -15,6 +15,7 @@ Application de flashcards personnelle basee sur la methode de Leitner, avec supp
 - Settings pour box1_target + intervalles
 - Accueil en grille d'icones + navigation header/bottom
 - Parametre de maintien learned_review_interval_days (defaut 90)
+- Parametre reverse_probability (0..1) pour inverser question/reponse
 
 ## Tech
 - React + TypeScript + Vite

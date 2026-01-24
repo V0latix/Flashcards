@@ -4,6 +4,7 @@ export type LeitnerSettings = {
   box1Target: number
   intervalDays: Record<number, number>
   learnedReviewIntervalDays: number
+  reverseProbability: number
 }
 
 const STORAGE_KEY = 'leitnerSettings'
@@ -11,7 +12,8 @@ const STORAGE_KEY = 'leitnerSettings'
 const getDefaultSettings = (): LeitnerSettings => ({
   box1Target: BOX1_TARGET,
   intervalDays: { ...INTERVAL_DAYS },
-  learnedReviewIntervalDays: 90
+  learnedReviewIntervalDays: 90,
+  reverseProbability: 0
 })
 
 const toPositiveInt = (value: unknown): number | null => {
@@ -20,6 +22,20 @@ const toPositiveInt = (value: unknown): number | null => {
     return null
   }
   return Math.floor(parsed)
+}
+
+const toClampedProbability = (value: unknown): number | null => {
+  const parsed = typeof value === 'string' ? Number.parseFloat(value) : Number(value)
+  if (!Number.isFinite(parsed)) {
+    return null
+  }
+  if (parsed < 0) {
+    return 0
+  }
+  if (parsed > 1) {
+    return 1
+  }
+  return parsed
 }
 
 export const getLeitnerSettings = (): LeitnerSettings => {
@@ -40,7 +56,13 @@ export const getLeitnerSettings = (): LeitnerSettings => {
     }
     const learnedReviewIntervalDays =
       toPositiveInt(parsed.learnedReviewIntervalDays) ?? 90
-    return { box1Target, intervalDays, learnedReviewIntervalDays }
+    const reverseProbability = toClampedProbability(parsed.reverseProbability) ?? 0
+    return {
+      box1Target,
+      intervalDays,
+      learnedReviewIntervalDays,
+      reverseProbability
+    }
   } catch {
     return getDefaultSettings()
   }

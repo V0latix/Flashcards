@@ -168,7 +168,8 @@ export async function buildDailySession(
 export const applyReviewResult = async (
   cardId: number,
   result: 'good' | 'bad',
-  todayInput: string
+  todayInput: string,
+  wasReversed = false
 ): Promise<void> => {
   const today = normalizeToday(todayInput)
   const { intervalDays } = getLeitnerSettings()
@@ -225,7 +226,8 @@ export const applyReviewResult = async (
       result,
       previous_box: previousBox,
       new_box: nextBox,
-      was_learned_before: wasLearned
+      was_learned_before: wasLearned,
+      was_reversed: wasReversed
     }
 
     await db.reviewLogs.add(logEntry)

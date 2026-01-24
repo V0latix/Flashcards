@@ -12,6 +12,7 @@ function Settings() {
     5: 30
   })
   const [learnedReviewIntervalDays, setLearnedReviewIntervalDays] = useState(90)
+  const [reverseProbability, setReverseProbability] = useState(0)
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
@@ -19,6 +20,7 @@ function Settings() {
     setBox1Target(data.box1Target)
     setIntervals({ ...data.intervalDays })
     setLearnedReviewIntervalDays(data.learnedReviewIntervalDays)
+    setReverseProbability(data.reverseProbability)
   }, [])
 
   const handleSave = (event: React.FormEvent) => {
@@ -39,7 +41,8 @@ function Settings() {
     saveLeitnerSettings({
       box1Target,
       intervalDays: { ...intervals },
-      learnedReviewIntervalDays
+      learnedReviewIntervalDays,
+      reverseProbability
     })
     setStatus('Parametres enregistres.')
   }
@@ -93,6 +96,19 @@ function Settings() {
             className="input"
             onChange={(event) => setLearnedReviewIntervalDays(Number(event.target.value))}
           />
+        </div>
+        <div className="section">
+          <label htmlFor="reverseProbability">Inverser question/reponse</label>
+          <input
+            id="reverseProbability"
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round(reverseProbability * 100)}
+            className="input"
+            onChange={(event) => setReverseProbability(Number(event.target.value) / 100)}
+          />
+          <p>{Math.round(reverseProbability * 100)}%</p>
         </div>
         <button type="submit" className="btn btn-primary">
           Enregistrer

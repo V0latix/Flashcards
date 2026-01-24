@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
+import { getLeitnerSettings } from '../leitner/settings'
 
 function ReviewSession() {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const [isLoading, setIsLoading] = useState(true)
   const [cards, setCards] = useState<
-    Array<{ cardId: number; front: string; back: string }>
+    Array<{ cardId: number; front: string; back: string; wasReversed: boolean }>
   >([])
   const [index, setIndex] = useState(0)
   const [showBack, setShowBack] = useState(false)
@@ -25,11 +26,16 @@ function ReviewSession() {
   useEffect(() => {
     const loadSession = async () => {
       const session = await buildDailySession(today)
-      const queue = [...session.box1, ...session.due].map((entry) => ({
-        cardId: entry.card.id ?? 0,
-        front: entry.card.front_md,
-        back: entry.card.back_md
-      }))
+      const { reverseProbability } = getLeitnerSettings()
+      const queue = [...session.box1, ...session.due].map((entry) => {
+        const isReversed = Math.random() < reverseProbability
+        return {
+          cardId: entry.card.id ?? 0,
+          front: isReversed ? entry.card.back_md : entry.card.front_md,
+          back: isReversed ? entry.card.front_md : entry.card.back_md,
+          wasReversed: isReversed
+        }
+      })
       const filtered = queue.filter((item) => item.cardId !== 0)
       setCards(shuffle(filtered))
       setIsLoading(false)
@@ -48,7 +54,7 @@ function ReviewSession() {
     if (!currentCard) {
       return
     }
-    await applyReviewResult(currentCard.cardId, result, today)
+    await applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed)
     setShowBack(false)
     setIndex((prev) => prev + 1)
     if (result === 'good') {

@@ -296,7 +296,8 @@ function ImportExport() {
                 result: log.result,
                 previous_box: log.previous_box,
                 new_box: log.new_box,
-                was_learned_before: log.was_learned_before
+                was_learned_before: log.was_learned_before,
+                was_reversed: log.was_reversed
               }
             })
             .filter(Boolean) as ReviewLog[]

@@ -260,6 +260,7 @@ Checks manuels :
 - Stats `/stats` : vue globale + graphiques + tags
 - Settings `/settings` : box1_target + intervalles
 - Settings `/settings` : learned_review_interval_days (defaut 90)
+- Settings `/settings` : reverse_probability (0..1) pour inversion Q/R
 
 ## A — Act (à venir)
 
