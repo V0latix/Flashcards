@@ -2,11 +2,13 @@ export type Card = {
   id?: number
   front_md: string
   back_md: string
+  hint_md?: string | null
   tags: string[]
   created_at: string
   updated_at: string
   suspended?: boolean
   source?: string | null
+  source_type?: string | null
   source_id?: string | null
 }
 
@@ -25,6 +27,8 @@ export type ReviewState = {
   box: number
   due_date: string | null
   last_reviewed_at?: string | null
+  is_learned?: boolean
+  learned_at?: string | null
 }
 
 export type ReviewLog = {

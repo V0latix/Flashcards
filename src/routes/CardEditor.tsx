@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
@@ -10,6 +10,7 @@ function CardEditor() {
   const navigate = useNavigate()
   const [front, setFront] = useState('')
   const [back, setBack] = useState('')
+  const [hint, setHint] = useState('')
   const [tagsInput, setTagsInput] = useState('')
   const [isLoading, setIsLoading] = useState(Boolean(cardId))
   const numericCardId = cardId ? Number(cardId) : null
@@ -35,6 +36,7 @@ function CardEditor() {
       if (card) {
         setFront(card.front_md)
         setBack(card.back_md)
+        setHint(card.hint_md ?? '')
         setTagsInput(card.tags.join(', '))
       }
       setIsLoading(false)
@@ -45,17 +47,20 @@ function CardEditor() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    const normalizedHint = hint.trim() ? hint : null
     if (numericCardId && !Number.isNaN(numericCardId)) {
       await updateCard(numericCardId, {
         front_md: front,
         back_md: back,
-        tags: parsedTags
+        tags: parsedTags,
+        hint_md: normalizedHint
       })
     } else {
       await createCard({
         front_md: front,
         back_md: back,
-        tags: parsedTags
+        tags: parsedTags,
+        hint_md: normalizedHint
       })
     }
     navigate('/library')
@@ -87,6 +92,16 @@ function CardEditor() {
               value={back}
               className="textarea"
               onChange={(event) => setBack(event.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="hint">Hint (optional)</label>
+            <textarea
+              id="hint"
+              rows={4}
+              value={hint}
+              className="textarea"
+              onChange={(event) => setHint(event.target.value)}
             />
           </div>
           <div>
@@ -139,34 +154,6 @@ function CardEditor() {
           </div>
         </div>
       </section>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/review">Review session</Link>
-          </li>
-          <li>
-            <Link to="/library">Library</Link>
-          </li>
-          <li>
-            <Link to="/card/new">New card</Link>
-          </li>
-          <li>
-            <Link to="/card/1/edit">Edit card (demo)</Link>
-          </li>
-          <li>
-            <Link to="/stats">Stats</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-          <li>
-            <Link to="/import-export">Import/Export</Link>
-          </li>
-        </ul>
-      </nav>
     </main>
   )
 }

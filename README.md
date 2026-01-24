@@ -6,11 +6,14 @@ Application de flashcards personnelle basee sur la methode de Leitner, avec supp
 - Leitner strict (Box 0..5, intervalles 1/3/7/15/30, box1_target=10)
 - Session quotidienne avec cartes Box 1 + cartes dues (Box 2..5)
 - Cards avec Markdown + KaTeX + tags hierarchiques (format `A/B/C`)
+- Champs optionnels cartes: `hint_md`, `source_type`, `source_id`
 - Library tags-first avec explorateur d'arbre
 - Import/Export JSON tolerant + diagnostic d'import
 - Packs publics (Supabase) + import idempotent vers la base locale
 - Dashboard Stats (global, progression, tags, Leitner, insights)
 - Settings pour box1_target + intervalles
+- Accueil en grille d'icones + navigation header/bottom
+- Parametre de maintien learned_review_interval_days (defaut 90)
 
 ## Tech
 - React + TypeScript + Vite
@@ -70,6 +73,8 @@ Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absen
 ## Donnees locales
 - Cards stockees en IndexedDB (Dexie)
 - ReviewState et ReviewLog generes localement
+- Metadonnees optionnelles: `hint_md`, `source_type`, `source_id`
+- ReviewState: `is_learned`, `learned_at`
 
 ## Verification rapide
 1) `npm run dev`

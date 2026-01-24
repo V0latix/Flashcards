@@ -40,7 +40,9 @@ export async function importPackToLocal(
         card_id: newCardId,
         box: 0,
         due_date: null,
-        last_reviewed_at: null
+        last_reviewed_at: null,
+        is_learned: false,
+        learned_at: null
       })
 
       imported += 1

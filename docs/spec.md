@@ -145,11 +145,13 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - `id`
 - `front_md`
 - `back_md`
+- `hint_md` (optionnel)
 - `tags[]` (hierarchiques possibles avec `/`, ex: `Geographie/Capitales`)
 - `created_at`
 - `updated_at`
 - `suspended` (bool, optionnel)
 - `source` (optionnel, ex: `supabase`)
+- `source_type` (optionnel, ex: `pack`)
 - `source_id` (optionnel, id externe pour l'import idempotent)
 
 #### Media
@@ -164,6 +166,8 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - `box` ∈ {0..5}
 - `due_date`
 - `last_reviewed_at` (nullable)
+- `is_learned` (bool, defaut: false)
+- `learned_at` (nullable)
 
 #### ReviewLog
 - `id`
@@ -212,6 +216,7 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Packs Explorer avec tags arborescents et filtrage par prefixe
 - Dashboard Stats avec sections globales, progression et tags
 - Header global sticky avec bouton Home
+- Home plein ecran avec icones + descriptions, bouton Ajouter avec sous-actions
 
 ## I — Import/Export
 
@@ -244,6 +249,7 @@ Checks manuels :
 - Library `/library` : tags-first + recherche dans le scope courant
 - Stats `/stats` : vue globale + graphiques + tags
 - Settings `/settings` : box1_target + intervalles
+- Settings `/settings` : learned_review_interval_days (defaut 90)
 
 ## A — Act (à venir)
 

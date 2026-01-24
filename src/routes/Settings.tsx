@@ -11,24 +11,35 @@ function Settings() {
     4: 15,
     5: 30
   })
+  const [learnedReviewIntervalDays, setLearnedReviewIntervalDays] = useState(90)
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
     const data = getLeitnerSettings()
     setBox1Target(data.box1Target)
     setIntervals({ ...data.intervalDays })
+    setLearnedReviewIntervalDays(data.learnedReviewIntervalDays)
   }, [])
 
   const handleSave = (event: React.FormEvent) => {
     event.preventDefault()
-    const values = [box1Target, intervals[1], intervals[2], intervals[3], intervals[4], intervals[5]]
+    const values = [
+      box1Target,
+      intervals[1],
+      intervals[2],
+      intervals[3],
+      intervals[4],
+      intervals[5],
+      learnedReviewIntervalDays
+    ]
     if (values.some((value) => !Number.isFinite(value) || value <= 0)) {
       setStatus('Les valeurs doivent etre des nombres positifs.')
       return
     }
     saveLeitnerSettings({
       box1Target,
-      intervalDays: { ...intervals }
+      intervalDays: { ...intervals },
+      learnedReviewIntervalDays
     })
     setStatus('Parametres enregistres.')
   }
@@ -71,6 +82,17 @@ function Settings() {
               />
             </div>
           ))}
+        </div>
+        <div className="section">
+          <label htmlFor="learnedReviewIntervalDays">Revue maintien (jours)</label>
+          <input
+            id="learnedReviewIntervalDays"
+            type="number"
+            min={1}
+            value={learnedReviewIntervalDays}
+            className="input"
+            onChange={(event) => setLearnedReviewIntervalDays(Number(event.target.value))}
+          />
         </div>
         <button type="submit" className="btn btn-primary">
           Enregistrer

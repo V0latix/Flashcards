@@ -244,7 +244,9 @@ function ImportExport() {
               card_id: newCardId,
               box: providedState?.box ?? 0,
               due_date: providedState?.due_date ?? null,
-              last_reviewed_at: providedState?.last_reviewed_at ?? null
+              last_reviewed_at: providedState?.last_reviewed_at ?? null,
+              is_learned: providedState?.is_learned ?? false,
+              learned_at: providedState?.learned_at ?? null
             })
           })
 

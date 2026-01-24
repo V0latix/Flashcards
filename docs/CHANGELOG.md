@@ -16,11 +16,14 @@
 - Tests unitaires Vitest pour la logique Leitner.
 - Donnees de packs de capitales dans `packs/` (tags hierarchiques possibles).
 - Header global sticky avec bouton Home.
+- Accueil en grille d'icones avec descriptions + action Ajouter (carte/import/packs).
+- Champs cartes optionnels `hint_md`, `source_type`, `source_id`.
+- Champs ReviewState `is_learned` et `learned_at` + setting `learned_review_interval_days`.
 
 ### Changed
 - AutoFill Box 1 par tirage aleatoire uniforme depuis Box 0.
 - Ordre des cartes melange au demarrage de la session.
-- UI minimale avec layout centre et styles de base.
+- UI minimale avec layout centre, styles de base et navigation header/bottom.
 
 ### Fixed
 - Diagnostics IndexedDB au demarrage.

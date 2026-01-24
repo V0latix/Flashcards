@@ -54,6 +54,45 @@ class FlashcardsDB extends Dexie {
           }
         })
       })
+
+    this.version(4)
+      .stores({
+        cards: '++id, created_at, updated_at, source, [source+source_id]',
+        media: '++id, card_id, side',
+        reviewStates: 'card_id, box, due_date',
+        reviewLogs: '++id, card_id, timestamp'
+      })
+      .upgrade(async (tx) => {
+        await tx.table('cards').toCollection().modify((card) => {
+          if (!('hint_md' in card)) {
+            card.hint_md = null
+          }
+          if (!('source_type' in card)) {
+            card.source_type = null
+          }
+          if (!('source_id' in card)) {
+            card.source_id = null
+          }
+        })
+      })
+
+    this.version(5)
+      .stores({
+        cards: '++id, created_at, updated_at, source, [source+source_id]',
+        media: '++id, card_id, side',
+        reviewStates: 'card_id, box, due_date',
+        reviewLogs: '++id, card_id, timestamp'
+      })
+      .upgrade(async (tx) => {
+        await tx.table('reviewStates').toCollection().modify((state) => {
+          if (!('is_learned' in state)) {
+            state.is_learned = false
+          }
+          if (!('learned_at' in state)) {
+            state.learned_at = null
+          }
+        })
+      })
   }
 }
 

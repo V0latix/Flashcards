@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 import { deleteCard, listCardsWithReviewState } from '../db/queries'
 import type { Card, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
@@ -10,6 +13,7 @@ function Library() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const [openHints, setOpenHints] = useState<Record<number, boolean>>({})
 
   const loadCards = async () => {
     const data = await listCardsWithReviewState(0)
@@ -134,6 +138,20 @@ function Library() {
     return trimmed.length > 80 ? `${trimmed.slice(0, 80)}…` : trimmed
   }
 
+  const renderMarkdown = (value: string) => (
+    <ReactMarkdown
+      remarkPlugins={[remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+      components={{
+        img({ alt, ...props }) {
+          return <img alt={alt || 'Image'} loading="lazy" {...props} />
+        }
+      }}
+    >
+      {value}
+    </ReactMarkdown>
+  )
+
   return (
     <main className="container page">
       <div className="page-header">
@@ -204,6 +222,25 @@ function Library() {
                     <p>
                       Box {reviewState?.box ?? 0} · Due {reviewState?.due_date ?? '—'}
                     </p>
+                    {card.hint_md ? (
+                      <div className="section">
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() =>
+                            setOpenHints((prev) => ({
+                              ...prev,
+                              [card.id ?? 0]: !prev[card.id ?? 0]
+                            }))
+                          }
+                        >
+                          {openHints[card.id ?? 0] ? "Masquer l'indice" : "Afficher l'indice"}
+                        </button>
+                        {openHints[card.id ?? 0] ? (
+                          <div className="markdown">{renderMarkdown(card.hint_md)}</div>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       className="btn btn-secondary"
@@ -218,31 +255,6 @@ function Library() {
           </div>
         </section>
       )}
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/review">Review session</Link>
-          </li>
-          <li>
-            <Link to="/library">Library</Link>
-          </li>
-          <li>
-            <Link to="/card/new">New card</Link>
-          </li>
-          <li>
-            <Link to="/stats">Stats</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-          <li>
-            <Link to="/import-export">Import/Export</Link>
-          </li>
-        </ul>
-      </nav>
     </main>
   )
 }

@@ -78,6 +78,9 @@ export async function createCard(input: {
   front_md: string
   back_md: string
   tags?: string[]
+  hint_md?: string | null
+  source_type?: string | null
+  source_id?: string | null
 }): Promise<number> {
   const now = new Date().toISOString()
   const tags = input.tags ?? []
@@ -86,15 +89,20 @@ export async function createCard(input: {
     const cardId = await db.cards.add({
       front_md: input.front_md,
       back_md: input.back_md,
+      hint_md: input.hint_md ?? null,
       tags,
       created_at: now,
-      updated_at: now
+      updated_at: now,
+      source_type: input.source_type ?? null,
+      source_id: input.source_id ?? null
     })
 
     await db.reviewStates.add({
       card_id: cardId,
       box: 0,
-      due_date: null
+      due_date: null,
+      is_learned: false,
+      learned_at: null
     })
 
     return cardId
@@ -103,15 +111,36 @@ export async function createCard(input: {
 
 export async function updateCard(
   id: number,
-  updates: { front_md: string; back_md: string; tags: string[] }
+  updates: {
+    front_md?: string
+    back_md?: string
+    tags?: string[]
+    hint_md?: string | null
+    source_type?: string | null
+    source_id?: string | null
+  }
 ): Promise<number> {
   const now = new Date().toISOString()
-  return db.cards.update(id, {
-    front_md: updates.front_md,
-    back_md: updates.back_md,
-    tags: updates.tags,
-    updated_at: now
-  })
+  const payload: Partial<Card> = { updated_at: now }
+  if (updates.front_md !== undefined) {
+    payload.front_md = updates.front_md
+  }
+  if (updates.back_md !== undefined) {
+    payload.back_md = updates.back_md
+  }
+  if (updates.tags !== undefined) {
+    payload.tags = updates.tags
+  }
+  if (updates.hint_md !== undefined) {
+    payload.hint_md = updates.hint_md
+  }
+  if (updates.source_type !== undefined) {
+    payload.source_type = updates.source_type
+  }
+  if (updates.source_id !== undefined) {
+    payload.source_id = updates.source_id
+  }
+  return db.cards.update(id, payload)
 }
 
 export async function deleteCard(id: number): Promise<void> {

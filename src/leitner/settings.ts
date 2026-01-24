@@ -3,13 +3,15 @@ import { BOX1_TARGET, INTERVAL_DAYS } from './config'
 export type LeitnerSettings = {
   box1Target: number
   intervalDays: Record<number, number>
+  learnedReviewIntervalDays: number
 }
 
 const STORAGE_KEY = 'leitnerSettings'
 
 const getDefaultSettings = (): LeitnerSettings => ({
   box1Target: BOX1_TARGET,
-  intervalDays: { ...INTERVAL_DAYS }
+  intervalDays: { ...INTERVAL_DAYS },
+  learnedReviewIntervalDays: 90
 })
 
 const toPositiveInt = (value: unknown): number | null => {
@@ -36,7 +38,9 @@ export const getLeitnerSettings = (): LeitnerSettings => {
       const value = parsed.intervalDays ? parsed.intervalDays[box] : undefined
       intervalDays[box] = toPositiveInt(value) ?? INTERVAL_DAYS[box]
     }
-    return { box1Target, intervalDays }
+    const learnedReviewIntervalDays =
+      toPositiveInt(parsed.learnedReviewIntervalDays) ?? 90
+    return { box1Target, intervalDays, learnedReviewIntervalDays }
   } catch {
     return getDefaultSettings()
   }
