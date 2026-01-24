@@ -217,6 +217,16 @@ ul {
   justify-content: space-between;
 }
 
+.markdown img {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+
 @media (max-width: 900px) {
   .split {
     flex-direction: column;

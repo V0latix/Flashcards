@@ -108,15 +108,35 @@ function CardEditor() {
         <h2>Preview</h2>
         <div>
           <h3>Front</h3>
-          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {front || '*Rien a afficher*'}
-          </ReactMarkdown>
+          <div className="markdown">
+            <ReactMarkdown
+              remarkPlugins={[remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                img({ alt, ...props }) {
+                  return <img alt={alt || 'Image'} loading="lazy" {...props} />
+                }
+              }}
+            >
+              {front || '*Rien a afficher*'}
+            </ReactMarkdown>
+          </div>
         </div>
         <div>
           <h3>Back</h3>
-          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {back || '*Rien a afficher*'}
-          </ReactMarkdown>
+          <div className="markdown">
+            <ReactMarkdown
+              remarkPlugins={[remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                img({ alt, ...props }) {
+                  return <img alt={alt || 'Image'} loading="lazy" {...props} />
+                }
+              }}
+            >
+              {back || '*Rien a afficher*'}
+            </ReactMarkdown>
+          </div>
         </div>
       </section>
       <nav>
