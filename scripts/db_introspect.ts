@@ -8,7 +8,7 @@ if (!connectionString) {
 }
 
 const fetchTables = async (client: Client): Promise<string[]> => {
-  const result = await client.query(
+  const result = await client.query<{ table_name: string }>(
     `
       SELECT table_name
       FROM information_schema.tables
@@ -17,11 +17,15 @@ const fetchTables = async (client: Client): Promise<string[]> => {
       ORDER BY table_name;
     `
   )
-  return result.rows.map((row) => row.table_name as string)
+  return result.rows.map((row) => row.table_name)
 }
 
 const fetchColumns = async (client: Client, tableName: string) => {
-  const result = await client.query(
+  const result = await client.query<{
+    column_name: string
+    data_type: string
+    is_nullable: 'YES' | 'NO'
+  }>(
     `
       SELECT column_name, data_type, is_nullable
       FROM information_schema.columns
