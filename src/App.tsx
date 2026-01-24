@@ -5,6 +5,7 @@ import AppShell from './components/AppShell'
 import { healthCheckSupabase } from './supabase/health'
 import CardEditor from './routes/CardEditor'
 import DebugMedia from './routes/DebugMedia'
+import DebugSupabase from './routes/DebugSupabase'
 import Home from './routes/Home'
 import ImportExport from './routes/ImportExport'
 import Library from './routes/Library'
@@ -43,6 +44,7 @@ function App() {
           <Route path="/card/new" element={<CardEditor />} />
           <Route path="/card/:cardId/edit" element={<CardEditor />} />
           <Route path="/debug/media" element={<DebugMedia />} />
+          <Route path="/debug/supabase" element={<DebugSupabase />} />
           <Route path="/packs" element={<Packs />} />
           <Route path="/packs/:slug" element={<PackDetail />} />
           <Route path="/stats" element={<StatsPage />} />
