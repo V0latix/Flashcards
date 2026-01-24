@@ -1,85 +1,84 @@
-# React + TypeScript + Vite
+# Flashcards Leitner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application de flashcards personnelle basee sur la methode de Leitner, avec support Markdown + KaTeX, stockage local via IndexedDB (Dexie) et packs publics via Supabase (lecture seule).
 
-## Supabase (lecture seule)
+## Fonctionnalites
+- Leitner strict (Box 0..5, intervalles 1/3/7/15/30, box1_target=10)
+- Session quotidienne avec cartes Box 1 + cartes dues (Box 2..5)
+- Cards avec Markdown + KaTeX + tags hierarchiques (format `A/B/C`)
+- Library tags-first avec explorateur d'arbre
+- Import/Export JSON tolerant + diagnostic d'import
+- Packs publics (Supabase) + import idempotent vers la base locale
 
-Creer un fichier `.env.local` a la racine :
+## Tech
+- React + TypeScript + Vite
+- IndexedDB via Dexie
+- Supabase (lecture seule)
+- Vitest pour les tests unitaires
+
+## Installation
+```bash
+npm install
+npm run dev
+```
+
+## Configuration Supabase (lecture seule)
+Creer un fichier `.env.local` a la racine du projet :
 
 ```
-VITE_SUPABASE_URL=your-project-url
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_URL=https://<ton-projet>.supabase.co
+VITE_SUPABASE_ANON_KEY=<ta-cle-anon>
 ```
 
-Ces valeurs se trouvent dans le dashboard Supabase :
+Les valeurs se trouvent dans Supabase :
 Project Settings -> API -> Project URL + anon/public key.
 
-Currently, two official plugins are available:
+## Scripts utiles
+- `npm run dev` : demarrer l'app
+- `npm run build` : build production
+- `npm run lint` : lint
+- `npm test` : tests unitaires
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Pages principales
+- `/` Home
+- `/review` ReviewSession
+- `/library` Library (tags arborescents)
+- `/card/new` CardEditor
+- `/card/:cardId/edit` CardEditor
+- `/packs` Packs (Supabase)
+- `/packs/:slug` PackDetail
+- `/import-export` Import/Export
 
-## React Compiler
+## Import/Export JSON
+Formats acceptes :
+- `{ "schema_version": 1, "cards": [ ... ] }`
+- `{ "cards": [ ... ] }`
+- `[ ... ]`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Champs cartes acceptes : `front_md`/`back_md` ou `front`/`back`.
+Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absent.
 
-## Expanding the ESLint configuration
+## Packs publics (Supabase)
+- Liste des packs sur `/packs`
+- Detail d'un pack sur `/packs/:slug`
+- Import d'un pack vers la base locale (idempotent via `source` + `source_id`)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Donnees locales
+- Cards stockees en IndexedDB (Dexie)
+- ReviewState et ReviewLog generes localement
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Verification rapide
+1) `npm run dev`
+2) Importer un pack public, puis ouvrir `/library`
+3) Lancer une session `/review`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Structure rapide
+- `src/leitner/` : moteur Leitner
+- `src/db/` : Dexie + queries
+- `src/routes/` : pages
+- `src/supabase/` : client + API + import
+- `packs/` : packs JSON locaux
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Notes
+- Supabase est utilise en lecture seule (pas d'auth).
+- Le health check Supabase s'exécute uniquement en mode dev.

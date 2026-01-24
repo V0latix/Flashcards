@@ -145,10 +145,12 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - `id`
 - `front_md`
 - `back_md`
-- `tags[]`
+- `tags[]` (hierarchiques possibles avec `/`, ex: `Geographie/Capitales`)
 - `created_at`
 - `updated_at`
 - `suspended` (bool, optionnel)
+- `source` (optionnel, ex: `supabase`)
+- `source_id` (optionnel, id externe pour l'import idempotent)
 
 #### Media
 - `id`
@@ -188,6 +190,8 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - `/library` Library
 - `/card/new` CardEditor
 - `/card/:cardId/edit` CardEditor
+- `/packs` Packs
+- `/packs/:slug` PackDetail
 - `/stats` Stats
 - `/settings` Settings
 - `/import-export` ImportExport
@@ -204,6 +208,8 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Layout centre avec largeur max + padding
 - Styles reutilisables (container, card, button, input) dans `src/index.css`
 - Library en vue tags-first + recherche dans le scope courant
+- Tags hierarchiques affiches en arbre (separateur `/`)
+- Packs Explorer avec tags arborescents et filtrage par prefixe
 
 ## I — Import/Export
 
@@ -215,12 +221,14 @@ La session n’impose aucune limite stricte sur le nombre total de cartes.
 - Champs acceptes : `front_md`/`back_md` ou `front`/`back`
 - Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absent
 - Bouton debug pour importer un echantillon et logs de diagnostic
+- Import d'un pack Supabase vers la base locale (idempotent via `source` + `source_id`)
 
 ## S — Services externes
 
 - Supabase en lecture seule (client dans `src/supabase/`)
 - Health check au demarrage en mode dev uniquement
 - Variables attendues : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Packs et cartes publiques exposes via Supabase (`packs`, `public_cards`)
 
 ## V — Verification
 
