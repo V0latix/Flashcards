@@ -93,6 +93,22 @@ class FlashcardsDB extends Dexie {
           }
         })
       })
+
+    this.version(6)
+      .stores({
+        cards:
+          '++id, created_at, updated_at, source, source_type, source_id, [source+source_id], [source_type+source_id]',
+        media: '++id, card_id, side',
+        reviewStates: 'card_id, box, due_date',
+        reviewLogs: '++id, card_id, timestamp'
+      })
+      .upgrade(async (tx) => {
+        await tx.table('cards').toCollection().modify((card) => {
+          if (!('source_type' in card)) {
+            card.source_type = null
+          }
+        })
+      })
   }
 }
 

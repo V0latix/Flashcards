@@ -3,6 +3,18 @@ import { Link } from 'react-router-dom'
 import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
 
 function Settings() {
+  const defaultBox1Target = 10
+  const defaultIntervals = {
+    1: 1,
+    2: 3,
+    3: 7,
+    4: 15,
+    5: 30
+  }
+  const defaultLearnedInterval = 90
+  const minLearnedInterval = 7
+  const maxLearnedInterval = 3650
+
   const [box1Target, setBox1Target] = useState(10)
   const [intervals, setIntervals] = useState<Record<number, number>>({
     1: 1,
@@ -31,11 +43,19 @@ function Settings() {
       intervals[2],
       intervals[3],
       intervals[4],
-      intervals[5],
-      learnedReviewIntervalDays
+      intervals[5]
     ]
     if (values.some((value) => !Number.isFinite(value) || value <= 0)) {
       setStatus('Les valeurs doivent etre des nombres positifs.')
+      return
+    }
+    if (
+      learnedReviewIntervalDays < minLearnedInterval ||
+      learnedReviewIntervalDays > maxLearnedInterval
+    ) {
+      setStatus(
+        `L'intervalle learned doit etre entre ${minLearnedInterval} et ${maxLearnedInterval} jours.`
+      )
       return
     }
     saveLeitnerSettings({
@@ -54,6 +74,7 @@ function Settings() {
         <p>Configurer la taille de la Box 1 et les intervalles Leitner.</p>
       </div>
       <form className="card section" onSubmit={handleSave}>
+        <h2>Revision</h2>
         <div className="section">
           <label htmlFor="box1Target">Box 1 target</label>
           <input
@@ -91,11 +112,13 @@ function Settings() {
           <input
             id="learnedReviewIntervalDays"
             type="number"
-            min={1}
+            min={minLearnedInterval}
+            max={maxLearnedInterval}
             value={learnedReviewIntervalDays}
             className="input"
             onChange={(event) => setLearnedReviewIntervalDays(Number(event.target.value))}
           />
+          <p>Revision de maintien pour les cartes learned.</p>
         </div>
         <div className="section">
           <label htmlFor="reverseProbability">Inverser question/reponse</label>
@@ -112,6 +135,19 @@ function Settings() {
         </div>
         <button type="submit" className="btn btn-primary">
           Enregistrer
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => {
+            setBox1Target(defaultBox1Target)
+            setIntervals({ ...defaultIntervals })
+            setLearnedReviewIntervalDays(defaultLearnedInterval)
+            setReverseProbability(0)
+            setStatus('Valeurs par defaut restaurees.')
+          }}
+        >
+          Restaurer valeurs par defaut
         </button>
         {status ? <p>{status}</p> : null}
       </form>

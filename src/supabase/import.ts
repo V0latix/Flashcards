@@ -5,9 +5,10 @@ export async function importPackToLocal(
   packSlug: string
 ): Promise<{ imported: number; alreadyPresent: number }> {
   const cards = await listPublicCardsByPackSlug(packSlug)
+  const sourceType = 'supabase_public'
   const source = 'supabase'
 
-  const existing = await db.cards.where('source').equals(source).toArray()
+  const existing = await db.cards.where('source_type').equals(sourceType).toArray()
   const existingIds = new Set(
     existing
       .map((card) => card.source_id)
@@ -33,6 +34,7 @@ export async function importPackToLocal(
         created_at: now,
         updated_at: now,
         source,
+        source_type: sourceType,
         source_id: sourceId
       })
 
