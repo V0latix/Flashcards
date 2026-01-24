@@ -135,13 +135,13 @@ function Library() {
       return null
     }
     return (
-      <ul style={{ listStyle: 'none', paddingLeft: depth === 0 ? 0 : 16 }}>
+      <ul className="tree">
         {nodes.map((node) => {
           const isCollapsed = collapsed[node.path] ?? false
           const hasChildren = node.children.length > 0
           return (
             <li key={node.path}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div className="tree-row">
                 {hasChildren ? (
                   <button
                     type="button"
@@ -156,7 +156,7 @@ function Library() {
                     {isCollapsed ? '▸' : '▾'}
                   </button>
                 ) : (
-                  <span style={{ width: 34 }} />
+                  <span className="tree-spacer" />
                 )}
                 <button
                   type="button"
@@ -201,7 +201,10 @@ function Library() {
 
   return (
     <main className="container">
-      <h1>Library</h1>
+      <div className="page-header">
+        <h1>Library</h1>
+        <p>Explore tes cartes par dossiers de tags.</p>
+      </div>
       <p>
         <Link to="/card/new" className="btn btn-primary">
           Ajouter une carte
@@ -210,8 +213,8 @@ function Library() {
       {isLoading ? (
         <p>Chargement...</p>
       ) : (
-        <section className="card section" style={{ display: 'flex', gap: 16 }}>
-          <div style={{ minWidth: 220, flex: '0 0 220px' }}>
+        <section className="card section split">
+          <div className="sidebar">
             <h2>Tags</h2>
             <button
               type="button"
@@ -220,17 +223,12 @@ function Library() {
             >
               Toutes les cartes
             </button>
-            {tagTree.children.length === 0 ? (
-              <p>Aucun tag pour le moment.</p>
-            ) : (
-              renderTagNodes(tagTree.children)
-            )}
+            {tagTree.children.length === 0 ? <p>Aucun tag pour le moment.</p> : null}
+            {renderTagNodes(tagTree.children)}
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <h2 style={{ margin: 0 }}>
-                {selectedTag ? `Tag: ${selectedTag}` : 'Toutes les cartes'}
-              </h2>
+          <div className="panel">
+            <div className="panel-header">
+              <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Toutes les cartes'}</h2>
               {selectedTag ? (
                 <button type="button" className="btn btn-secondary" onClick={handleGoUp}>
                   Remonter
@@ -238,9 +236,9 @@ function Library() {
               ) : null}
             </div>
             {breadcrumbParts.length > 0 ? (
-              <p>
+              <div className="breadcrumb">
                 {breadcrumbParts.map((part, index) => (
-                  <span key={breadcrumbPaths[index]}>
+                  <span key={breadcrumbPaths[index]} className="chip">
                     <button
                       type="button"
                       className="btn btn-secondary"
@@ -248,10 +246,9 @@ function Library() {
                     >
                       {part}
                     </button>
-                    {index < breadcrumbParts.length - 1 ? ' / ' : null}
                   </span>
                 ))}
-              </p>
+              </div>
             ) : null}
             <label htmlFor="search">Recherche</label>
             <input
@@ -261,19 +258,17 @@ function Library() {
               className="input"
               onChange={(event) => setQuery(event.target.value)}
             />
-            {filteredCards.length === 0 ? (
-              <p>Aucune carte pour le moment.</p>
-            ) : (
-              <ul>
+            {filteredCards.length === 0 ? <p>Aucune carte pour le moment.</p> : null}
+            {filteredCards.length > 0 ? (
+              <ul className="card-list">
                 {filteredCards.map(({ card, reviewState }) => (
-                  <li key={card.id}>
+                  <li key={card.id} className="card list-item">
                     <Link to={`/card/${card.id}/edit`}>
                       {renderSnippet(card.front_md)}
-                    </Link>{' '}
-                    <span>
-                      Box {reviewState?.box ?? 0} · Due{' '}
-                      {reviewState?.due_date ?? '—'}
-                    </span>
+                    </Link>
+                    <p>
+                      Box {reviewState?.box ?? 0} · Due {reviewState?.due_date ?? '—'}
+                    </p>
                     <button
                       type="button"
                       className="btn btn-secondary"
@@ -284,7 +279,7 @@ function Library() {
                   </li>
                 ))}
               </ul>
-            )}
+            ) : null}
           </div>
         </section>
       )}

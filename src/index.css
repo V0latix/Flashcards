@@ -1,13 +1,23 @@
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  line-height: 1.5;
+  font-family: 'Space Grotesk', 'IBM Plex Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
   font-weight: 400;
-  color: #1f2933;
-  background-color: #f5f7fb;
+  color: #0f172a;
+  background-color: #f1f5f9;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #0f766e;
+  --primary-strong: #0f5f5a;
+  --secondary: #e2e8f0;
+  --shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
 }
 
 * {
@@ -18,29 +28,37 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: radial-gradient(circle at top, #ffffff 0%, #eef2f7 55%, #e2e8f0 100%);
 }
 
 a {
-  font-weight: 500;
-  color: #1d4ed8;
+  font-weight: 600;
+  color: var(--primary);
   text-decoration: none;
 }
 a:hover {
-  color: #1e40af;
+  color: var(--primary-strong);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  margin: 0 0 12px;
 }
 
 h1 {
-  font-size: 2rem;
-  margin: 0 0 16px;
+  font-size: 2.2rem;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-  font-size: 1.25rem;
-  margin: 0 0 12px;
+  font-size: 1.4rem;
 }
 
 p {
   margin: 0 0 12px;
+  color: var(--muted);
 }
 
 ul {
@@ -49,9 +67,13 @@ ul {
 }
 
 .container {
-  max-width: 1040px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 24px 16px 40px;
+  padding: 28px 18px 48px;
+}
+
+.page-header {
+  margin-bottom: 24px;
 }
 
 .section {
@@ -59,35 +81,52 @@ ul {
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.card-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .btn {
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid transparent;
   padding: 10px 16px;
   font-size: 0.95rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .btn-primary {
-  background: #1d4ed8;
+  background: var(--primary);
   color: #ffffff;
-}
-
-.btn-secondary {
-  background: #e2e8f0;
-  color: #1f2933;
+  box-shadow: 0 10px 20px rgba(15, 118, 110, 0.2);
 }
 
 .btn-primary:hover {
-  background: #1e40af;
+  background: var(--primary-strong);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
@@ -97,22 +136,95 @@ ul {
 .input,
 .textarea {
   width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 10px 12px;
   font-size: 0.95rem;
   font-family: inherit;
-  background: #ffffff;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .textarea {
   resize: vertical;
 }
 
+.split {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.sidebar {
+  flex: 0 0 240px;
+}
+
+.panel {
+  flex: 1;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tree {
+  list-style: none;
+  padding-left: 0;
+  margin: 12px 0 0;
+}
+
+.tree .tree {
+  padding-left: 16px;
+}
+
+.tree-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tree-spacer {
+  width: 32px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 16px;
+}
+
 .button-row {
   display: flex;
   gap: 12px;
   justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .split {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
 }
 
 @media (max-width: 640px) {

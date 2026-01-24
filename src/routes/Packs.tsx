@@ -113,13 +113,13 @@ function Packs() {
       return null
     }
     return (
-      <ul style={{ listStyle: 'none', paddingLeft: depth === 0 ? 0 : 16 }}>
+      <ul className="tree">
         {nodes.map((node) => {
           const isCollapsed = collapsed[node.path] ?? false
           const hasChildren = node.children.length > 0
           return (
             <li key={node.path}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div className="tree-row">
                 {hasChildren ? (
                   <button
                     type="button"
@@ -134,7 +134,7 @@ function Packs() {
                     {isCollapsed ? '▸' : '▾'}
                   </button>
                 ) : (
-                  <span style={{ width: 34 }} />
+                  <span className="tree-spacer" />
                 )}
                 <button
                   type="button"
@@ -154,13 +154,16 @@ function Packs() {
 
   return (
     <main className="container">
-      <h1>Packs</h1>
+      <div className="page-header">
+        <h1>Packs</h1>
+        <p>Parcours les packs publics par dossier de tags.</p>
+      </div>
       {isLoading ? <p>Chargement...</p> : null}
       {error ? <p>{error}</p> : null}
       {!isLoading && !error && packs.length === 0 ? <p>Aucun pack.</p> : null}
       {!isLoading && !error && packs.length > 0 ? (
-        <section className="card section" style={{ display: 'flex', gap: 16 }}>
-          <div style={{ minWidth: 220, flex: '0 0 220px' }}>
+        <section className="card section split">
+          <div className="sidebar">
             <h2>Tags</h2>
             <button
               type="button"
@@ -175,17 +178,15 @@ function Packs() {
               renderTagNodes(tagTree.children)
             )}
           </div>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ marginTop: 0 }}>
-              {selectedTag ? `Tag: ${selectedTag}` : 'Tous les packs'}
-            </h2>
+          <div className="panel">
+            <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Tous les packs'}</h2>
             {filteredPacks.length === 0 ? (
               <p>Aucun pack.</p>
             ) : (
-              <ul>
+              <ul className="card-list">
                 {filteredPacks.map((pack) => (
-                  <li key={pack.id}>
-                    <h2>{pack.title}</h2>
+                  <li key={pack.id} className="card list-item">
+                    <h3>{pack.title}</h3>
                     <Link className="btn btn-primary" to={`/packs/${pack.slug}`}>
                       Ouvrir
                     </Link>
