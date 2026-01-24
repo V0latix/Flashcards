@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import db from './db'
+import { healthCheckSupabase } from './supabase/health'
 import CardEditor from './routes/CardEditor'
 import Home from './routes/Home'
 import ImportExport from './routes/ImportExport'
@@ -22,6 +23,10 @@ function App() {
     }
 
     void runDbCheck()
+
+    if (import.meta.env.DEV) {
+      void healthCheckSupabase()
+    }
   }, [])
 
   return (
