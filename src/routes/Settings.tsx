@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteAllCards } from '../db/queries'
 import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
+import { getStoredTheme, setTheme, type ThemeMode } from '../theme'
 
 function Settings() {
   const defaultBox1Target = 10
@@ -28,6 +29,7 @@ function Settings() {
   const [reverseProbability, setReverseProbability] = useState(
     initialSettings.reverseProbability
   )
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getStoredTheme())
   const [status, setStatus] = useState<string | null>(null)
   const [dangerOpen, setDangerOpen] = useState(false)
   const [dangerText, setDangerText] = useState('')
@@ -72,6 +74,25 @@ function Settings() {
         <h1>Settings</h1>
         <p>Configurer la taille de la Box 1 et les intervalles Leitner.</p>
       </div>
+      <section className="card section">
+        <h2>Apparence</h2>
+        <div className="section">
+          <label htmlFor="theme-toggle">Mode sombre</label>
+          <div className="toggle-row">
+            <input
+              id="theme-toggle"
+              type="checkbox"
+              checked={themeMode === 'dark'}
+              onChange={(event) => {
+                const nextTheme: ThemeMode = event.target.checked ? 'dark' : 'light'
+                setThemeMode(nextTheme)
+                setTheme(nextTheme)
+              }}
+            />
+            <span>{themeMode === 'dark' ? 'Activé' : 'Désactivé'}</span>
+          </div>
+        </div>
+      </section>
       <form className="card section" onSubmit={handleSave}>
         <h2>Revision</h2>
         <div className="section">
