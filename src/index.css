@@ -168,6 +168,54 @@ ul {
   font-weight: 600;
 }
 
+.auth-trigger {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.auth-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.auth-error {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.auth-success {
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.auth-provider {
+  justify-content: center;
+  width: 100%;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 .nav-menu a:hover {
   background: var(--surface-muted);
 }
@@ -379,6 +427,14 @@ ul {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+}
+
+.home-account {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 2;
 }
 
 .home-grid {
