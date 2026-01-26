@@ -37,3 +37,12 @@ export const SettingsIcon = (props: IconProps) => (
     />
   </svg>
 )
+
+export const UserIcon = (props: IconProps) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+    <path
+      d="M12 12.25a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4.2 0-7.5 2.1-7.5 4.75V21h15v-2c0-2.65-3.3-4.75-7.5-4.75z"
+      fill="currentColor"
+    />
+  </svg>
+)

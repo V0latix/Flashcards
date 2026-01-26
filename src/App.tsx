@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthProvider'
 import db from './db'
 import AppShell from './components/AppShell'
 import { healthCheckSupabase } from './supabase/health'
@@ -49,23 +50,25 @@ function App() {
   }, [])
 
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <AppShell>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/review" element={<ReviewSession />} />
-          <Route path="/library" element={<Library />} />
-          <Route path="/card/new" element={<CardEditor />} />
-          <Route path="/card/:cardId/edit" element={<CardEditor />} />
-          <Route path="/packs" element={<Packs />} />
-          <Route path="/packs/:slug" element={<PackDetail />} />
-          <Route path="/stats" element={<StatsPage />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/import-export" element={<ImportExport />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AppShell>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <AppShell>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/review" element={<ReviewSession />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/card/new" element={<CardEditor />} />
+            <Route path="/card/:cardId/edit" element={<CardEditor />} />
+            <Route path="/packs" element={<Packs />} />
+            <Route path="/packs/:slug" element={<PackDetail />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/import-export" element={<ImportExport />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AppShell>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

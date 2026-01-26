@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import AuthButton from '../auth/AuthButton'
 import { ChartIcon, HomeIcon, PlayIcon, PlusIcon, SettingsIcon } from './icons'
 
 type AppShellProps = {
@@ -89,6 +90,9 @@ function AppShell({ children }: AppShellProps) {
               icon={<SettingsIcon className="icon" />}
               isActive={isActive('/settings')}
             />
+            <div className="auth-trigger">
+              <AuthButton />
+            </div>
           </div>
         </header>
       ) : null}

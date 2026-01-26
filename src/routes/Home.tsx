@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
+import AuthButton from '../auth/AuthButton'
 import { ChartIcon, HomeIcon, PlayIcon, PlusIcon, SettingsIcon } from '../components/icons'
 
 function Home() {
   return (
     <main className="home-hero">
+      <div className="home-account">
+        <AuthButton className="btn btn-secondary auth-button" />
+      </div>
       <div className="home-grid" role="navigation" aria-label="Accueil">
         <Link to="/review" className="home-tile home-primary" aria-label="Commencer une session">
           <PlayIcon className="home-icon" />
