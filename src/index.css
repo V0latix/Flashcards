@@ -18,6 +18,9 @@
   --primary-strong: #0f5f5a;
   --secondary: #e2e8f0;
   --shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  --chart-track: #e2e8f0;
+  --chart-good: #0f766e;
+  --chart-bad: #fb7185;
 }
 
 :root[data-theme='dark'] {
@@ -32,6 +35,9 @@
   --primary-strong: #14b8a6;
   --secondary: #1f2a44;
   --shadow: 0 20px 40px rgba(2, 6, 23, 0.45);
+  --chart-track: #1f2a44;
+  --chart-good: #2dd4bf;
+  --chart-bad: #fb7185;
 }
 
 * {
@@ -240,10 +246,114 @@ ul {
   background: var(--border);
 }
 
-.toggle-row {
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 600;
+}
+
+.theme-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+}
+
+.theme-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+}
+
+.theme-track {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  color: var(--muted);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.theme-input:checked + .theme-track {
+  background: rgba(45, 212, 191, 0.18);
+  border-color: var(--primary);
+}
+
+.theme-input:checked + .theme-track .theme-thumb {
+  transform: translateX(28px);
+}
+
+.theme-icon {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.theme-icon-sun {
+  transform: translateY(-1px);
+}
+
+.theme-icon-moon {
+  transform: translateY(1px);
+}
+
+.chart {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  height: 160px;
+}
+
+.chart-col {
+  flex: 1;
+  text-align: center;
+}
+
+.chart-bar {
+  height: 100%;
+  background: var(--chart-track);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.chart-bar-good {
+  background: var(--chart-good);
+}
+
+.chart-bar-bad {
+  background: var(--chart-bad);
+}
+
+.chart-label {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .nav-menu a:hover {

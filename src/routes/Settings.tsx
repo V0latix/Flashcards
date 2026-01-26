@@ -77,20 +77,31 @@ function Settings() {
       <section className="card section">
         <h2>Apparence</h2>
         <div className="section">
-          <label htmlFor="theme-toggle">Mode sombre</label>
-          <div className="toggle-row">
-            <input
-              id="theme-toggle"
-              type="checkbox"
-              checked={themeMode === 'dark'}
-              onChange={(event) => {
-                const nextTheme: ThemeMode = event.target.checked ? 'dark' : 'light'
-                setThemeMode(nextTheme)
-                setTheme(nextTheme)
-              }}
-            />
-            <span>{themeMode === 'dark' ? 'Activé' : 'Désactivé'}</span>
-          </div>
+          <label className="theme-toggle" htmlFor="theme-toggle">
+            <span>Mode sombre</span>
+            <span className="theme-switch">
+              <input
+                id="theme-toggle"
+                type="checkbox"
+                className="theme-input"
+                checked={themeMode === 'dark'}
+                onChange={(event) => {
+                  const nextTheme: ThemeMode = event.target.checked ? 'dark' : 'light'
+                  setThemeMode(nextTheme)
+                  setTheme(nextTheme)
+                }}
+              />
+              <span className="theme-track" aria-hidden="true">
+                <span className="theme-thumb" />
+                <span className="theme-icon theme-icon-sun" aria-hidden="true">
+                  ☀︎
+                </span>
+                <span className="theme-icon theme-icon-moon" aria-hidden="true">
+                  ☾
+                </span>
+              </span>
+            </span>
+          </label>
         </div>
       </section>
       <form className="card section" onSubmit={handleSave}>

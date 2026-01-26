@@ -58,42 +58,38 @@ const Chart = ({
   data: Array<{ date: string; good: number; bad: number; total: number }>
 }) => {
   const max = Math.max(1, ...data.map((item) => item.total))
+  const hasReviews = data.some((item) => item.total > 0)
   return (
     <div className="card section">
       <h2>Revisions par jour</h2>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 160 }}>
-        {data.map((item) => (
-          <div key={item.date} style={{ flex: 1, textAlign: 'center' }}>
-            <div
-              style={{
-                height: `${(item.total / max) * 100}%`,
-                background: '#e2e8f0',
-                borderRadius: 6,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                overflow: 'hidden'
-              }}
-              title={`Bon: ${item.good} | Faux: ${item.bad}`}
-            >
-              <div
-                style={{
-                  height: `${(item.good / Math.max(1, item.total)) * 100}%`,
-                  background: '#0f766e'
-                }}
-              />
-              <div
-                style={{
-                  height: `${(item.bad / Math.max(1, item.total)) * 100}%`,
-                  background: '#fb7185'
-                }}
-              />
-            </div>
-            <div style={{ fontSize: 12, color: '#64748b' }}>{item.date.slice(5)}</div>
+      {!hasReviews ? (
+        <p>Aucune révision sur cette période.</p>
+      ) : (
+        <>
+          <div className="chart">
+            {data.map((item) => (
+              <div key={item.date} className="chart-col">
+                <div
+                  className="chart-bar"
+                  style={{ height: `${(item.total / max) * 100}%` }}
+                  title={`Bon: ${item.good} | Faux: ${item.bad}`}
+                >
+                  <div
+                    className="chart-bar-good"
+                    style={{ height: `${(item.good / Math.max(1, item.total)) * 100}%` }}
+                  />
+                  <div
+                    className="chart-bar-bad"
+                    style={{ height: `${(item.bad / Math.max(1, item.total)) * 100}%` }}
+                  />
+                </div>
+                <div className="chart-label">{item.date.slice(5)}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <p>Vert: bon, rose: faux (empile).</p>
+          <p>Vert: bon, rose: faux (empilé).</p>
+        </>
+      )}
     </div>
   )
 }
