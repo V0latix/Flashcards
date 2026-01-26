@@ -531,11 +531,15 @@ export const runInitialSync = async (userId: string) => {
     console.error('[sync] initial failed', error)
   } finally {
     isSyncing = false
+    if (pendingSync && activeUserId) {
+      void syncOnce(activeUserId)
+    }
   }
 }
 
 export const syncOnce = async (userId: string, forcePull = false) => {
   if (isSyncing) {
+    pendingSync = true
     return
   }
   if (!pendingSync && !forcePull && pendingDeletes.length === 0) {
@@ -555,7 +559,15 @@ export const syncOnce = async (userId: string, forcePull = false) => {
   } catch (error) {
     console.error('[sync] failed', error)
   } finally {
+    const shouldResync = pendingSync
     pendingSync = false
     isSyncing = false
+    if (shouldResync && activeUserId) {
+      window.setTimeout(() => {
+        if (activeUserId) {
+          void syncOnce(activeUserId)
+        }
+      }, 0)
+    }
   }
 }
