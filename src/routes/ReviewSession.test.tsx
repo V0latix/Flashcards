@@ -73,6 +73,30 @@ describe('ReviewSession', () => {
     })
   })
 
+  it('shows answers in session recap', async () => {
+    await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/review']}>
+        <ReviewSession />
+      </MemoryRouter>
+    )
+
+    await screen.findByText(/Carte 1/)
+    fireEvent.click(screen.getByRole('button', { name: /Revealer/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Bon' }))
+
+    await screen.findByText(/Session terminee/i)
+    expect(screen.getByText('Q1')).toBeInTheDocument()
+    expect(screen.getByText('A1')).toBeInTheDocument()
+  })
+
   it('deletes a card during session and continues', async () => {
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.999)
     const firstId = await seedCardWithState({

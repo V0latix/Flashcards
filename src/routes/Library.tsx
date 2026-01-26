@@ -22,6 +22,23 @@ function Library() {
   const [isCardDeleting, setIsCardDeleting] = useState(false)
   const navigate = useNavigate()
 
+  const formatDueDate = (value: string | null | undefined) => {
+    if (!value) {
+      return '—'
+    }
+    const [year, month, day] = value.split('-').map(Number)
+    if (!year || !month || !day) {
+      return value
+    }
+    const date = new Date(Date.UTC(year, month - 1, day))
+    return date.toLocaleDateString('fr-FR', {
+      timeZone: 'UTC',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+  }
+
   const loadCards = async () => {
     const data = await listCardsWithReviewState(0)
     setCards(data)
@@ -293,7 +310,7 @@ function Library() {
                     </Link>
                     <div className="chip">Box {reviewState?.box ?? 0}</div>
                     <p>
-                      Due {reviewState?.due_date ?? '—'}
+                      Prochain test : {formatDueDate(reviewState?.due_date)}
                     </p>
                     {card.hint_md ? (
                       <div className="section">

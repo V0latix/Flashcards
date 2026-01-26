@@ -160,6 +160,9 @@ function ReviewSession() {
                       <div className="markdown">
                         <MarkdownRenderer value={card.front || '—'} />
                       </div>
+                      <div className="markdown">
+                        <MarkdownRenderer value={card.back || '—'} />
+                      </div>
                       <p>
                         Resultat: {answers[card.cardId] === 'good'
                           ? 'Bon'
@@ -186,6 +189,9 @@ function ReviewSession() {
                           <div className="markdown">
                             <MarkdownRenderer value={card.front || '—'} />
                           </div>
+                          <div className="markdown">
+                            <MarkdownRenderer value={card.back || '—'} />
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -201,6 +207,9 @@ function ReviewSession() {
                         <li key={card.cardId} className="card list-item">
                           <div className="markdown">
                             <MarkdownRenderer value={card.front || '—'} />
+                          </div>
+                          <div className="markdown">
+                            <MarkdownRenderer value={card.back || '—'} />
                           </div>
                         </li>
                       ))}
