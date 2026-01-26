@@ -12,6 +12,7 @@ export type Card = {
   source_id?: string | null
   source_ref?: string | null
   cloud_id?: string | null
+  synced_at?: string | null
 }
 
 export type MediaSide = 'front' | 'back' | 'both'

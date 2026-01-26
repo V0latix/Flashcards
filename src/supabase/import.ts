@@ -38,7 +38,8 @@ export async function importPackToLocal(
         source_type: sourceType,
         source_id: sourceId,
         source_ref: packSlug,
-        cloud_id: null
+        cloud_id: null,
+        synced_at: null
       })
 
       await db.reviewStates.add({

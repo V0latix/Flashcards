@@ -118,7 +118,8 @@ const mapRemoteCardToLocal = (card: RemoteCard): Card => ({
   source_type: card.source_type === 'public_pack' ? 'supabase_public' : 'manual',
   source_id: card.source_public_id,
   source_ref: card.source_ref,
-  source: card.source_type === 'public_pack' ? 'supabase' : null
+  source: card.source_type === 'public_pack' ? 'supabase' : null,
+  synced_at: card.updated_at
 })
 
 const mapLocalProgressToRemote = (
@@ -247,6 +248,7 @@ const mergeSnapshots = async (
   const lastSyncAt = getLastSyncAt()
   const lastSyncMs = parseTime(lastSyncAt)
   const localDeleteIds: number[] = []
+  const cardsToMarkSynced: string[] = []
 
   for (const remoteCard of remote.cards) {
     const localCard = localCardMap.get(remoteCard.id)
@@ -262,6 +264,7 @@ const mergeSnapshots = async (
     }
     if (isRemoteNewer(remoteCard.updated_at, localCard.updated_at)) {
       await db.cards.update(localCard.id ?? 0, mapRemoteCardToLocal(remoteCard))
+      cardsToMarkSynced.push(remoteCard.id)
     } else if (isRemoteNewer(localCard.updated_at, remoteCard.updated_at)) {
       cardsToUpsert.push(mapLocalCardToRemote(userId, localCard))
     }
@@ -272,7 +275,7 @@ const mergeSnapshots = async (
       return
     }
     const updatedAtMs = parseTime(card.updated_at)
-    if (lastSyncAt && updatedAtMs <= lastSyncMs) {
+    if (card.synced_at && lastSyncAt && updatedAtMs <= lastSyncMs) {
       if (card.id) {
         localDeleteIds.push(card.id)
       }
@@ -388,6 +391,20 @@ const mergeSnapshots = async (
   }
 
   await upsertRemoteCards(cardsToUpsert)
+  if (cardsToUpsert.length > 0) {
+    const syncedAt = new Date().toISOString()
+    const cloudIds = cardsToUpsert.map((card) => card.id)
+    await db.cards
+      .where('cloud_id')
+      .anyOf(cloudIds)
+      .modify({ synced_at: syncedAt })
+  }
+  if (cardsToMarkSynced.length > 0) {
+    await db.cards
+      .where('cloud_id')
+      .anyOf(cardsToMarkSynced)
+      .modify({ synced_at: new Date().toISOString() })
+  }
   await upsertRemoteProgress(progressToUpsert)
   await insertRemoteReviewLogs(logsToInsert)
 }

@@ -100,7 +100,8 @@ export async function createCard(input: {
       source_type: input.source_type ?? null,
       source_id: input.source_id ?? null,
       source_ref: input.source_ref ?? null,
-      cloud_id: null
+      cloud_id: null,
+      synced_at: null
     })
 
     await db.reviewStates.add({

@@ -233,7 +233,8 @@ function ImportExport() {
               source_type: 'manual',
               source_id: null,
               source_ref: null,
-              cloud_id: null
+              cloud_id: null,
+              synced_at: null
             })
             idMap.set(card.sourceId, newCardId)
             insertedCards += 1

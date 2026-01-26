@@ -83,7 +83,8 @@ describe('sync engine', () => {
       source_type: 'manual',
       source_id: null,
       source_ref: null,
-      cloud_id: 'cloud-1'
+      cloud_id: 'cloud-1',
+      synced_at: updatedAt
     })
     await db.reviewStates.add({
       card_id: cardId,
