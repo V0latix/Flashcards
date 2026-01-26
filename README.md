@@ -54,6 +54,9 @@ Le client frontend est dans `src/utils/supabase.ts` (anon key uniquement).
 ### Web (GitHub Pages)
 - Build + deploy via GitHub Actions: `.github/workflows/deploy-web.yml`
 - URL: https://v0latix.github.io/Flashcards/
+- Configure repo secrets for deploy:
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
 
 ### Mobile (TestFlight)
 Voir `docs/mobile-release.md`.
