@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashcards</title>
+    <script>
+      (function () {
+        var base = '/Flashcards/'
+        var path = window.location.pathname
+        if (path.indexOf(base) === 0) {
+          path = path.slice(base.length)
+        } else if (path.charAt(0) === '/') {
+          path = path.slice(1)
+        }
+        var redirect = base + '?redirect=' + encodeURIComponent(path + window.location.search + window.location.hash)
+        window.location.replace(redirect)
+      })()
+    </script>
+  </head>
+  <body></body>
+</html>

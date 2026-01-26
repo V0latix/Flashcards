@@ -18,12 +18,27 @@ let isSyncing = false
 let pendingSync = false
 let pendingDeletes: string[] = []
 let debounceTimer: number | null = null
+const LAST_SYNC_KEY = 'flashcards_last_sync_at'
 
 const parseTime = (value: string | null | undefined): number => {
   if (!value) {
     return 0
   }
   return new Date(value).getTime()
+}
+
+const getLastSyncAt = (): string | null => {
+  if (typeof localStorage === 'undefined') {
+    return null
+  }
+  return localStorage.getItem(LAST_SYNC_KEY)
+}
+
+const setLastSyncAt = (value: string) => {
+  if (typeof localStorage === 'undefined') {
+    return
+  }
+  localStorage.setItem(LAST_SYNC_KEY, value)
 }
 
 const isRemoteNewer = (remote: string | null | undefined, local: string | null | undefined) =>
@@ -192,6 +207,18 @@ const ensureLogIds = async (logs: ReviewLog[]) => {
   })
 }
 
+const deleteLocalCardsByIds = async (cardIds: number[]) => {
+  if (cardIds.length === 0) {
+    return
+  }
+  await db.transaction('rw', db.cards, db.reviewStates, db.reviewLogs, db.media, async () => {
+    await db.cards.bulkDelete(cardIds)
+    await db.reviewStates.bulkDelete(cardIds)
+    await db.reviewLogs.where('card_id').anyOf(cardIds).delete()
+    await db.media.where('card_id').anyOf(cardIds).delete()
+  })
+}
+
 const mergeSnapshots = async (
   userId: string,
   local: LocalSnapshot,
@@ -217,6 +244,9 @@ const mergeSnapshots = async (
   })
 
   const remoteCardIds = new Set(remote.cards.map((card) => card.id))
+  const lastSyncAt = getLastSyncAt()
+  const lastSyncMs = parseTime(lastSyncAt)
+  const localDeleteIds: number[] = []
 
   for (const remoteCard of remote.cards) {
     const localCard = localCardMap.get(remoteCard.id)
@@ -239,6 +269,13 @@ const mergeSnapshots = async (
 
   local.cards.forEach((card) => {
     if (!card.cloud_id || remoteCardIds.has(card.cloud_id)) {
+      return
+    }
+    const updatedAtMs = parseTime(card.updated_at)
+    if (lastSyncAt && updatedAtMs <= lastSyncMs) {
+      if (card.id) {
+        localDeleteIds.push(card.id)
+      }
       return
     }
     cardsToUpsert.push(mapLocalCardToRemote(userId, card))
@@ -346,6 +383,9 @@ const mergeSnapshots = async (
   if (localLogAdds.length > 0) {
     await db.reviewLogs.bulkAdd(localLogAdds)
   }
+  if (localDeleteIds.length > 0) {
+    await deleteLocalCardsByIds(localDeleteIds)
+  }
 
   await upsertRemoteCards(cardsToUpsert)
   await upsertRemoteProgress(progressToUpsert)
@@ -360,6 +400,7 @@ const handleInitialSync = async (userId: string) => {
   const remoteEmpty = remote.cards.length === 0
 
   if (remoteEmpty && localEmpty) {
+    setLastSyncAt(new Date().toISOString())
     return
   }
   if (remoteEmpty && !localEmpty) {
@@ -399,6 +440,7 @@ const handleInitialSync = async (userId: string) => {
         updated_at: local.settingsUpdatedAt
       })
     }
+    setLastSyncAt(new Date().toISOString())
     return
   }
   if (!remoteEmpty && localEmpty) {
@@ -436,10 +478,12 @@ const handleInitialSync = async (userId: string) => {
         remote.settings.updated_at
       )
     }
+    setLastSyncAt(new Date().toISOString())
     return
   }
 
   await mergeSnapshots(userId, local, remote)
+  setLastSyncAt(new Date().toISOString())
 }
 
 export const setActiveUser = (userId: string | null) => {
@@ -500,13 +544,14 @@ export const syncOnce = async (userId: string, forcePull = false) => {
   isSyncing = true
   try {
     const local = await loadLocalSnapshot()
-    const remote = await fetchRemoteSnapshot(userId)
     if (pendingDeletes.length > 0) {
       const deletes = [...new Set(pendingDeletes)]
       pendingDeletes = []
       await deleteRemoteCards(userId, deletes)
     }
+    const remote = await fetchRemoteSnapshot(userId)
     await mergeSnapshots(userId, local, remote)
+    setLastSyncAt(new Date().toISOString())
   } catch (error) {
     console.error('[sync] failed', error)
   } finally {
