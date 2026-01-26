@@ -158,6 +158,12 @@ export const SettingsScreen = () => {
           onPress={() => navigation.navigate('SupabaseDebug')}
           variant="secondary"
         />
+        <View style={styles.buttonSpacing} />
+        <Button
+          title="Open Media Test"
+          onPress={() => navigation.navigate('MediaTest')}
+          variant="secondary"
+        />
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Danger zone</Text>
@@ -212,5 +218,8 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     color: colors.text
+  },
+  buttonSpacing: {
+    height: 10
   }
 })

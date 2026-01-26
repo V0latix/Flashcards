@@ -21,4 +21,5 @@ export type RootStackParamList = {
   ReviewSession: undefined
   PackDetail: { slug: string; pack?: PackSummary }
   SupabaseDebug: undefined
+  MediaTest: undefined
 }

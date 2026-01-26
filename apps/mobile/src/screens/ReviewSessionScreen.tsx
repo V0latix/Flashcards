@@ -6,6 +6,7 @@ import type { RootStackParamList } from '../navigation/types'
 import { applyReviewResult, buildDailySession, type SessionCard } from '../core/leitner'
 import { addReviewLog, deleteCard, listCards, listReviewStates, replaceReviewStates, upsertReviewState } from '../storage/store'
 import { getLeitnerSettings } from '../storage/settings'
+import { MarkdownRenderer } from '../components/MarkdownRenderer'
 import { Button } from '../ui/Button'
 import { colors } from '../ui/theme'
 
@@ -127,12 +128,12 @@ export const ReviewSessionScreen = () => {
       </Text>
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Front</Text>
-        <Text style={styles.cardText}>{current.front || '-'}</Text>
+        <MarkdownRenderer value={current.front || '-'} />
       </View>
       {showBack ? (
         <View style={styles.card}>
           <Text style={styles.cardLabel}>Back</Text>
-          <Text style={styles.cardText}>{current.back || '-'}</Text>
+          <MarkdownRenderer value={current.back || '-'} />
         </View>
       ) : (
         <View style={styles.section}>

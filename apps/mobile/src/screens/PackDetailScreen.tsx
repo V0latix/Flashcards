@@ -4,6 +4,7 @@ import { RouteProp, useRoute } from '@react-navigation/native'
 import type { RootStackParamList } from '../navigation/types'
 import { listPublicCardsByPackSlug } from '../lib/supabaseApi'
 import { savePackSnapshot } from '../storage/store'
+import { MarkdownRenderer } from '../components/MarkdownRenderer'
 import { Button } from '../ui/Button'
 import { colors } from '../ui/theme'
 
@@ -102,8 +103,10 @@ export const PackDetailScreen = () => {
           ) : (
             cards.slice(0, 50).map((card) => (
               <View key={String(card.id)} style={styles.card}>
-                <Text style={styles.cardTitle}>{card.front_md ?? '-'}</Text>
-                <Text style={styles.cardPreview}>{card.back_md ?? '-'}</Text>
+                <Text style={styles.cardTitle}>Front</Text>
+                <MarkdownRenderer value={card.front_md ?? '-'} />
+                <Text style={styles.cardTitle}>Back</Text>
+                <MarkdownRenderer value={card.back_md ?? '-'} />
               </View>
             ))
           )}

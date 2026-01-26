@@ -10,6 +10,7 @@ import { PackDetailScreen } from '../screens/PackDetailScreen'
 import { SettingsScreen } from '../screens/SettingsScreen'
 import { StatsScreen } from '../screens/StatsScreen'
 import { SupabaseDebugScreen } from '../screens/SupabaseDebugScreen'
+import { MediaTestScreen } from '../screens/MediaTestScreen'
 import { colors } from '../ui/theme'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -44,6 +45,7 @@ export const RootNavigator = () => (
       <Stack.Screen name="ReviewSession" component={ReviewSessionScreen} />
       <Stack.Screen name="PackDetail" component={PackDetailScreen} />
       <Stack.Screen name="SupabaseDebug" component={SupabaseDebugScreen} />
+      <Stack.Screen name="MediaTest" component={MediaTestScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 )
