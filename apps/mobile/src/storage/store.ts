@@ -164,6 +164,12 @@ export const listReviewLogs = async (): Promise<ReviewLog[]> => {
   return [...store.reviewLogs]
 }
 
+export const replaceReviewStates = async (states: ReviewState[]): Promise<void> => {
+  await withStore((store) => {
+    store.reviewStates = [...states]
+  })
+}
+
 export const getCardById = async (id: number): Promise<StoredCard | undefined> => {
   const store = await getStore()
   return store.cards.find((card) => card.id === id)
