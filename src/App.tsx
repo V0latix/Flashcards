@@ -5,6 +5,7 @@ import db from './db'
 import AppShell from './components/AppShell'
 import { healthCheckSupabase } from './supabase/health'
 import { supabaseClient } from './utils/supabase'
+import { useSync } from './sync/useSync'
 import CardEditor from './routes/CardEditor'
 import Home from './routes/Home'
 import ImportExport from './routes/ImportExport'
@@ -14,6 +15,11 @@ import Packs from './routes/Packs'
 import ReviewSession from './routes/ReviewSession'
 import Settings from './routes/Settings'
 import StatsPage from './routes/StatsPage'
+
+function SyncGate() {
+  useSync()
+  return null
+}
 
 function App() {
   useEffect(() => {
@@ -51,6 +57,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <SyncGate />
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AppShell>
           <Routes>

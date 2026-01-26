@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteAllCards } from '../db/queries'
 import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
+import { markLocalChange } from '../sync/queue'
 import { getStoredTheme, setTheme, type ThemeMode } from '../theme'
 
 function Settings() {
@@ -65,6 +66,7 @@ function Settings() {
       learnedReviewIntervalDays,
       reverseProbability
     })
+    markLocalChange()
     setStatus('Parametres enregistres.')
   }
 
@@ -176,6 +178,7 @@ function Settings() {
             setLearnedReviewIntervalDays(defaultLearnedInterval)
             setReverseProbability(0)
             setStatus('Valeurs par defaut restaurees.')
+            markLocalChange()
           }}
         >
           Restaurer valeurs par defaut
