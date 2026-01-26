@@ -325,6 +325,7 @@ ul {
   gap: 8px;
   align-items: flex-end;
   height: 160px;
+  min-height: 160px;
 }
 
 .chart-col {

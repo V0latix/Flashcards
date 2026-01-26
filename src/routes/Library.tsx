@@ -90,6 +90,8 @@ function Library() {
     [cards]
   )
 
+  const totalCardsCount = cards.length
+
   const filteredCards = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
     return cards.filter(({ card }) => {
@@ -123,7 +125,14 @@ function Library() {
   )
 
   const handleTraining = () => {
-    const ids = filteredCards
+    const sourceCards = selectedTag
+      ? cards.filter(({ card }) =>
+          card.tags.some(
+            (tag) => tag === selectedTag || tag.startsWith(`${selectedTag}/`)
+          )
+        )
+      : cards
+    const ids = sourceCards
       .map(({ card }) => card.id)
       .filter((id): id is number => typeof id === 'number')
     if (ids.length === 0) {
@@ -226,6 +235,7 @@ function Library() {
           <div className="panel">
             <div className="panel-header">
               <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Toutes les cartes'}</h2>
+              <span className="chip">Total: {totalCardsCount}</span>
               {selectedTag ? (
                 <button type="button" className="btn btn-secondary" onClick={handleGoUp}>
                   Remonter
@@ -235,7 +245,7 @@ function Library() {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleTraining}
-                disabled={filteredCards.length === 0}
+                disabled={cards.length === 0}
               >
                 Session d'entrainement
               </button>

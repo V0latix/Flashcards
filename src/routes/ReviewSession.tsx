@@ -14,6 +14,7 @@ function ReviewSession() {
   const [cards, setCards] = useState<
     Array<{ cardId: number; front: string; back: string; wasReversed: boolean }>
   >([])
+  const [answers, setAnswers] = useState<Record<number, 'good' | 'bad'>>({})
   const [index, setIndex] = useState(0)
   const [showBack, setShowBack] = useState(false)
   const [goodCount, setGoodCount] = useState(0)
@@ -82,6 +83,7 @@ function ReviewSession() {
       })
       const filtered = queue.filter((item) => item.cardId !== 0)
       setCards(shuffle(filtered))
+      setAnswers({})
       setIsLoading(false)
     }
 
@@ -101,6 +103,10 @@ function ReviewSession() {
     if (!isTraining) {
       await applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed)
     }
+    setAnswers((prev) => ({
+      ...prev,
+      [currentCard.cardId]: result
+    }))
     setShowBack(false)
     setIndex((prev) => prev + 1)
     if (result === 'good') {
@@ -128,6 +134,8 @@ function ReviewSession() {
   }
 
   const isDone = !isLoading && index >= cards.length
+  const goodCards = cards.filter((card) => answers[card.cardId] === 'good')
+  const badCards = cards.filter((card) => answers[card.cardId] === 'bad')
 
   return (
     <main className="container page">
@@ -140,6 +148,68 @@ function ReviewSession() {
           <p>
             Total: {cards.length} · Bon: {goodCount} · Faux: {badCount}
           </p>
+          {isTraining ? (
+            <div className="section">
+              <h3>Cartes d'entrainement</h3>
+              {cards.length === 0 ? (
+                <p>Aucune carte.</p>
+              ) : (
+                <ul className="card-list">
+                  {cards.map((card) => (
+                    <li key={card.cardId} className="card list-item">
+                      <div className="markdown">
+                        <MarkdownRenderer value={card.front || '—'} />
+                      </div>
+                      <p>
+                        Resultat: {answers[card.cardId] === 'good'
+                          ? 'Bon'
+                          : answers[card.cardId] === 'bad'
+                          ? 'Faux'
+                          : '—'}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <div className="section">
+              <div className="split">
+                <div className="panel">
+                  <h3>Bon</h3>
+                  {goodCards.length === 0 ? (
+                    <p>Aucune bonne reponse.</p>
+                  ) : (
+                    <ul className="card-list">
+                      {goodCards.map((card) => (
+                        <li key={card.cardId} className="card list-item">
+                          <div className="markdown">
+                            <MarkdownRenderer value={card.front || '—'} />
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="panel">
+                  <h3>Faux</h3>
+                  {badCards.length === 0 ? (
+                    <p>Aucune mauvaise reponse.</p>
+                  ) : (
+                    <ul className="card-list">
+                      {badCards.map((card) => (
+                        <li key={card.cardId} className="card list-item">
+                          <div className="markdown">
+                            <MarkdownRenderer value={card.front || '—'} />
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
           <Link to="/" className="btn btn-primary">
             Retour a l'accueil
           </Link>
