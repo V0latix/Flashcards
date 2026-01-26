@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import { deleteCard, deleteCardsByTag, listCardsWithReviewState } from '../db/queries'
 import type { Card, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
+import { saveTrainingQueue } from '../utils/training'
 
 function Library() {
   const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
@@ -19,6 +20,7 @@ function Library() {
   const [isTagDeleting, setIsTagDeleting] = useState(false)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
   const [isCardDeleting, setIsCardDeleting] = useState(false)
+  const navigate = useNavigate()
 
   const loadCards = async () => {
     const data = await listCardsWithReviewState(0)
@@ -120,6 +122,17 @@ function Library() {
     [filteredCards, visibleCount]
   )
 
+  const handleTraining = () => {
+    const ids = filteredCards
+      .map(({ card }) => card.id)
+      .filter((id): id is number => typeof id === 'number')
+    if (ids.length === 0) {
+      return
+    }
+    saveTrainingQueue(ids)
+    navigate('/review?mode=training')
+  }
+
   const renderTagNodes = (nodes: TagNode[], depth = 0) => {
     if (nodes.length === 0) {
       return null
@@ -218,6 +231,14 @@ function Library() {
                   Remonter
                 </button>
               ) : null}
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleTraining}
+                disabled={filteredCards.length === 0}
+              >
+                Session d'entrainement
+              </button>
             </div>
             {selectedTag ? (
               <div className="section">

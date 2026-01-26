@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import db from '../db'
 import ReviewSession from './ReviewSession'
 import { resetDb, seedCardWithState } from '../test/utils'
+import { saveTrainingQueue } from '../utils/training'
 
 const setSettings = (box1Target = 2) => {
   localStorage.setItem(
@@ -106,5 +107,31 @@ describe('ReviewSession', () => {
 
     await screen.findByText(/Carte 1 \/ 1/)
     randomSpy.mockRestore()
+  })
+
+  it('training mode does not update Leitner state', async () => {
+    const cardId = await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+    saveTrainingQueue([cardId])
+
+    render(
+      <MemoryRouter initialEntries={['/review?mode=training']}>
+        <ReviewSession />
+      </MemoryRouter>
+    )
+
+    await screen.findByText(/Mode entrainement/i)
+    fireEvent.click(screen.getByRole('button', { name: /Revealer/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'Bon' }))
+
+    await waitFor(async () => {
+      const state = await db.reviewStates.get(cardId)
+      expect(state?.box).toBe(1)
+    })
   })
 })

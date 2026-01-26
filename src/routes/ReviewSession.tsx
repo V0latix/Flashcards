@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import db from '../db'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteCard } from '../db/queries'
+import { consumeTrainingQueue } from '../utils/training'
 
 function ReviewSession() {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
@@ -21,6 +23,7 @@ function ReviewSession() {
   const [searchParams] = useSearchParams()
 
   const tagFilter = searchParams.get('tag')?.trim() || null
+  const isTraining = searchParams.get('mode') === 'training'
 
   const shuffle = <T,>(input: T[]): T[] => {
     const result = [...input]
@@ -33,8 +36,33 @@ function ReviewSession() {
 
   useEffect(() => {
     const loadSession = async () => {
-      const session = await buildDailySession(today)
       const { reverseProbability } = getLeitnerSettings()
+
+      if (isTraining) {
+        const ids = consumeTrainingQueue()
+        if (ids.length === 0) {
+          setCards([])
+          setIsLoading(false)
+          return
+        }
+        const rawCards = await db.cards.bulkGet(ids)
+        const queue = rawCards
+          .filter((card): card is NonNullable<typeof card> => Boolean(card?.id))
+          .map((card) => {
+            const isReversed = Math.random() < reverseProbability
+            return {
+              cardId: card.id ?? 0,
+              front: isReversed ? card.back_md : card.front_md,
+              back: isReversed ? card.front_md : card.back_md,
+              wasReversed: isReversed
+            }
+          })
+        setCards(shuffle(queue))
+        setIsLoading(false)
+        return
+      }
+
+      const session = await buildDailySession(today)
       const baseQueue = [...session.box1, ...session.due]
       const filteredQueue = tagFilter
         ? baseQueue.filter((entry) =>
@@ -58,7 +86,7 @@ function ReviewSession() {
     }
 
     void loadSession()
-  }, [tagFilter, today])
+  }, [isTraining, tagFilter, today])
 
   const currentCard = cards[index]
 
@@ -70,7 +98,9 @@ function ReviewSession() {
     if (!currentCard) {
       return
     }
-    await applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed)
+    if (!isTraining) {
+      await applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed)
+    }
     setShowBack(false)
     setIndex((prev) => prev + 1)
     if (result === 'good') {
@@ -116,6 +146,9 @@ function ReviewSession() {
         </section>
       ) : currentCard ? (
         <section className="card section">
+          {isTraining ? (
+            <p>Mode entrainement (ne modifie pas la progression).</p>
+          ) : null}
           {tagFilter ? <p>Filtre tag: {tagFilter}</p> : null}
           <p>
             Carte {index + 1} / {cards.length}
@@ -179,7 +212,7 @@ function ReviewSession() {
           />
         </section>
       ) : (
-        <p>Aucune carte a reviser.</p>
+        <p>{isTraining ? "Aucune carte d'entrainement." : 'Aucune carte a reviser.'}</p>
       )}
     </main>
   )
