@@ -50,6 +50,14 @@ Le client frontend est dans `src/utils/supabase.ts` (anon key uniquement).
 - `npm test` : tests unitaires
 - `npm run mobile` : demarrer l'app mobile Expo
 
+## Deployment
+### Web (GitHub Pages)
+- Build + deploy via GitHub Actions: `.github/workflows/deploy-web.yml`
+- URL: https://v0latix.github.io/Flashcards/
+
+### Mobile (TestFlight)
+Voir `docs/mobile-release.md`.
+
 ## Mobile (Expo)
 Voir `docs/mobile-dev.md` pour les prerequis et la config.
 
