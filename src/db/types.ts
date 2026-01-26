@@ -10,6 +10,8 @@ export type Card = {
   source?: string | null
   source_type?: string | null
   source_id?: string | null
+  source_ref?: string | null
+  cloud_id?: string | null
 }
 
 export type MediaSide = 'front' | 'back' | 'both'
@@ -29,6 +31,7 @@ export type ReviewState = {
   last_reviewed_at?: string | null
   is_learned?: boolean
   learned_at?: string | null
+  updated_at?: string | null
 }
 
 export type ReviewLog = {
@@ -40,4 +43,6 @@ export type ReviewLog = {
   new_box: number
   was_learned_before?: boolean
   was_reversed?: boolean
+  client_event_id?: string | null
+  device_id?: string | null
 }

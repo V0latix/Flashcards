@@ -1,5 +1,6 @@
 import db from '../db'
 import { listPublicCardsByPackSlug } from './api'
+import { markLocalChange } from '../sync/queue'
 
 export async function importPackToLocal(
   packSlug: string
@@ -35,13 +36,16 @@ export async function importPackToLocal(
         updated_at: now,
         source,
         source_type: sourceType,
-        source_id: sourceId
+        source_id: sourceId,
+        source_ref: packSlug,
+        cloud_id: null
       })
 
       await db.reviewStates.add({
         card_id: newCardId,
         box: 0,
         due_date: null,
+        updated_at: now,
         last_reviewed_at: null,
         is_learned: false,
         learned_at: null
@@ -50,6 +54,10 @@ export async function importPackToLocal(
       imported += 1
     }
   })
+
+  if (imported > 0) {
+    markLocalChange()
+  }
 
   return { imported, alreadyPresent }
 }

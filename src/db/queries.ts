@@ -1,5 +1,6 @@
 import db from './index'
 import type { Card, ReviewLog, ReviewState } from './types'
+import { markLocalChange, queueCardDelete } from '../sync/queue'
 
 export type CardFilter = {
   text?: string
@@ -83,11 +84,12 @@ export async function createCard(input: {
   hint_md?: string | null
   source_type?: string | null
   source_id?: string | null
+  source_ref?: string | null
 }): Promise<number> {
   const now = new Date().toISOString()
   const tags = input.tags ?? []
 
-  return db.transaction('rw', db.cards, db.reviewStates, async () => {
+  const cardId = await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const cardId = await db.cards.add({
       front_md: input.front_md,
       back_md: input.back_md,
@@ -96,19 +98,25 @@ export async function createCard(input: {
       created_at: now,
       updated_at: now,
       source_type: input.source_type ?? null,
-      source_id: input.source_id ?? null
+      source_id: input.source_id ?? null,
+      source_ref: input.source_ref ?? null,
+      cloud_id: null
     })
 
     await db.reviewStates.add({
       card_id: cardId,
       box: 0,
       due_date: null,
+      updated_at: now,
       is_learned: false,
       learned_at: null
     })
 
     return cardId
   })
+
+  markLocalChange()
+  return cardId
 }
 
 export async function updateCard(
@@ -120,6 +128,8 @@ export async function updateCard(
     hint_md?: string | null
     source_type?: string | null
     source_id?: string | null
+    source_ref?: string | null
+    cloud_id?: string | null
   }
 ): Promise<number> {
   const now = new Date().toISOString()
@@ -142,10 +152,21 @@ export async function updateCard(
   if (updates.source_id !== undefined) {
     payload.source_id = updates.source_id
   }
-  return db.cards.update(id, payload)
+  if (updates.source_ref !== undefined) {
+    payload.source_ref = updates.source_ref
+  }
+  if (updates.cloud_id !== undefined) {
+    payload.cloud_id = updates.cloud_id
+  }
+  const updated = await db.cards.update(id, payload)
+  if (updated) {
+    markLocalChange()
+  }
+  return updated
 }
 
 export async function deleteCard(id: number): Promise<void> {
+  const card = await db.cards.get(id)
   await db.transaction('rw', db.cards, db.reviewStates, db.reviewLogs, db.media, async () => {
     await db.cards.delete(id)
     await db.reviewStates.delete(id)
@@ -155,6 +176,8 @@ export async function deleteCard(id: number): Promise<void> {
   if (import.meta.env.DEV) {
     console.log('[DELETE] card', id)
   }
+
+  queueCardDelete(card?.cloud_id ?? null)
 }
 
 const matchesTag = (tags: string[], tag: string, includeDescendants: boolean) => {
@@ -188,10 +211,17 @@ export async function deleteCardsByTag(
     console.log('[DELETE] tag', tag, { includeDescendants, count: targetIds.length })
   }
 
+  const cloudIds = cards
+    .filter((card) => card.id && targetIds.includes(card.id))
+    .map((card) => card.cloud_id)
+    .filter((value): value is string => typeof value === 'string')
+  cloudIds.forEach((cloudId) => queueCardDelete(cloudId))
+
   return targetIds.length
 }
 
 export async function deleteAllCards(): Promise<void> {
+  const cards = await db.cards.toArray()
   await db.transaction('rw', db.cards, db.reviewStates, db.reviewLogs, db.media, async () => {
     await db.cards.clear()
     await db.reviewStates.clear()
@@ -201,6 +231,11 @@ export async function deleteAllCards(): Promise<void> {
   if (import.meta.env.DEV) {
     console.log('[DELETE] all cards')
   }
+
+  cards
+    .map((card) => card.cloud_id)
+    .filter((value): value is string => typeof value === 'string')
+    .forEach((cloudId) => queueCardDelete(cloudId))
 }
 
 export async function getReviewState(cardId: number): Promise<ReviewState | undefined> {
@@ -208,11 +243,19 @@ export async function getReviewState(cardId: number): Promise<ReviewState | unde
 }
 
 export async function upsertReviewState(state: ReviewState): Promise<number> {
-  return db.reviewStates.put(state)
+  const payload: ReviewState = {
+    ...state,
+    updated_at: state.updated_at ?? new Date().toISOString()
+  }
+  const result = await db.reviewStates.put(payload)
+  markLocalChange()
+  return result
 }
 
 export async function addReviewLog(entry: ReviewLog): Promise<number> {
-  return db.reviewLogs.add(entry)
+  const result = await db.reviewLogs.add(entry)
+  markLocalChange()
+  return result
 }
 
 export async function listReviewLogsSince(

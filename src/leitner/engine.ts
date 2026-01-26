@@ -1,5 +1,7 @@
 import db from '../db'
 import type { Card, ReviewLog, ReviewState } from '../db/types'
+import { getDeviceId, createUuid } from '../sync/ids'
+import { markLocalChange } from '../sync/queue'
 import { LEITNER_BOX_COUNT } from './config'
 import { getLeitnerSettings } from './settings'
 
@@ -217,7 +219,8 @@ export const applyReviewResult = async (
       due_date: nextDueDate,
       last_reviewed_at: today,
       is_learned: nextIsLearned,
-      learned_at: nextLearnedAt
+      learned_at: nextLearnedAt,
+      updated_at: nowIso
     })
 
     const logEntry: ReviewLog = {
@@ -227,9 +230,13 @@ export const applyReviewResult = async (
       previous_box: previousBox,
       new_box: nextBox,
       was_learned_before: wasLearned,
-      was_reversed: wasReversed
+      was_reversed: wasReversed,
+      client_event_id: createUuid(),
+      device_id: getDeviceId()
     }
 
     await db.reviewLogs.add(logEntry)
   })
+
+  markLocalChange()
 }

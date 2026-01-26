@@ -8,6 +8,7 @@ export type LeitnerSettings = {
 }
 
 const STORAGE_KEY = 'leitnerSettings'
+const META_KEY = 'leitnerSettingsMeta'
 
 const getDefaultSettings = (): LeitnerSettings => ({
   box1Target: BOX1_TARGET,
@@ -68,9 +69,33 @@ export const getLeitnerSettings = (): LeitnerSettings => {
   }
 }
 
+export const getLeitnerSettingsMeta = (): { updated_at: string | null } => {
+  if (typeof localStorage === 'undefined') {
+    return { updated_at: null }
+  }
+  try {
+    const raw = localStorage.getItem(META_KEY)
+    if (!raw) {
+      return { updated_at: null }
+    }
+    const parsed = JSON.parse(raw) as { updated_at?: string }
+    return { updated_at: parsed.updated_at ?? null }
+  } catch {
+    return { updated_at: null }
+  }
+}
+
+export const setLeitnerSettingsMeta = (updatedAt: string): void => {
+  if (typeof localStorage === 'undefined') {
+    return
+  }
+  localStorage.setItem(META_KEY, JSON.stringify({ updated_at: updatedAt }))
+}
+
 export const saveLeitnerSettings = (settings: LeitnerSettings): void => {
   if (typeof localStorage === 'undefined') {
     return
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+  setLeitnerSettingsMeta(new Date().toISOString())
 }
