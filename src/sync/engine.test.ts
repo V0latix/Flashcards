@@ -106,4 +106,56 @@ describe('sync engine', () => {
     const cardsPayload = vi.mocked(upsertRemoteCards).mock.calls[0]?.[0] ?? []
     expect(cardsPayload).toHaveLength(0)
   })
+
+  it('prefers remote card when remote updated_at is newer', async () => {
+    const localUpdatedAt = '2025-12-01T00:00:00.000Z'
+    const remoteUpdatedAt = '2026-01-01T00:00:00.000Z'
+    const cardId = await db.cards.add({
+      front_md: 'Local Q',
+      back_md: 'Local A',
+      tags: [],
+      created_at: localUpdatedAt,
+      updated_at: localUpdatedAt,
+      source_type: 'manual',
+      source_id: null,
+      source_ref: null,
+      cloud_id: 'cloud-1',
+      synced_at: localUpdatedAt
+    })
+    await db.reviewStates.add({
+      card_id: cardId,
+      box: 0,
+      due_date: null,
+      is_learned: false,
+      learned_at: null,
+      updated_at: localUpdatedAt
+    })
+
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue({
+      cards: [
+        {
+          id: 'cloud-1',
+          user_id: 'user-1',
+          source_type: 'manual',
+          source_ref: null,
+          source_public_id: null,
+          front_md: 'Remote Q',
+          back_md: 'Remote A',
+          hint_md: null,
+          tags: [],
+          created_at: localUpdatedAt,
+          updated_at: remoteUpdatedAt
+        }
+      ],
+      progress: [],
+      settings: null,
+      reviewLogs: []
+    })
+
+    await syncOnce('user-1', true)
+
+    const updated = await db.cards.get(cardId)
+    expect(updated?.front_md).toBe('Remote Q')
+    expect(updated?.back_md).toBe('Remote A')
+  })
 })
