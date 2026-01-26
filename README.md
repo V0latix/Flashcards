@@ -48,6 +48,16 @@ Le client frontend est dans `src/utils/supabase.ts` (anon key uniquement).
 - `npm run build` : build production
 - `npm run lint` : lint
 - `npm test` : tests unitaires
+- `npm run mobile` : demarrer l'app mobile Expo
+
+## Mobile (Expo)
+Voir `docs/mobile-dev.md` pour les prerequis et la config.
+
+Smoke check rapide :
+1) `npm run mobile`
+2) Accueil -> "Play Session" ouvre une session
+3) Settings -> Open Media Test (image + drapeau SVG + LaTeX)
+4) Packs -> ouvrir un pack -> Download pack -> Library affiche les cartes
 
 ## Pages principales
 - `/` Home

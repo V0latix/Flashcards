@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import db from '../db'
 import ReviewSession from './ReviewSession'
 import { resetDb, seedCardWithState } from '../test/utils'
@@ -73,6 +73,7 @@ describe('ReviewSession', () => {
   })
 
   it('deletes a card during session and continues', async () => {
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.999)
     const firstId = await seedCardWithState({
       front: 'Q1',
       back: 'A1',
@@ -104,5 +105,6 @@ describe('ReviewSession', () => {
     })
 
     await screen.findByText(/Carte 1 \/ 1/)
+    randomSpy.mockRestore()
   })
 })
