@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import db from '../db'
 import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
+import { createUuid, getDeviceId } from '../sync/ids'
+import { markLocalChange } from '../sync/queue'
 
 function ImportExport() {
   const [status, setStatus] = useState<string>('')
@@ -227,7 +229,11 @@ function ImportExport() {
               back_md: card.back_md,
               tags: card.tags,
               created_at: now,
-              updated_at: now
+              updated_at: now,
+              source_type: 'manual',
+              source_id: null,
+              source_ref: null,
+              cloud_id: null
             })
             idMap.set(card.sourceId, newCardId)
             insertedCards += 1
@@ -246,7 +252,8 @@ function ImportExport() {
               due_date: providedState?.due_date ?? null,
               last_reviewed_at: providedState?.last_reviewed_at ?? null,
               is_learned: providedState?.is_learned ?? false,
-              learned_at: providedState?.learned_at ?? null
+              learned_at: providedState?.learned_at ?? null,
+              updated_at: new Date().toISOString()
             })
           })
 
@@ -297,7 +304,9 @@ function ImportExport() {
                 previous_box: log.previous_box,
                 new_box: log.new_box,
                 was_learned_before: log.was_learned_before,
-                was_reversed: log.was_reversed
+                was_reversed: log.was_reversed,
+                client_event_id: createUuid(),
+                device_id: getDeviceId()
               }
             })
             .filter(Boolean) as ReviewLog[]
@@ -335,6 +344,7 @@ function ImportExport() {
     }
 
     setStatus('Import termine.')
+    markLocalChange()
   }
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
