@@ -291,8 +291,9 @@ function Library() {
                     <Link to={`/card/${card.id}/edit`} className="markdown">
                       <MarkdownRenderer value={card.front_md || '*Sans front*'} />
                     </Link>
+                    <div className="chip">Box {reviewState?.box ?? 0}</div>
                     <p>
-                      Box {reviewState?.box ?? 0} · Due {reviewState?.due_date ?? '—'}
+                      Due {reviewState?.due_date ?? '—'}
                     </p>
                     {card.hint_md ? (
                       <div className="section">

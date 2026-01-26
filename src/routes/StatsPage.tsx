@@ -95,7 +95,7 @@ const Chart = ({
 }
 
 function StatsPage() {
-  const [periodDays, setPeriodDays] = useState<7 | 30 | 90>(7)
+  const [periodDays, setPeriodDays] = useState<7 | 30>(7)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [tagRowsLimitByKey, setTagRowsLimitByKey] = useState<Record<string, number>>({})
@@ -277,7 +277,7 @@ function StatsPage() {
       <section className="card section">
         <h2>Progression (revisions)</h2>
         <div className="panel-header">
-          {([7, 30, 90] as const).map((days) => (
+          {([7, 30] as const).map((days) => (
             <button
               key={days}
               type="button"
