@@ -1,6 +1,6 @@
 import db from '../db'
 import type { Card, ReviewLog, ReviewState } from '../db/types'
-import { getLeitnerSettingsMeta } from '../leitner/settings'
+import { getLeitnerSettingsMeta, setLeitnerSettingsMeta } from '../leitner/settings'
 import { createUuid, getDeviceId } from './ids'
 import { loadLocalSnapshot, saveSettingsFromRemote } from './localStore'
 import {
@@ -416,6 +416,19 @@ const handleInitialSync = async (userId: string) => {
   const localEmpty = local.cards.length === 0
   const remoteEmpty = remote.cards.length === 0
 
+  if (!remote.settings) {
+    const updatedAt = local.settingsUpdatedAt ?? new Date().toISOString()
+    setLeitnerSettingsMeta(updatedAt)
+    await upsertRemoteSettings({
+      user_id: userId,
+      box1_target: local.settings.box1Target,
+      intervals: local.settings.intervalDays,
+      learned_review_interval_days: local.settings.learnedReviewIntervalDays,
+      reverse_probability: local.settings.reverseProbability,
+      updated_at: updatedAt
+    })
+  }
+
   if (remoteEmpty && localEmpty) {
     setLastSyncAt(new Date().toISOString())
     return
@@ -447,16 +460,6 @@ const handleInitialSync = async (userId: string) => {
         })
         .filter((entry): entry is RemoteReviewLog => Boolean(entry))
     )
-    if (local.settingsUpdatedAt) {
-      await upsertRemoteSettings({
-        user_id: userId,
-        box1_target: local.settings.box1Target,
-        intervals: local.settings.intervalDays,
-        learned_review_interval_days: local.settings.learnedReviewIntervalDays,
-        reverse_probability: local.settings.reverseProbability,
-        updated_at: local.settingsUpdatedAt
-      })
-    }
     setLastSyncAt(new Date().toISOString())
     return
   }

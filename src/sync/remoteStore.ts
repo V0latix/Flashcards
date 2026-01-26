@@ -95,3 +95,16 @@ export const deleteRemoteCards = async (userId: string, cloudIds: string[]) => {
     throw new Error(error.message)
   }
 }
+
+export const upsertUserProfile = async (user: { id: string; email?: string | null }) => {
+  const { error } = await supabase.from('user_profiles').upsert(
+    {
+      id: user.id,
+      email: user.email ?? null
+    },
+    { onConflict: 'id' }
+  )
+  if (error) {
+    throw new Error(error.message)
+  }
+}

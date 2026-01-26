@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useAuth } from '../auth/AuthProvider'
 import { runInitialSync, setActiveUser, syncOnce } from './engine'
+import { upsertUserProfile } from './remoteStore'
 
 export const useSync = () => {
   const { user } = useAuth()
@@ -11,6 +12,9 @@ export const useSync = () => {
       return
     }
     setActiveUser(user.id)
+    void upsertUserProfile({ id: user.id, email: user.email ?? null }).catch((error) => {
+      console.warn('[sync] profile upsert failed', error)
+    })
     void runInitialSync(user.id)
 
     const interval = window.setInterval(() => {
