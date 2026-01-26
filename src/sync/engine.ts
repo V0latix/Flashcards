@@ -92,7 +92,7 @@ const mapLocalCardToRemote = (userId: string, card: Card): RemoteCard => ({
   updated_at: card.updated_at
 })
 
-const mapRemoteCardToLocal = (card: RemoteCard): Partial<Card> => ({
+const mapRemoteCardToLocal = (card: RemoteCard): Card => ({
   cloud_id: card.id,
   front_md: card.front_md,
   back_md: card.back_md,
@@ -200,7 +200,6 @@ const mergeSnapshots = async (
   const localCardMap = await ensureCloudIds(local.cards)
   await ensureLogIds(local.reviewLogs)
 
-  const remoteCardsById = new Map(remote.cards.map((card) => [card.id, card]))
   const remoteProgressByCard = new Map(remote.progress.map((progress) => [progress.card_id, progress]))
   const remoteLogIds = new Set(remote.reviewLogs.map((log) => log.client_event_id))
 
@@ -222,12 +221,11 @@ const mergeSnapshots = async (
   for (const remoteCard of remote.cards) {
     const localCard = localCardMap.get(remoteCard.id)
     if (!localCard) {
-      const localCardId = await db.cards.add({
-        ...mapRemoteCardToLocal(remoteCard)
-      })
+      const localPayload = mapRemoteCardToLocal(remoteCard)
+      const localCardId = await db.cards.add(localPayload)
       localCardIdByCloudId.set(remoteCard.id, localCardId)
       localCardMap.set(remoteCard.id, {
-        ...(mapRemoteCardToLocal(remoteCard) as Card),
+        ...localPayload,
         id: localCardId
       })
       continue
