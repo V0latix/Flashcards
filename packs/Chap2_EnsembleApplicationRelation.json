@@ -1,0 +1,356 @@
+{
+  "version": 1,
+  "exported_at": "2026-01-27T00:00:00Z",
+  "cards": [
+    {
+      "front_md": "Que sont les notions d’ensemble et d’élément ?",
+      "back_md": "Un ensemble est une « collection d’objets » et les objets qui le composent sont appelés ses éléments.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Que signifie la notation $a \\in E$ ?",
+      "back_md": "$a \\in E$ signifie que $a$ est un élément de l’ensemble $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Que signifie la notation $a \\notin E$ ?",
+      "back_md": "$a \\notin E$ signifie que $a$ n’est pas un élément de l’ensemble $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelles sont les deux façons de définir un ensemble ?",
+      "back_md": "Un ensemble peut être défini :\n- en extension (liste de ses éléments),\n- par compréhension (condition d’appartenance).",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment définit-on un ensemble par compréhension ?",
+      "back_md": "Par la notation $\\{x \\in E : P(x)\\}$, ensemble des éléments de $E$ vérifiant la propriété $P(x)$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner un exemple d’égalité entre une définition en extension et par compréhension.",
+      "back_md": "$\\{0,1,2,3\\} = \\{n \\in \\mathbb{N} : n \\le 3\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment s’écrit l’ensemble des entiers relatifs compris entre $-2$ et $2$ ?",
+      "back_md": "En extension : $\\{-2,-1,0,1,2\\}$.\nPar compréhension : $\\{n \\in \\mathbb{Z} : -2 \\le n \\le 2\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment s’écrit l’ensemble des entiers naturels pairs ?",
+      "back_md": "En extension : $\\{2n \\mid n \\in \\mathbb{N}\\}$.\nPar compréhension : $\\{n \\in \\mathbb{N} : \\exists k \\in \\mathbb{N},\\ n = 2k\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment exprime-t-on l’ensemble des zéros d’une fonction $f : \\mathbb{R} \\to \\mathbb{R}$ ?",
+      "back_md": "$\\{x \\in \\mathbb{R} : f(x)=0\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "L’ordre des éléments compte-t-il dans un ensemble défini en extension ?",
+      "back_md": "Non, par exemple $\\{a,b\\} = \\{b,a\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Que signifie le cardinal d’un ensemble fini ?",
+      "back_md": "Le cardinal d’un ensemble $E$, noté $\\mathrm{card}\\,E$, est le nombre d’éléments distincts de $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quel est le cardinal de l’ensemble $\\{1,x,x^2\\}$ selon $x$ ?",
+      "back_md": "Il vaut $1$ si $x=1$, $2$ si $x=0$ ou $x=-1$, et $3$ sinon.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce que l’ensemble vide ?",
+      "back_md": "L’ensemble vide, noté $\\varnothing$, est l’ensemble qui ne contient aucun élément.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner un exemple de définition conduisant à l’ensemble vide.",
+      "back_md": "$\\{x \\in \\mathbb{R} : x^2 + 1 = 0\\} = \\varnothing$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir la notion de sous-ensemble.",
+      "back_md": "Un ensemble $F$ est un sous-ensemble de $E$ si tout élément de $F$ est aussi élément de $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment note-t-on l’inclusion d’ensembles ?",
+      "back_md": "On note $F \\subset E$ lorsque $F$ est inclus dans $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une inclusion stricte ?",
+      "back_md": "On a une inclusion stricte lorsque $F \\subset E$ et $F \\ne E$, notée $F \\subsetneq E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Traduire l’inclusion $F \\subset E$ avec des quantificateurs.",
+      "back_md": "$F \\subset E \\iff \\forall x \\in F,\\ x \\in E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelles inclusions sont toujours vraies pour tout ensemble $E$ ?",
+      "back_md": "$E \\subset E$ et $\\varnothing \\subset E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner la chaîne d’inclusions classiques entre ensembles de nombres.",
+      "back_md": "$\\mathbb{N} \\subsetneq \\mathbb{Z} \\subsetneq \\mathbb{Q} \\subsetneq \\mathbb{R}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Énoncer la transitivité de l’inclusion.",
+      "back_md": "Si $E \\subset F$ et $F \\subset G$, alors $E \\subset G$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelle est la négation de $F \\subset E$ ?",
+      "back_md": "$F \\not\\subset E \\iff \\exists x \\in F,\\ x \\notin E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quand dit-on que deux ensembles $E$ et $F$ sont égaux ?",
+      "back_md": "$E = F \\iff (E \\subset F \\text{ et } F \\subset E)$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelle est la méthode principale pour montrer l’égalité de deux ensembles ?",
+      "back_md": "La méthode de la double inclusion : montrer $E \\subset F$ puis $F \\subset E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir la réunion de deux ensembles $E$ et $F$.",
+      "back_md": "La réunion $E \\cup F$ est l’ensemble des éléments appartenant à $E$ ou à $F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir l’intersection de deux ensembles $E$ et $F$.",
+      "back_md": "L’intersection $E \\cap F$ est l’ensemble des éléments appartenant à $E$ et à $F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Traduire $x \\in E \\cup F$ et $x \\in E \\cap F$.",
+      "back_md": "$x \\in E \\cup F \\iff (x \\in E \\text{ ou } x \\in F)$.\n$x \\in E \\cap F \\iff (x \\in E \\text{ et } x \\in F)$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir la différence ensembliste $E \\setminus F$.",
+      "back_md": "$E \\setminus F = \\{x \\in E : x \\notin F\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir le complémentaire d’un ensemble $A$ dans $E$.",
+      "back_md": "Le complémentaire de $A$ dans $E$ est $E \\setminus A$, noté aussi $\\overline{A}$ ou $A^c$ lorsque $E$ est fixé.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner les égalités fondamentales liant un ensemble et son complémentaire.",
+      "back_md": "$A \\cup \\overline{A} = E$ et $A \\cap \\overline{A} = \\varnothing$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Énoncer les lois de De Morgan pour les ensembles.",
+      "back_md": "$\\overline{A \\cup B} = \\overline{A} \\cap \\overline{B}$ et $\\overline{A \\cap B} = \\overline{A} \\cup \\overline{B}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une application (ou fonction) entre deux ensembles ?",
+      "back_md": "Une application $f$ de $E$ vers $F$, notée $f : E \\to F$, associe à tout élément $x \\in E$ un unique élément $f(x) \\in F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment appelle-t-on les ensembles $E$ et $F$ dans une application $f : E \\to F$ ?",
+      "back_md": "$E$ est l’ensemble de départ (ou domaine) et $F$ est l’ensemble d’arrivée (ou codomaine).",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Que signifie l’écriture $y = f(x)$ ?",
+      "back_md": "$y$ est l’image de $x$ par l’application $f$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’un antécédent d’un élément $y \\in F$ par $f$ ?",
+      "back_md": "Un antécédent de $y$ est un élément $x \\in E$ tel que $f(x)=y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment définit-on l’image directe d’une partie $A \\subset E$ par une application $f : E \\to F$ ?",
+      "back_md": "L’image de $A$ par $f$ est $f(A)=\\{f(x) \\mid x \\in A\\} \\subset F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment définit-on l’image réciproque d’une partie $B \\subset F$ par une application $f : E \\to F$ ?",
+      "back_md": "L’image réciproque de $B$ par $f$ est $f^{-1}(B)=\\{x \\in E \\mid f(x) \\in B\\} \\subset E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner la définition d’une application injective.",
+      "back_md": "$f : E \\to F$ est injective si $\\forall x,x' \\in E,\\ f(x)=f(x') \\Rightarrow x=x'$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner une formulation équivalente de l’injectivité.",
+      "back_md": "$f$ est injective si tout élément de $F$ admet au plus un antécédent par $f$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner la définition d’une application surjective.",
+      "back_md": "$f : E \\to F$ est surjective si $\\forall y \\in F,\\ \\exists x \\in E$ tel que $f(x)=y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment caractérise-t-on la surjectivité à l’aide de l’image ?",
+      "back_md": "$f$ est surjective si et seulement si $f(E)=F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Donner la définition d’une application bijective.",
+      "back_md": "Une application est bijective si elle est à la fois injective et surjective.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelle propriété fondamentale possède une application bijective ?",
+      "back_md": "Tout élément de $F$ admet un unique antécédent dans $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce que l’application identité sur un ensemble $E$ ?",
+      "back_md": "L’application identité, notée $\\mathrm{Id}_E$, est définie par $\\mathrm{Id}_E(x)=x$ pour tout $x \\in E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir la composée de deux applications.",
+      "back_md": "Si $f : E \\to F$ et $g : F \\to G$, la composée $g \\circ f : E \\to G$ est définie par $(g \\circ f)(x)=g(f(x))$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "La composition d’applications est-elle associative ?",
+      "back_md": "Oui : $h \\circ (g \\circ f) = (h \\circ g) \\circ f$ lorsque les compositions sont définies.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelle relation lie la composée avec l’application identité ?",
+      "back_md": "$f \\circ \\mathrm{Id}_E = f$ et $\\mathrm{Id}_F \\circ f = f$ pour $f : E \\to F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce que la restriction d’une application $f : E \\to F$ à une partie $A \\subset E$ ?",
+      "back_md": "La restriction de $f$ à $A$, notée $f_{|A}$, est l’application $f_{|A} : A \\to F$ définie par $f_{|A}(x)=f(x)$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelle est la définition de l’application réciproque d’une bijection ?",
+      "back_md": "Si $f : E \\to F$ est bijective, il existe une unique application $f^{-1} : F \\to E$ telle que $f^{-1}(f(x))=x$ et $f(f^{-1}(y))=y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quel lien existe entre injectivité, surjectivité et application réciproque ?",
+      "back_md": "Une application admet une réciproque si et seulement si elle est bijective.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une relation binaire entre deux ensembles $E$ et $F$ ?",
+      "back_md": "Une relation binaire $\\mathcal{R}$ de $E$ vers $F$ est une partie de $E \\times F$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Comment note-t-on qu’un couple $(x,y)$ appartient à une relation $\\mathcal{R}$ ?",
+      "back_md": "On note $(x,y) \\in \\mathcal{R}$ ou encore $x\\,\\mathcal{R}\\,y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une relation sur un ensemble $E$ ?",
+      "back_md": "Une relation sur $E$ est une relation binaire de $E$ vers $E$, c’est-à-dire une partie de $E \\times E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’appelle-t-on le graphe d’une relation $\\mathcal{R}$ ?",
+      "back_md": "Le graphe de $\\mathcal{R}$ est l’ensemble des couples $(x,y)$ de $E \\times F$ tels que $x\\,\\mathcal{R}\\,y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir une relation réflexive sur un ensemble $E$.",
+      "back_md": "Une relation $\\mathcal{R}$ sur $E$ est réflexive si $\\forall x \\in E,\\ x\\,\\mathcal{R}\\,x$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir une relation symétrique.",
+      "back_md": "Une relation $\\mathcal{R}$ sur $E$ est symétrique si $\\forall x,y \\in E,\\ x\\,\\mathcal{R}\\,y \\Rightarrow y\\,\\mathcal{R}\\,x$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir une relation antisymétrique.",
+      "back_md": "Une relation $\\mathcal{R}$ sur $E$ est antisymétrique si $\\forall x,y \\in E,\\ (x\\,\\mathcal{R}\\,y \\text{ et } y\\,\\mathcal{R}\\,x) \\Rightarrow x=y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir une relation transitive.",
+      "back_md": "Une relation $\\mathcal{R}$ sur $E$ est transitive si $\\forall x,y,z \\in E,\\ (x\\,\\mathcal{R}\\,y \\text{ et } y\\,\\mathcal{R}\\,z) \\Rightarrow x\\,\\mathcal{R}\\,z$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une relation d’équivalence ?",
+      "back_md": "Une relation d’équivalence est une relation réflexive, symétrique et transitive.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir la classe d’équivalence d’un élément $x \\in E$.",
+      "back_md": "La classe d’équivalence de $x$ est $[x]=\\{y \\in E : y\\,\\mathcal{R}\\,x\\}$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quand deux éléments $x$ et $y$ ont-ils la même classe d’équivalence ?",
+      "back_md": "$[x]=[y] \\iff x\\,\\mathcal{R}\\,y$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Quelle propriété fondamentale vérifient les classes d’équivalence ?",
+      "back_md": "Les classes d’équivalence forment une partition de l’ensemble $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une partition d’un ensemble $E$ ?",
+      "back_md": "Une partition de $E$ est une famille de parties non vides, deux à deux disjointes, dont la réunion est $E$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’une relation d’ordre sur un ensemble $E$ ?",
+      "back_md": "Une relation d’ordre est une relation réflexive, antisymétrique et transitive.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’un ordre total ?",
+      "back_md": "Un ordre est total si, pour tous $x,y \\in E$, on a $x\\,\\mathcal{R}\\,y$ ou $y\\,\\mathcal{R}\\,x$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Qu’est-ce qu’un ordre partiel ?",
+      "back_md": "Un ordre est partiel lorsqu’il n’est pas total.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir un majorant d’une partie $A$ d’un ensemble ordonné $(E,\\le)$.",
+      "back_md": "Un élément $M \\in E$ est un majorant de $A$ si $\\forall x \\in A,\\ x \\le M$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir un minorant d’une partie $A$ d’un ensemble ordonné $(E,\\le)$.",
+      "back_md": "Un élément $m \\in E$ est un minorant de $A$ si $\\forall x \\in A,\\ m \\le x$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir le plus grand élément d’une partie $A$.",
+      "back_md": "$M$ est le plus grand élément de $A$ si $M \\in A$ et $\\forall x \\in A,\\ x \\le M$.",
+      "tags": ["Maths/Bases"]
+    },
+    {
+      "front_md": "Définir le plus petit élément d’une partie $A$.",
+      "back_md": "$m$ est le plus petit élément de $A$ si $m \\in A$ et $\\forall x \\in A,\\ m \\le x$.",
+      "tags": ["Maths/Bases"]
+    }
+  ]
+}
