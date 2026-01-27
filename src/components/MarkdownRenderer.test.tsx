@@ -37,4 +37,11 @@ describe('MarkdownRenderer', () => {
     expect(document.querySelector('.katex')).toBeTruthy()
     expect(screen.queryByText(/\\\\forall/)).toBeNull()
   })
+
+  it('repairs JSON control escapes like \\b, \\f, \\t inside TeX commands', () => {
+    const broken = "$\big(\frac{1}{2} \text{ok}\big)$"
+    render(<MarkdownRenderer value={broken} />)
+    expect(document.querySelector('.katex')).toBeTruthy()
+    expect(document.querySelector('.katex-error')).toBeNull()
+  })
 })

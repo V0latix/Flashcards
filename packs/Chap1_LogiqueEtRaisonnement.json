@@ -138,7 +138,7 @@
     },
     {
     "front_md": "Quel fondement structurel justifie le principe de récurrence sur $\\mathbb{N}$ ?",
-    "back_md": "Le principe repose sur le fait que $\\mathbb{N}$ est le plus petit ensemble contenant $0$ et stable par l’application successeur $n \\mapsto n+1$.",
+    "back_md": "Le principe repose sur le fait que toute partie de $\\mathbb{N}$ non vide possède un plus petit élément",
     "tags": ["Maths/Analyse/Logique et raisonnement"]
     },
     {

@@ -19,6 +19,15 @@ const normalizeMathEscapes = (value: string) =>
     // Some imports over-escape TeX commands like \\forall -> \forall.
     .replace(/\\\\(?=[A-Za-z{}[\]()])/g, '\\')
 
+const CONTROL_ESCAPE_MAP: Record<string, string> = {
+  '\u0008': '\\b', // \b -> backspace (e.g., \big)
+  '\u0009': '\\t', // \t -> tab (e.g., \text)
+  '\u000c': '\\f' // \f -> form feed (e.g., \frac)
+}
+
+const normalizeControlEscapes = (value: string) =>
+  value.replace(/[\u0008\u0009\u000c]/g, (char) => CONTROL_ESCAPE_MAP[char] ?? char)
+
 const MarkdownImage = ({
   src,
   alt,
@@ -53,7 +62,9 @@ const MarkdownImage = ({
 }
 
 const MarkdownRenderer = ({ value }: MarkdownRendererProps) => {
-  const normalizedValue = normalizeMathDelimiters(normalizeMathEscapes(value))
+  const normalizedValue = normalizeMathDelimiters(
+    normalizeMathEscapes(normalizeControlEscapes(value))
+  )
 
   return (
     <ReactMarkdown
