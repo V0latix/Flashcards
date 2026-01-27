@@ -569,9 +569,11 @@ ul {
 .home-hero {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 24px;
+  justify-content: flex-start;
+  padding: 84px 24px 32px;
+  gap: 16px;
   position: relative;
 }
 
@@ -587,6 +589,36 @@ ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 18px;
+}
+
+.home-summary {
+  width: min(100%, 880px);
+}
+
+.home-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.home-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.home-summary-count {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.home-summary-next {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
 .home-tile {

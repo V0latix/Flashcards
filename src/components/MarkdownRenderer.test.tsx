@@ -25,4 +25,16 @@ describe('MarkdownRenderer', () => {
     consoleSpy.mockRestore()
     vi.unstubAllEnvs()
   })
+
+  it('normalizes \\[ \\] math delimiters for KaTeX', () => {
+    render(<MarkdownRenderer value={"\\[a^2 + b^2 = c^2\\]"} />)
+    expect(document.querySelector('.katex')).toBeTruthy()
+    expect(screen.queryByText(/\\\[/)).toBeNull()
+  })
+
+  it('unescapes common TeX escapes from JSON imports', () => {
+    render(<MarkdownRenderer value={"\\$\\\\forall x \\\\in \\\\mathbb{N}\\$"} />)
+    expect(document.querySelector('.katex')).toBeTruthy()
+    expect(screen.queryByText(/\\\\forall/)).toBeNull()
+  })
 })

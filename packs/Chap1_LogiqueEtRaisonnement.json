@@ -1,0 +1,150 @@
+{
+    "schema_version": 1,
+    "cards": [
+    {
+    "front_md": "Qu’est-ce qu’une assertion en mathématiques ?",
+    "back_md": "Une assertion est une phrase mathématique qui admet une valeur de vérité : elle est soit vraie, soit fausse.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Quelle est la différence logique entre une assertion et un prédicat ?",
+    "back_md": "Un prédicat est une application $P : E \\to \\{\\text{vrai}, \\text{faux}\\}$. Il ne devient une assertion qu’après instanciation (choix d’un élément) ou quantification.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Définir la négation $\\lnot P$ d’une assertion $P$.",
+    "back_md": "La négation $\\lnot P$ est l’assertion vraie si et seulement si $P$ est fausse.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Définir la conjonction $P \\land Q$.",
+    "back_md": "La conjonction $P \\land Q$ est vraie si et seulement si $P$ est vraie et $Q$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Définir la disjonction $P \\lor Q$.",
+    "back_md": "La disjonction $P \\lor Q$ est vraie si et seulement si au moins l’une des deux assertions $P$ ou $Q$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner une définition formelle de l’implication $P \\Rightarrow Q$.",
+    "back_md": "L’assertion $P \\Rightarrow Q$ est fausse si et seulement si $P$ est vraie et $Q$ est fausse. Elle est vraie dans tous les autres cas.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner une forme logiquement équivalente de $P \\Rightarrow Q$.",
+    "back_md": "$$P \\Rightarrow Q \\iff \\lnot P \\lor Q.$$",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Pourquoi l’implication $P \\Rightarrow Q$ est-elle vraie lorsque $P$ est fausse ?",
+    "back_md": "Parce que $P \\Rightarrow Q$ est équivalente à $\\lnot P \\lor Q$. Si $P$ est fausse, alors $\\lnot P$ est vraie, donc $\\lnot P \\lor Q$ est vraie, donc $P \\Rightarrow Q$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner un exemple d’implication vraie dont l’hypothèse est fausse.",
+    "back_md": "L’assertion « Si $2$ est impair, alors $7$ est premier » est vraie, car l’hypothèse « $2$ est impair » est fausse.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Définir l’équivalence logique $P \\Leftrightarrow Q$.",
+    "back_md": "L’assertion $P \\Leftrightarrow Q$ est vraie si et seulement si $P$ et $Q$ ont la même valeur de vérité.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Énoncer les lois de De Morgan.",
+    "back_md": "$$\\lnot(P \\land Q) \\iff (\\lnot P) \\lor (\\lnot Q).$$\n$$\\lnot(P \\lor Q) \\iff (\\lnot P) \\land (\\lnot Q).$$",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Quelle est la contraposée de l’implication $P \\Rightarrow Q$ ?",
+    "back_md": "La contraposée est $\\lnot Q \\Rightarrow \\lnot P$.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Quel est le lien logique entre une implication et sa contraposée ?",
+    "back_md": "$$P \\Rightarrow Q \\iff (\\lnot Q \\Rightarrow \\lnot P).$$",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Définir le raisonnement par l’absurde (principe logique).",
+    "back_md": "Pour établir une assertion $P$, on suppose $\\lnot P$ et on en déduit une contradiction, c’est-à-dire une assertion fausse (par exemple $R \\land \\lnot R$). On conclut alors que $P$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner la définition du quantificateur universel $\\forall$.",
+    "back_md": "L’assertion $\\forall x \\in E,\\ P(x)$ est vraie si, pour tout $x$ appartenant à $E$, l’assertion $P(x)$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner la définition du quantificateur existentiel $\\exists$.",
+    "back_md": "L’assertion $\\exists x \\in E,\\ P(x)$ est vraie s’il existe au moins un $x$ appartenant à $E$ tel que $P(x)$ soit vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner la négation de $\\forall x \\in E,\\ P(x)$.",
+    "back_md": "$$\\lnot(\\forall x \\in E,\\ P(x)) \\iff \\exists x \\in E,\\ \\lnot P(x).$$",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner la négation de $\\exists x \\in E,\\ P(x)$.",
+    "back_md": "$$\\lnot(\\exists x \\in E,\\ P(x)) \\iff \\forall x \\in E,\\ \\lnot P(x).$$",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Que signifie $\\exists ! x \\in E,\\ P(x)$ ?",
+    "back_md": "Cela signifie qu’il existe un unique $x$ dans $E$ tel que $P(x)$ soit vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Exprimer $\\exists ! x \\in E,\\ P(x)$ sans utiliser le symbole $\\exists !$.",
+    "back_md": "$$\\exists x \\in E,\\ \big(P(x) \\land \\forall y \\in E,\\ (P(y) \\Rightarrow y = x)\big).$$",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Les deux assertions suivantes sont-elles équivalentes ?\n$$\\forall x \\in E,\\ \\exists y \\in F,\\ R(x,y)$$\n$$\\exists y \\in F,\\ \\forall x \\in E,\\ R(x,y)$$",
+    "back_md": "Non en général. La première autorise un choix de $y$ dépendant de $x$. La seconde impose l’existence d’un même $y$ convenant pour tous les $x$.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Qu’est-ce qu’une « variable muette » dans une assertion quantifiée ?",
+    "back_md": "Dans $\\forall x \\in E,\\ P(x)$ ou $\\exists x \\in E,\\ P(x)$, la variable $x$ est muette : on peut la renommer (par exemple $x$ en $t$) sans changer le sens de l’assertion.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Que vaut l’assertion $\\forall x \\in \\varnothing,\\ P(x)$ ?",
+    "back_md": "Elle est vraie : il n’existe aucun élément de $\\varnothing$ pour contredire $P(x)$.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Donner un exemple canonique montrant que l’ordre des quantificateurs est crucial.",
+    "back_md": "Sur $\\mathbb{R}$, l’assertion\n$$\\exists x > 0,\\ \\forall y > 0,\\ x < y$$\nest fausse (elle demanderait un plus petit réel strictement positif), tandis que\n$$\\forall y > 0,\\ \\exists x > 0,\\ x < y$$\nest vraie (par exemple $x = y/2$).",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Énoncer le principe de la récurrence simple sur $\\mathbb{N}$ (à partir de $0$).",
+    "back_md": "Soit $P(n)$ une assertion dépendant de $n \\in \\mathbb{N}$. Si $P(0)$ est vraie et si $\\forall n \\in \\mathbb{N},\\ P(n) \\Rightarrow P(n+1)$, alors $\\forall n \\in \\mathbb{N},\\ P(n)$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Énoncer le principe de la récurrence à partir d’un rang $n_0 \\in \\mathbb{N}$.",
+    "back_md": "Soit $P(n)$ une assertion. Si $P(n_0)$ est vraie et si $\\forall n \\in \\mathbb{N},\\ (n \\ge n_0 \\Rightarrow (P(n) \\Rightarrow P(n+1)))$, alors $\\forall n \\in \\mathbb{N},\\ (n \\ge n_0 \\Rightarrow P(n))$.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Formuler la récurrence forte sur $\\mathbb{N}$ (à partir de $0$).",
+    "back_md": "Si $P(0)$ est vraie et si $\\forall n \\in \\mathbb{N},\\ \big((\\forall k \\in \\\\{0,\\dots,n\\\\},\\ P(k)) \\Rightarrow P(n+1)\big)$, alors $\\forall n \\in \\mathbb{N},\\ P(n)$ est vraie.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Quel fondement structurel justifie le principe de récurrence sur $\\mathbb{N}$ ?",
+    "back_md": "Le principe repose sur le fait que $\\mathbb{N}$ est le plus petit ensemble contenant $0$ et stable par l’application successeur $n \\mapsto n+1$.",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    },
+    {
+    "front_md": "Pourquoi la récurrence ne s’applique-t-elle pas directement sur $\\mathbb{Z}$ ?",
+    "back_md": "Parce que $\\mathbb{Z}$ ne possède pas de plus petit élément, ce qui empêche une initialisation globale (on ne peut pas « démarrer » au plus petit entier).",
+    "tags": ["Maths/Analyse/Logique et raisonnement"]
+    }
+    ]
+}

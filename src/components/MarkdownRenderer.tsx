@@ -8,6 +8,17 @@ type MarkdownRendererProps = {
   value: string
 }
 
+const normalizeMathDelimiters = (value: string) =>
+  value
+    .replace(/\\\[((?:.|\r|\n)*?)\\\]/g, (_, expr: string) => `$$\n${expr}\n$$`)
+    .replace(/\\\(((?:.|\r|\n)*?)\\\)/g, (_, expr: string) => `$${expr}$`)
+
+const normalizeMathEscapes = (value: string) =>
+  value
+    .replace(/\\\$/g, '$')
+    // Some imports over-escape TeX commands like \\forall -> \forall.
+    .replace(/\\\\(?=[A-Za-z{}[\]()])/g, '\\')
+
 const MarkdownImage = ({
   src,
   alt,
@@ -41,17 +52,21 @@ const MarkdownImage = ({
   )
 }
 
-const MarkdownRenderer = ({ value }: MarkdownRendererProps) => (
-  <ReactMarkdown
-    urlTransform={(uri) => uri}
-    remarkPlugins={[remarkMath]}
-    rehypePlugins={[rehypeKatex]}
-    components={{
-      img: MarkdownImage
-    }}
-  >
-    {value}
-  </ReactMarkdown>
-)
+const MarkdownRenderer = ({ value }: MarkdownRendererProps) => {
+  const normalizedValue = normalizeMathDelimiters(normalizeMathEscapes(value))
+
+  return (
+    <ReactMarkdown
+      urlTransform={(uri) => uri}
+      remarkPlugins={[remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+      components={{
+        img: MarkdownImage
+      }}
+    >
+      {normalizedValue}
+    </ReactMarkdown>
+  )
+}
 
 export default MarkdownRenderer
