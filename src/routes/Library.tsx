@@ -12,6 +12,7 @@ function Library() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const [selectedBoxes, setSelectedBoxes] = useState<number[]>([])
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [openHints, setOpenHints] = useState<Record<number, boolean>>({})
   const [visibleCount, setVisibleCount] = useState(100)
@@ -62,6 +63,19 @@ function Library() {
     setVisibleCount(100)
   }
 
+  const toggleBoxFilter = (box: number) => {
+    setSelectedBoxes((prev) => {
+      const next = prev.includes(box) ? prev.filter((item) => item !== box) : [...prev, box]
+      return next.sort((a, b) => a - b)
+    })
+    setVisibleCount(100)
+  }
+
+  const clearBoxFilter = () => {
+    setSelectedBoxes([])
+    setVisibleCount(100)
+  }
+
   const tagDeleteCount = useMemo(() => {
     if (!selectedTag) {
       return 0
@@ -108,10 +122,21 @@ function Library() {
   )
 
   const totalCardsCount = cards.length
+  const boxOptions = [0, 1, 2, 3, 4, 5]
+  const boxCounts = useMemo(() => {
+    const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    cards.forEach(({ reviewState }) => {
+      const box = reviewState?.box ?? 0
+      if (typeof counts[box] === 'number') {
+        counts[box] += 1
+      }
+    })
+    return counts
+  }, [cards])
 
   const filteredCards = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
-    return cards.filter(({ card }) => {
+    return cards.filter(({ card, reviewState }) => {
       if (selectedTag) {
         const hasTag = card.tags.some((tag) => {
           const normalized = tag.trim()
@@ -125,6 +150,13 @@ function Library() {
         }
       }
 
+      if (selectedBoxes.length > 0) {
+        const cardBox = reviewState?.box ?? 0
+        if (!selectedBoxes.includes(cardBox)) {
+          return false
+        }
+      }
+
       if (normalizedQuery) {
         const haystack = `${card.front_md} ${card.back_md}`.toLowerCase()
         if (!haystack.includes(normalizedQuery)) {
@@ -134,7 +166,7 @@ function Library() {
 
       return true
     })
-  }, [cards, query, selectedTag])
+  }, [cards, query, selectedBoxes, selectedTag])
 
   const visibleCards = useMemo(
     () => filteredCards.slice(0, visibleCount),
@@ -266,6 +298,31 @@ function Library() {
               >
                 Session d'entrainement
               </button>
+              <div className="panel-actions">
+                <span className="chip">Boites</span>
+                <div className="filter-group">
+                  {boxOptions.map((box) => (
+                    <button
+                      key={box}
+                      type="button"
+                      className={`btn btn-secondary btn-toggle${
+                        selectedBoxes.includes(box) ? ' is-active' : ''
+                      }`}
+                      onClick={() => toggleBoxFilter(box)}
+                    >
+                      {box} ({boxCounts[box] ?? 0})
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={clearBoxFilter}
+                    disabled={selectedBoxes.length === 0}
+                  >
+                    Toutes
+                  </button>
+                </div>
+              </div>
             </div>
             {selectedTag ? (
               <div className="section">
