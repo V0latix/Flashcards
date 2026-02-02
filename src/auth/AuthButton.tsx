@@ -7,16 +7,14 @@ type AuthButtonProps = {
 }
 
 function AuthButton({ className }: AuthButtonProps) {
-  const { user, loading, signInWithMagicLink, signInWithProvider, signOut } = useAuth()
+  const { user, loading, signInWithProvider, signOut } = useAuth()
   const [open, setOpen] = useState(false)
-  const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(
     null
   )
 
   const openModal = () => {
-    setEmail(user?.email ?? '')
     setStatus(null)
     setOpen(true)
   }
@@ -26,25 +24,9 @@ function AuthButton({ className }: AuthButtonProps) {
     setStatus(null)
   }
 
-  const handleSendLink = async () => {
-    const trimmed = email.trim()
-    if (!trimmed) {
-      setStatus({ type: 'error', message: 'Email requis.' })
-      return
-    }
+  const handleGoogle = async () => {
     setSubmitting(true)
-    const { error } = await signInWithMagicLink(trimmed)
-    if (error) {
-      setStatus({ type: 'error', message: error })
-    } else {
-      setStatus({ type: 'success', message: 'Lien envoyé. Vérifie tes emails.' })
-    }
-    setSubmitting(false)
-  }
-
-  const handleGithub = async () => {
-    setSubmitting(true)
-    const { error } = await signInWithProvider('github')
+    const { error } = await signInWithProvider('google')
     if (error) {
       setStatus({ type: 'error', message: error })
       setSubmitting(false)
@@ -103,32 +85,15 @@ function AuthButton({ className }: AuthButtonProps) {
               </>
             ) : (
               <>
-                <p className="auth-muted">
-                  Envoie un lien magique pour te connecter sur tous tes appareils.
-                </p>
+                <p className="auth-muted">Connecte-toi avec Google pour synchroniser tes données.</p>
                 <button
                   type="button"
                   className="btn btn-secondary auth-provider"
-                  onClick={handleGithub}
+                  onClick={handleGoogle}
                   disabled={submitting}
                 >
-                  Continuer avec GitHub
+                  Continuer avec Google
                 </button>
-                <div className="auth-divider">
-                  <span>ou</span>
-                </div>
-                <label className="sr-only" htmlFor="auth-email">
-                  Email
-                </label>
-                <input
-                  id="auth-email"
-                  className="input"
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                />
                 {status ? (
                   <p className={status.type === 'error' ? 'auth-error' : 'auth-success'}>
                     {status.message}
@@ -137,14 +102,6 @@ function AuthButton({ className }: AuthButtonProps) {
                 <div className="button-row">
                   <button type="button" className="btn btn-secondary" onClick={closeModal}>
                     Annuler
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleSendLink}
-                    disabled={submitting}
-                  >
-                    Envoyer le lien
                   </button>
                 </div>
               </>
