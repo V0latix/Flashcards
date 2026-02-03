@@ -777,9 +777,8 @@ ul {
     width: 100%;
   }
 
-  .app-header-inner {
-    flex-wrap: wrap;
-    gap: 8px;
+  .app-header {
+    display: none;
   }
 
   .bottom-nav {
