@@ -5,8 +5,10 @@ import { deleteAllCards } from '../db/queries'
 import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
 import { markLocalChange } from '../sync/queue'
 import { getStoredTheme, setTheme, type ThemeMode } from '../theme'
+import { useI18n } from '../i18n/I18nProvider'
 
 function Settings() {
+  const { t, language, setLanguage } = useI18n()
   const defaultBox1Target = 10
   const defaultIntervals = {
     1: 1,
@@ -48,7 +50,7 @@ function Settings() {
       intervals[5]
     ]
     if (values.some((value) => !Number.isFinite(value) || value <= 0)) {
-      setStatus('Les valeurs doivent etre des nombres positifs.')
+      setStatus(t('settings.positiveNumbers'))
       return
     }
     if (
@@ -56,7 +58,10 @@ function Settings() {
       learnedReviewIntervalDays > maxLearnedInterval
     ) {
       setStatus(
-        `L'intervalle learned doit etre entre ${minLearnedInterval} et ${maxLearnedInterval} jours.`
+        t('settings.learnedIntervalBounds', {
+          min: minLearnedInterval,
+          max: maxLearnedInterval
+        })
       )
       return
     }
@@ -67,20 +72,20 @@ function Settings() {
       reverseProbability
     })
     markLocalChange()
-    setStatus('Parametres enregistres.')
+    setStatus(t('settings.saved'))
   }
 
   return (
     <main className="container page">
       <div className="page-header">
-        <h1>Settings</h1>
-        <p>Configurer la taille de la Box 1 et les intervalles Leitner.</p>
+        <h1>{t('settings.title')}</h1>
+        <p>{t('settings.subtitle')}</p>
       </div>
       <section className="card section">
-        <h2>Apparence</h2>
+        <h2>{t('labels.appearance')}</h2>
         <div className="section">
           <label className="theme-toggle" htmlFor="theme-toggle">
-            <span>Mode sombre</span>
+            <span>{t('labels.darkMode')}</span>
             <span className="theme-switch">
               <input
                 id="theme-toggle"
@@ -105,11 +110,23 @@ function Settings() {
             </span>
           </label>
         </div>
+        <div className="section">
+          <label htmlFor="language-select">{t('labels.language')}</label>
+          <select
+            id="language-select"
+            className="input"
+            value={language}
+            onChange={(event) => setLanguage(event.target.value === 'en' ? 'en' : 'fr')}
+          >
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+          </select>
+        </div>
       </section>
       <form className="card section" onSubmit={handleSave}>
-        <h2>Revision</h2>
+        <h2>{t('settings.review')}</h2>
         <div className="section">
-          <label htmlFor="box1Target">Box 1 target</label>
+          <label htmlFor="box1Target">{t('settings.box1Target')}</label>
           <input
             id="box1Target"
             type="number"
@@ -120,10 +137,12 @@ function Settings() {
           />
         </div>
         <div className="section">
-          <h2>Intervalles (jours)</h2>
+          <h2>{t('labels.intervals')}</h2>
           {[1, 2, 3, 4, 5].map((box) => (
             <div key={box} className="section">
-              <label htmlFor={`interval-${box}`}>Box {box}</label>
+              <label htmlFor={`interval-${box}`}>
+                {t('labels.box')} {box}
+              </label>
               <input
                 id={`interval-${box}`}
                 type="number"
@@ -141,7 +160,7 @@ function Settings() {
           ))}
         </div>
         <div className="section">
-          <label htmlFor="learnedReviewIntervalDays">Revue maintien (jours)</label>
+          <label htmlFor="learnedReviewIntervalDays">{t('labels.learnedReview')}</label>
           <input
             id="learnedReviewIntervalDays"
             type="number"
@@ -151,10 +170,10 @@ function Settings() {
             className="input"
             onChange={(event) => setLearnedReviewIntervalDays(Number(event.target.value))}
           />
-          <p>Revision de maintien pour les cartes learned.</p>
+          <p>{t('settings.learnedIntervalHelp')}</p>
         </div>
         <div className="section">
-          <label htmlFor="reverseProbability">Inverser question/reponse</label>
+          <label htmlFor="reverseProbability">{t('labels.reverseQA')}</label>
           <input
             id="reverseProbability"
             type="range"
@@ -167,7 +186,7 @@ function Settings() {
           <p>{Math.round(reverseProbability * 100)}%</p>
         </div>
         <button type="submit" className="btn btn-primary">
-          Enregistrer
+          {t('actions.save')}
         </button>
         <button
           type="button"
@@ -177,33 +196,33 @@ function Settings() {
             setIntervals({ ...defaultIntervals })
             setLearnedReviewIntervalDays(defaultLearnedInterval)
             setReverseProbability(0)
-            setStatus('Valeurs par defaut restaurees.')
+            setStatus(t('settings.defaultRestored'))
             markLocalChange()
           }}
         >
-          Restaurer valeurs par defaut
+          {t('actions.restoreDefaults')}
         </button>
         {status ? <p>{status}</p> : null}
       </form>
       <section className="card section">
-        <h2>Danger zone</h2>
-        <p>Suppression totale des cartes et de toutes les donnees locales.</p>
+        <h2>{t('settings.dangerZone')}</h2>
+        <p>{t('settings.dangerDesc')}</p>
         <button type="button" className="btn btn-danger" onClick={() => setDangerOpen(true)}>
-          Supprimer toutes les cartes
+          {t('settings.deleteAll')}
         </button>
       </section>
       <ConfirmDialog
         open={dangerOpen}
-        title="Suppression totale"
-        message="Toutes les cartes, sessions, statistiques et progressions seront supprimees."
-        confirmLabel="Supprimer"
+        title={t('settings.deleteAllTitle')}
+        message={t('settings.deleteAllMessage')}
+        confirmLabel={t('actions.delete')}
         onConfirm={async () => {
           if (isDeleting || dangerText !== 'SUPPRIMER') {
             return
           }
           setIsDeleting(true)
           await deleteAllCards()
-          setStatus('Suppression terminee.')
+          setStatus(t('settings.deletedDone'))
           setIsDeleting(false)
           setDangerOpen(false)
           setDangerText('')
@@ -217,7 +236,7 @@ function Settings() {
         confirmDisabled={isDeleting || dangerText !== 'SUPPRIMER'}
       >
         <div className="section">
-          <label htmlFor="dangerInput">Tapez "SUPPRIMER" pour confirmer</label>
+          <label htmlFor="dangerInput">{t('settings.confirmDelete')}</label>
           <input
             id="dangerInput"
             type="text"

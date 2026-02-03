@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createCard, getCardById, updateCard } from '../db/queries'
 import MarkdownRenderer from '../components/MarkdownRenderer'
+import { useI18n } from '../i18n/I18nProvider'
 
 function CardEditor() {
+  const { t } = useI18n()
   const { cardId } = useParams()
   const navigate = useNavigate()
   const [front, setFront] = useState('')
@@ -12,7 +14,7 @@ function CardEditor() {
   const [tagsInput, setTagsInput] = useState('')
   const [isLoading, setIsLoading] = useState(Boolean(cardId))
   const numericCardId = cardId ? Number(cardId) : null
-  const modeLabel = cardId ? `Edit card ${cardId}` : 'New card'
+  const modeLabel = cardId ? `${t('cardEditor.titleEdit')} ${cardId}` : t('cardEditor.titleNew')
 
   const parsedTags = useMemo(() => {
     if (!tagsInput.trim()) {
@@ -66,14 +68,14 @@ function CardEditor() {
 
   return (
     <main className="container page">
-      <h1>Card Editor</h1>
+      <h1>{cardId ? t('cardEditor.titleEdit') : t('cardEditor.titleNew')}</h1>
       <p>{modeLabel}</p>
       {isLoading ? (
-        <p>Chargement...</p>
+        <p>{t('status.loading')}</p>
       ) : (
         <form onSubmit={handleSubmit} className="card section">
           <div>
-            <label htmlFor="front">Front</label>
+            <label htmlFor="front">{t('cardEditor.front')}</label>
             <textarea
               id="front"
               rows={6}
@@ -83,7 +85,7 @@ function CardEditor() {
             />
           </div>
           <div>
-            <label htmlFor="back">Back</label>
+            <label htmlFor="back">{t('cardEditor.back')}</label>
             <textarea
               id="back"
               rows={6}
@@ -93,7 +95,7 @@ function CardEditor() {
             />
           </div>
           <div>
-            <label htmlFor="hint">Hint (optional)</label>
+            <label htmlFor="hint">{t('cardEditor.hint')}</label>
             <textarea
               id="hint"
               rows={4}
@@ -103,7 +105,7 @@ function CardEditor() {
             />
           </div>
           <div>
-            <label htmlFor="tags">Tags (comma separated)</label>
+            <label htmlFor="tags">{t('cardEditor.tags')}</label>
             <input
               id="tags"
               type="text"
@@ -113,22 +115,22 @@ function CardEditor() {
             />
           </div>
           <button type="submit" className="btn btn-primary">
-            Save
+            {t('actions.save')}
           </button>
         </form>
       )}
       <section className="card section">
-        <h2>Preview</h2>
+        <h2>{t('cardEditor.preview')}</h2>
         <div>
-          <h3>Front</h3>
+          <h3>{t('cardEditor.front')}</h3>
           <div className="markdown">
-            <MarkdownRenderer value={front || '*Rien a afficher*'} />
+            <MarkdownRenderer value={front || '*Rien à afficher*'} />
           </div>
         </div>
         <div>
-          <h3>Back</h3>
+          <h3>{t('cardEditor.back')}</h3>
           <div className="markdown">
-            <MarkdownRenderer value={back || '*Rien a afficher*'} />
+            <MarkdownRenderer value={back || '*Rien à afficher*'} />
           </div>
         </div>
       </section>

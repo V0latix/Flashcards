@@ -7,8 +7,10 @@ import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteCard } from '../db/queries'
 import { consumeTrainingQueue } from '../utils/training'
+import { useI18n } from '../i18n/I18nProvider'
 
 function ReviewSession() {
+  const { t } = useI18n()
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const [isLoading, setIsLoading] = useState(true)
   const [cards, setCards] = useState<
@@ -139,36 +141,37 @@ function ReviewSession() {
 
   return (
     <main className="container page">
-      <h1>Review Session</h1>
+      <h1>{t('review.title')}</h1>
       {isLoading ? (
-        <p>Chargement...</p>
+        <p>{t('status.loading')}</p>
       ) : isDone ? (
         <section className="card section">
-          <h2>Session terminee</h2>
+          <h2>{t('review.completed')}</h2>
           <p>
-            Total: {cards.length} · Bon: {goodCount} · Faux: {badCount}
+            {t('labels.total')}: {cards.length} · {t('review.good')}: {goodCount} ·{' '}
+            {t('review.bad')}: {badCount}
           </p>
           {isTraining ? (
             <div className="section">
-              <h3>Cartes d'entrainement</h3>
+              <h3>{t('review.trainingCards')}</h3>
               {cards.length === 0 ? (
-                <p>Aucune carte.</p>
+                <p>{t('review.empty')}</p>
               ) : (
                 <ul className="card-list">
                   {cards.map((card) => (
                     <li key={card.cardId} className="card list-item">
                       <div className="markdown">
-                        <MarkdownRenderer value={card.front || '—'} />
+                        <MarkdownRenderer value={card.front || t('status.none')} />
                       </div>
                       <div className="markdown">
-                        <MarkdownRenderer value={card.back || '—'} />
+                        <MarkdownRenderer value={card.back || t('status.none')} />
                       </div>
                       <p>
-                        Resultat: {answers[card.cardId] === 'good'
-                          ? 'Bon'
+                        {t('stats.rate')}: {answers[card.cardId] === 'good'
+                          ? t('review.good')
                           : answers[card.cardId] === 'bad'
-                          ? 'Faux'
-                          : '—'}
+                          ? t('review.bad')
+                          : t('status.none')}
                       </p>
                     </li>
                   ))}
@@ -179,18 +182,18 @@ function ReviewSession() {
             <div className="section">
               <div className="split">
                 <div className="panel">
-                  <h3>Bon</h3>
+                  <h3>{t('review.good')}</h3>
                   {goodCards.length === 0 ? (
-                    <p>Aucune bonne reponse.</p>
+                    <p>{t('review.noGood')}</p>
                   ) : (
                     <ul className="card-list">
                       {goodCards.map((card) => (
                         <li key={card.cardId} className="card list-item">
                           <div className="markdown">
-                            <MarkdownRenderer value={card.front || '—'} />
+                            <MarkdownRenderer value={card.front || t('status.none')} />
                           </div>
                           <div className="markdown">
-                            <MarkdownRenderer value={card.back || '—'} />
+                            <MarkdownRenderer value={card.back || t('status.none')} />
                           </div>
                         </li>
                       ))}
@@ -198,18 +201,18 @@ function ReviewSession() {
                   )}
                 </div>
                 <div className="panel">
-                  <h3>Faux</h3>
+                  <h3>{t('review.bad')}</h3>
                   {badCards.length === 0 ? (
-                    <p>Aucune mauvaise reponse.</p>
+                    <p>{t('review.noBad')}</p>
                   ) : (
                     <ul className="card-list">
                       {badCards.map((card) => (
                         <li key={card.cardId} className="card list-item">
                           <div className="markdown">
-                            <MarkdownRenderer value={card.front || '—'} />
+                            <MarkdownRenderer value={card.front || t('status.none')} />
                           </div>
                           <div className="markdown">
-                            <MarkdownRenderer value={card.back || '—'} />
+                            <MarkdownRenderer value={card.back || t('status.none')} />
                           </div>
                         </li>
                       ))}
@@ -220,34 +223,34 @@ function ReviewSession() {
             </div>
           )}
           <Link to="/" className="btn btn-primary">
-            Retour a l'accueil
+            {t('review.backHome')}
           </Link>
         </section>
       ) : currentCard ? (
         <section className="card section">
           {isTraining ? (
-            <p>Mode entrainement (ne modifie pas la progression).</p>
+            <p>{t('review.trainingMode')}</p>
           ) : null}
-          {tagFilter ? <p>Filtre tag: {tagFilter}</p> : null}
+          {tagFilter ? <p>{t('library.tag')}: {tagFilter}</p> : null}
           <p>
-            Carte {index + 1} / {cards.length}
+            {t('labels.card')} {index + 1} / {cards.length}
           </p>
           <div>
-            <h2>Recto</h2>
+            <h2>{t('cardEditor.front')}</h2>
             <div className="markdown">
-              <MarkdownRenderer value={currentCard.front || '—'} />
+              <MarkdownRenderer value={currentCard.front || t('status.none')} />
             </div>
           </div>
           {showBack ? (
             <div>
-              <h2>Verso</h2>
+              <h2>{t('cardEditor.back')}</h2>
               <div className="markdown">
-                <MarkdownRenderer value={currentCard.back || '—'} />
+                <MarkdownRenderer value={currentCard.back || t('status.none')} />
               </div>
             </div>
           ) : (
             <button type="button" className="btn btn-primary" onClick={handleReveal}>
-              Revealer le verso
+              {t('review.revealBack')}
             </button>
           )}
           {showBack ? (
@@ -258,7 +261,7 @@ function ReviewSession() {
                 className="btn btn-primary"
                 onClick={() => handleAnswer('good')}
               >
-                Bon
+                {t('review.good')}
               </button>
               <button
                 type="button"
@@ -266,7 +269,7 @@ function ReviewSession() {
                 className="btn btn-secondary"
                 onClick={() => handleAnswer('bad')}
               >
-                Faux
+                {t('review.bad')}
               </button>
             </div>
           ) : null}
@@ -276,14 +279,14 @@ function ReviewSession() {
               className="btn btn-danger"
               onClick={() => setIsDeleteOpen(true)}
             >
-              Supprimer la carte
+              {t('review.deleteCard')}
             </button>
           </div>
           <ConfirmDialog
             open={isDeleteOpen}
-            title="Suppression"
-            message="Supprimer definitivement cette carte ? Cette action est irreversible."
-            confirmLabel="Supprimer"
+            title={t('actions.delete')}
+            message={t('review.confirmDelete')}
+            confirmLabel={t('review.confirmDeleteYes')}
             onConfirm={handleDelete}
             onCancel={() => setIsDeleteOpen(false)}
             isDanger
@@ -291,7 +294,7 @@ function ReviewSession() {
           />
         </section>
       ) : (
-        <p>{isTraining ? "Aucune carte d'entrainement." : 'Aucune carte a reviser.'}</p>
+        <p>{t('review.empty')}</p>
       )}
     </main>
   )

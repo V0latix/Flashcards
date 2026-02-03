@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { TagAgg } from '../stats/types'
 import { useStats } from '../stats/hooks'
+import { useI18n } from '../i18n/I18nProvider'
 
 type TagNode = {
   path: string
@@ -57,13 +58,14 @@ const Chart = ({
 }: {
   data: Array<{ date: string; good: number; bad: number; total: number }>
 }) => {
+  const { t } = useI18n()
   const max = Math.max(1, ...data.map((item) => item.total))
   const hasReviews = data.some((item) => item.total > 0)
   return (
     <div className="card section">
-      <h2>Revisions par jour</h2>
+      <h2>{t('stats.reviews')}</h2>
       {!hasReviews ? (
-        <p>Aucune révision sur cette période.</p>
+        <p>{t('status.none')}</p>
       ) : (
         <>
           <div className="chart">
@@ -72,7 +74,7 @@ const Chart = ({
                 <div
                   className="chart-bar"
                   style={{ height: `${(item.total / max) * 100}%` }}
-                  title={`Bon: ${item.good} | Faux: ${item.bad}`}
+                  title={`${t('review.good')}: ${item.good} | ${t('review.bad')}: ${item.bad}`}
                 >
                   <div
                     className="chart-bar-good"
@@ -87,7 +89,7 @@ const Chart = ({
               </div>
             ))}
           </div>
-          <p>Vert: bon, rose: faux (empilé).</p>
+          <p>Vert: {t('review.good').toLowerCase()}, rose: {t('review.bad').toLowerCase()}.</p>
         </>
       )}
     </div>
@@ -95,6 +97,7 @@ const Chart = ({
 }
 
 function StatsPage() {
+  const { t } = useI18n()
   const [periodDays, setPeriodDays] = useState<7 | 30>(7)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
@@ -235,38 +238,38 @@ function StatsPage() {
   return (
     <main className="container page">
       <div className="page-header">
-        <h1>Stats</h1>
-        <p>Suivi global, progression et tags.</p>
+        <h1>{t('stats.title')}</h1>
+        <p>{t('stats.subtitle')}</p>
       </div>
 
-      {stats.isLoading ? <p>Chargement...</p> : null}
+      {stats.isLoading ? <p>{t('status.loading')}</p> : null}
       {stats.error ? <p>{stats.error}</p> : null}
 
       {!stats.isLoading ? (
         <section className="card section">
-          <h2>Vue globale</h2>
+          <h2>{t('stats.overview')}</h2>
           <div className="card-list">
             <div className="card list-item">
-              <h3>Total cartes</h3>
+              <h3>{t('labels.total')}</h3>
               <p>{stats.global.totalCards}</p>
             </div>
             <div className="card list-item">
-              <h3>Cartes dues aujourd'hui</h3>
+              <h3>{t('stats.dueToday')}</h3>
               <p>{stats.global.dueToday}</p>
             </div>
             <div className="card list-item">
-              <h3>Cartes learned</h3>
+              <h3>{t('stats.learned')}</h3>
               <p>{stats.global.learnedCount}</p>
             </div>
             <div className="card list-item">
-              <h3>Revisions aujourd'hui</h3>
+              <h3>{t('stats.reviewsToday')}</h3>
               <p>{stats.global.reviewsToday}</p>
             </div>
             <div className="card list-item">
-              <h3>Taux reussite 7j</h3>
+              <h3>{t('stats.successRate7d')}</h3>
               <p>
                 {stats.global.successRate7d === null
-                  ? '—'
+                  ? t('status.none')
                   : `${Math.round(stats.global.successRate7d * 100)}%`}
               </p>
             </div>
@@ -275,7 +278,7 @@ function StatsPage() {
       ) : null}
 
       <section className="card section">
-        <h2>Progression (revisions)</h2>
+        <h2>{t('stats.progress')}</h2>
         <div className="panel-header">
           {([7, 30] as const).map((days) => (
             <button
@@ -284,7 +287,7 @@ function StatsPage() {
               className={days === periodDays ? 'btn btn-primary' : 'btn btn-secondary'}
               onClick={() => setPeriodDays(days)}
             >
-              {days} jours
+              {days === 7 ? t('stats.period7') : t('stats.period30')}
             </button>
           ))}
         </div>
@@ -292,18 +295,20 @@ function StatsPage() {
       </section>
 
       <section className="card section">
-        <h2>Repartition par box</h2>
+        <h2>{t('stats.boxSplit')}</h2>
         <table className="table">
           <thead>
             <tr>
-              <th>Box</th>
-              <th>Cartes</th>
+              <th>{t('labels.box')}</th>
+              <th>{t('labels.total')}</th>
             </tr>
           </thead>
           <tbody>
             {[0, 1, 2, 3, 4, 5].map((box) => (
               <tr key={box}>
-                <td>Box {box}</td>
+                <td>
+                  {t('labels.box')} {box}
+                </td>
                 <td>{stats.boxDistribution.counts[box] ?? 0}</td>
               </tr>
             ))}
@@ -315,43 +320,43 @@ function StatsPage() {
         <div className="sidebar">
           <h2>Tags</h2>
           <button type="button" className="btn btn-primary" onClick={() => setSelectedTag(null)}>
-            Tous les tags
+            {t('stats.tagsAll')}
           </button>
-          {tagTree.children.length === 0 ? <p>Aucun tag.</p> : null}
+          {tagTree.children.length === 0 ? <p>{t('library.noTags')}</p> : null}
           {renderTagNodes(tagTree.children)}
         </div>
         <div className="panel">
-          <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Tous les tags'}</h2>
+          <h2>{selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('stats.tagsAll')}</h2>
           {selectedStat ? (
             <div className="card list-item">
-              <p>Cartes: {selectedStat.cardsCount}</p>
-              <p>Box moyenne: {selectedStat.avgBox}</p>
+              <p>{t('labels.total')}: {selectedStat.cardsCount}</p>
+              <p>{t('labels.box')}: {selectedStat.avgBox}</p>
               <p>
-                Taux de reussite:{' '}
+                {t('stats.rate')}:{' '}
                 {selectedStat.successRate === null
-                  ? '—'
+                  ? t('status.none')
                   : `${Math.round(selectedStat.successRate * 100)}%`}
               </p>
-              <p>Cartes dues: {selectedStat.dueCount}</p>
+              <p>{t('stats.dueToday')}: {selectedStat.dueCount}</p>
             </div>
           ) : (
             <div className="card list-item">
-              <p>Selectionne un tag pour voir les details.</p>
+              <p>{t('stats.selectTag')}</p>
             </div>
           )}
           <div className="section">
-            <h3>Agregats</h3>
+            <h3>{t('stats.aggregates')}</h3>
             {tagRows.length === 0 ? (
-              <p>Aucune donnee.</p>
+              <p>{t('stats.noData')}</p>
             ) : (
               <table className="table">
                 <thead>
                   <tr>
                     <th>Tag</th>
-                    <th>Cartes</th>
-                    <th>Dues</th>
-                    <th>Box moy.</th>
-                    <th>Taux</th>
+                    <th>{t('labels.total')}</th>
+                    <th>{t('stats.dueToday')}</th>
+                    <th>{t('labels.box')}</th>
+                    <th>{t('stats.rate')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -363,7 +368,7 @@ function StatsPage() {
                       <td>{row.avgBox}</td>
                       <td>
                         {row.successRate === null
-                          ? '—'
+                          ? t('status.none')
                           : `${Math.round(row.successRate * 100)}%`}
                       </td>
                     </tr>
@@ -382,7 +387,7 @@ function StatsPage() {
                   }))
                 }
               >
-                Charger plus
+                {t('actions.loadMore')}
               </button>
             ) : null}
           </div>
@@ -390,21 +395,24 @@ function StatsPage() {
       </section>
 
       <section className="card section">
-        <h2>A travailler</h2>
-        <p>Tags avec faible taux de reussite (min {minReviewsForWeakTag} reviews).</p>
+        <h2>{t('stats.workOn')}</h2>
+        <p>{t('stats.lowRateHint', { min: minReviewsForWeakTag })}</p>
         {weakTags.length === 0 ? (
-          <p>Aucune donnee suffisante.</p>
+          <p>{t('stats.noData')}</p>
         ) : (
           <ul className="card-list">
             {weakTags.map((tag) => (
               <li key={tag.tagPath} className="card list-item">
                 <h3>{tag.tagPath}</h3>
-                <p>Reviews: {tag.reviews}</p>
+                <p>{t('stats.reviews')}: {tag.reviews}</p>
                 <p>
-                  Taux: {tag.successRate === null ? '—' : `${Math.round(tag.successRate * 100)}%`}
+                  {t('stats.rate')}:{' '}
+                  {tag.successRate === null
+                    ? t('status.none')
+                    : `${Math.round(tag.successRate * 100)}%`}
                 </p>
                 <Link to={`/review?tag=${encodeURIComponent(tag.tagPath)}`} className="btn btn-primary">
-                  Reviser ce tag
+                  {t('stats.reviewTag')}
                 </Link>
               </li>
             ))}

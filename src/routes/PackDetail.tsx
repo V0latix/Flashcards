@@ -3,8 +3,10 @@ import { Link, useParams } from 'react-router-dom'
 import { listPublicCardsByPackSlug } from '../supabase/api'
 import { importPackToLocal } from '../supabase/import'
 import type { PublicCard } from '../supabase/types'
+import { useI18n } from '../i18n/I18nProvider'
 
 function PackDetail() {
+  const { t } = useI18n()
   const { slug } = useParams()
   const [cards, setCards] = useState<PublicCard[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -45,8 +47,10 @@ function PackDetail() {
 
   return (
     <main className="container page">
-      <h1>Pack</h1>
-      <p>Slug: {slug}</p>
+      <h1>{t('packDetail.title')}</h1>
+      <p>
+        {t('packDetail.slug')}: {slug}
+      </p>
       <button
         type="button"
         className="btn btn-primary"
@@ -60,7 +64,10 @@ function PackDetail() {
           try {
             const result = await importPackToLocal(slug)
             setImportStatus(
-              `${result.imported} cartes importees, ${result.alreadyPresent} deja presentes`
+              t('packDetail.importResult', {
+                imported: result.imported,
+                already: result.alreadyPresent
+              })
             )
           } catch (err) {
             setImportStatus((err as Error).message)
@@ -69,11 +76,11 @@ function PackDetail() {
           }
         }}
       >
-        Importer ce pack dans ma bibliotheque
+        {t('packDetail.import')}
       </button>
       {importStatus ? <p>{importStatus}</p> : null}
       <section className="card section">
-        <label htmlFor="search">Recherche</label>
+        <label htmlFor="search">{t('labels.search')}</label>
         <input
           id="search"
           type="text"
@@ -82,20 +89,26 @@ function PackDetail() {
           onChange={(event) => setQuery(event.target.value)}
         />
       </section>
-      {isLoading ? <p>Chargement...</p> : null}
+      {isLoading ? <p>{t('status.loading')}</p> : null}
       {error ? <p>{error}</p> : null}
       {!isLoading && !error ? (
         <section className="card section">
-          <p>Total: {filteredCards.length}</p>
+          <p>
+            {t('packDetail.total')}: {filteredCards.length}
+          </p>
           {filteredCards.length === 0 ? (
-            <p>Aucune carte.</p>
+            <p>{t('packDetail.none')}</p>
           ) : (
             <ul>
               {filteredCards.map((card) => (
                 <li key={card.id}>
-                  <p>Front: {card.front_md}</p>
-                  <p>Back: {card.back_md}</p>
-                  <p>Tags: {card.tags?.join(', ') || '—'}</p>
+                  <p>
+                    {t('cardEditor.front')}: {card.front_md}
+                  </p>
+                  <p>
+                    {t('cardEditor.back')}: {card.back_md}
+                  </p>
+                  <p>Tags: {card.tags?.join(', ') || t('status.none')}</p>
                 </li>
               ))}
             </ul>
@@ -105,10 +118,10 @@ function PackDetail() {
       <nav>
         <ul>
           <li>
-            <Link to="/packs">Retour aux packs</Link>
+            <Link to="/packs">{t('packDetail.backToPacks')}</Link>
           </li>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/">{t('nav.home')}</Link>
           </li>
         </ul>
       </nav>

@@ -5,6 +5,7 @@ import { ChartIcon, HomeIcon, PlayIcon, PlusIcon, SettingsIcon } from '../compon
 import db from '../db'
 import type { ReviewState } from '../db/types'
 import { getLeitnerSettings } from '../leitner/settings'
+import { useI18n } from '../i18n/I18nProvider'
 
 type HomeBoxSummary = {
   dueCounts: Record<number, number>
@@ -13,6 +14,7 @@ type HomeBoxSummary = {
 
 function Home() {
   const todayKey = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const { t, language } = useI18n()
   const [boxSummary, setBoxSummary] = useState<HomeBoxSummary>(() => ({
     dueCounts: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
     nextDue: { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null }
@@ -58,14 +60,15 @@ function Home() {
 
   const formatDate = (value: string | null) => {
     if (!value) {
-      return '—'
+      return t('status.none')
     }
     const parsed = normalizeToDateKey(value)
     if (!parsed) {
       return value
     }
     const date = parseIsoDate(parsed)
-    return date.toLocaleDateString('fr-FR', {
+    const locale = language === 'fr' ? 'fr-FR' : 'en-US'
+    return date.toLocaleDateString(locale, {
       timeZone: 'UTC',
       day: '2-digit',
       month: '2-digit',
@@ -133,59 +136,69 @@ function Home() {
       <div className="home-account">
         <AuthButton className="btn btn-secondary auth-button" />
       </div>
-      <section className="home-summary card section" aria-label="Boxes du jour">
+      <section className="home-summary card section" aria-label={t('labels.boxes')}>
         <div className="panel-header">
-          <h2>Aujourd'hui</h2>
-          <span className="chip">Date: {formatDate(todayKey)}</span>
+          <h2>{t('labels.today')}</h2>
+          <span className="chip">
+            {t('labels.date')}: {formatDate(todayKey)}
+          </span>
         </div>
         <div className="home-summary-grid">
           {[1, 2, 3, 4, 5].map((box) => (
             <div key={box} className="home-summary-item">
-              <div className="chip">Box {box}</div>
-              <p className="home-summary-count">{boxSummary.dueCounts[box] ?? 0} a faire</p>
+              <div className="chip">
+                {t('labels.box')} {box}
+              </div>
+              <p className="home-summary-count">
+                {boxSummary.dueCounts[box] ?? 0} {t('labels.due')}
+              </p>
               <p className="home-summary-next">
-                Prochain test: {formatDate(boxSummary.nextDue[box])}
+                {t('labels.nextReview')}: {formatDate(boxSummary.nextDue[box])}
               </p>
             </div>
           ))}
         </div>
       </section>
-      <div className="home-grid" role="navigation" aria-label="Accueil">
-        <Link to="/review" className="home-tile home-primary" aria-label="Commencer une session">
+      <div className="home-grid" role="navigation" aria-label={t('nav.home')}>
+        <Link
+          to="/review"
+          className="home-tile home-primary"
+          aria-label={t('home.startSession')}
+        >
           <PlayIcon className="home-icon" />
-          <span className="home-label">Commencer une session</span>
-          <span className="home-desc">Lance la session du jour.</span>
+          <span className="home-label">{t('home.startSession')}</span>
+          <span className="home-desc">{t('home.startSessionDesc')}</span>
         </Link>
-        <div className="home-tile home-action" aria-label="Ajouter">
+        <div className="home-tile home-action" aria-label={t('nav.add')}>
           <PlusIcon className="home-icon" />
-          <span className="home-label">Ajouter</span>
-          <span className="home-desc">Carte, import JSON ou packs.</span>
+          <span className="home-label">{t('nav.add')}</span>
+          <span className="home-desc">{t('home.addDesc')}</span>
           <div className="home-actions">
             <Link to="/card/new" className="home-action-link">
-              Ajouter une carte
+              {t('actions.addCard')}
             </Link>
             <Link to="/import-export" className="home-action-link">
-              Importer JSON
+              {t('home.importJson')}
             </Link>
             <Link to="/packs" className="home-action-link">
-              Packs
+              {t('actions.packs')}
             </Link>
           </div>
         </div>
-        <Link to="/library" className="home-tile" aria-label="Library">
+        <Link to="/library" className="home-tile" aria-label={t('home.library')}>
           <HomeIcon className="home-icon" />
-          <span className="home-label">Library</span>
-          <span className="home-desc">Tes cartes locales et tags.</span>
+          <span className="home-label">{t('home.library')}</span>
+          <span className="home-desc">{t('home.libraryDesc')}</span>
         </Link>
-        <Link to="/stats" className="home-tile" aria-label="Stats">
+        <Link to="/stats" className="home-tile" aria-label={t('nav.stats')}>
           <ChartIcon className="home-icon" />
-          <span className="home-label">Stats</span>
-          <span className="home-desc">Progression et performances.</span>
+          <span className="home-label">{t('nav.stats')}</span>
+          <span className="home-desc">{t('home.statsDesc')}</span>
         </Link>
-        <Link to="/settings" className="home-tile" aria-label="Settings">
+        <Link to="/settings" className="home-tile" aria-label={t('nav.settings')}>
           <SettingsIcon className="home-icon" />
-          <span className="home-label">Settings</span>
-          <span className="home-desc">Parametres Leitner.</span>
+          <span className="home-label">{t('nav.settings')}</span>
+          <span className="home-desc">{t('home.settingsDesc')}</span>
         </Link>
       </div>
     </main>

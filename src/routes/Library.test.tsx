@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it } from 'vitest'
 import db from '../db'
+import { I18nProvider } from '../i18n/I18nProvider'
 import Library from './Library'
 import { resetDb, seedCardWithState } from '../test/utils'
 
@@ -28,12 +29,14 @@ describe('Library delete by tag', () => {
 
   it('removes cards for selected tag including sub-tags', async () => {
     render(
-      <MemoryRouter>
-        <Library />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter>
+          <Library />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
-    await screen.findByText(/Library/i)
+    await screen.findByText(/Bibliothèque/i)
     const tagButton = await screen.findByRole('button', { name: /Geographie/i })
     fireEvent.click(tagButton)
     fireEvent.click(

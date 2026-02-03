@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { UserIcon } from '../components/icons'
 import { useAuth } from './AuthProvider'
+import { useI18n } from '../i18n/I18nProvider'
 
 type AuthButtonProps = {
   className?: string
@@ -8,6 +9,7 @@ type AuthButtonProps = {
 
 function AuthButton({ className }: AuthButtonProps) {
   const { user, loading, signInWithProvider, signOut } = useAuth()
+  const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(
@@ -39,12 +41,12 @@ function AuthButton({ className }: AuthButtonProps) {
     if (error) {
       setStatus({ type: 'error', message: error })
     } else {
-      setStatus({ type: 'success', message: 'Déconnecté.' })
+      setStatus({ type: 'success', message: t('auth.signedOut') })
     }
     setSubmitting(false)
   }
 
-  const buttonLabel = loading ? 'Compte...' : user ? 'Compte' : 'Connexion'
+  const buttonLabel = loading ? `${t('auth.account')}...` : user ? t('auth.account') : t('auth.login')
 
   return (
     <>
@@ -60,10 +62,12 @@ function AuthButton({ className }: AuthButtonProps) {
       {open ? (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
           <div className="modal">
-            <h3>{user ? 'Compte' : 'Connexion'}</h3>
+            <h3>{user ? t('auth.account') : t('auth.login')}</h3>
             {user ? (
               <>
-                <p className="auth-muted">Connecté en tant que {user.email ?? 'Utilisateur'}.</p>
+                <p className="auth-muted">
+                  {t('auth.loggedInAs', { email: user.email ?? t('auth.account') })}
+                </p>
                 {status ? (
                   <p className={status.type === 'error' ? 'auth-error' : 'auth-success'}>
                     {status.message}
@@ -71,7 +75,7 @@ function AuthButton({ className }: AuthButtonProps) {
                 ) : null}
                 <div className="button-row">
                   <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                    Fermer
+                    {t('actions.close')}
                   </button>
                   <button
                     type="button"
@@ -79,20 +83,20 @@ function AuthButton({ className }: AuthButtonProps) {
                     onClick={handleSignOut}
                     disabled={submitting}
                   >
-                    Se déconnecter
+                    {t('auth.signOut')}
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <p className="auth-muted">Connecte-toi avec Google pour synchroniser tes données.</p>
+                <p className="auth-muted">{t('auth.googleHint')}</p>
                 <button
                   type="button"
                   className="btn btn-secondary auth-provider"
                   onClick={handleGoogle}
                   disabled={submitting}
                 >
-                  Continuer avec Google
+                  {t('auth.googleCta')}
                 </button>
                 {status ? (
                   <p className={status.type === 'error' ? 'auth-error' : 'auth-success'}>
@@ -101,7 +105,7 @@ function AuthButton({ className }: AuthButtonProps) {
                 ) : null}
                 <div className="button-row">
                   <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                    Annuler
+                    {t('actions.cancel')}
                   </button>
                 </div>
               </>

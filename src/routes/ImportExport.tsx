@@ -3,8 +3,10 @@ import db from '../db'
 import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 import { createUuid, getDeviceId } from '../sync/ids'
 import { markLocalChange } from '../sync/queue'
+import { useI18n } from '../i18n/I18nProvider'
 
 function ImportExport() {
+  const { t } = useI18n()
   const [status, setStatus] = useState<string>('')
   const [summary, setSummary] = useState<{
     parsed_cards: number
@@ -84,7 +86,7 @@ function ImportExport() {
   }
 
   const handleExport = async () => {
-    setStatus('Export en cours...')
+    setStatus(t('importExport.exportInProgress'))
     const [cards, reviewStates, media, reviewLogs] = await Promise.all([
       db.cards.toArray(),
       db.reviewStates.toArray(),
@@ -117,7 +119,7 @@ function ImportExport() {
     }
 
     downloadJson(payload)
-    setStatus('Export termine.')
+    setStatus(t('importExport.exportDone'))
   }
 
   const parsePayload = (payload: unknown) => {
@@ -132,7 +134,7 @@ function ImportExport() {
     } else if (payload && typeof payload === 'object') {
       const container = payload as Partial<ExportPayload> & { cards?: ImportCard[] }
       if ('schema_version' in container && container.schema_version !== 1) {
-        errors.push('Schema version non supportee')
+        errors.push(t('importExport.schemaUnsupported'))
       }
       if (Array.isArray(container.cards)) {
         cards = container.cards
@@ -147,7 +149,7 @@ function ImportExport() {
         reviewLogs = container.reviewLogs
       }
     } else {
-      errors.push('Format JSON non supporte')
+      errors.push(t('importExport.jsonUnsupported'))
     }
 
     return { cards, reviewStates, media, reviewLogs, errors }
@@ -155,7 +157,7 @@ function ImportExport() {
 
   const runImport = async (payload: unknown) => {
     setSummary(null)
-    setStatus('Import en cours...')
+    setStatus(t('importExport.importInProgress'))
 
     const {
       cards: rawCards,
@@ -180,7 +182,7 @@ function ImportExport() {
       const back = card.back_md ?? card.back
       if (!front || !back) {
         skipped += 1
-        errors.push(`Card ${index + 1}: front/back manquant`)
+        errors.push(t('importExport.missingFrontBack', { index: index + 1 }))
         return
       }
 
@@ -188,7 +190,7 @@ function ImportExport() {
       let sourceId = String(rawId)
       if (usedIds.has(sourceId)) {
         sourceId = generateId()
-        errors.push(`Card ${index + 1}: id duplique, nouvel id genere`)
+        errors.push(t('importExport.duplicateId', { index: index + 1 }))
       }
       usedIds.add(sourceId)
 
@@ -339,12 +341,12 @@ function ImportExport() {
     setSummary(nextSummary)
 
     if (insertedCards === 0) {
-      const reason = errors.length > 0 ? errors[0] : 'Aucune carte valide'
-      setStatus(`Import sans insertion: ${reason}`)
+      const reason = errors.length > 0 ? errors[0] : t('importExport.noValidCards')
+      setStatus(t('importExport.importNoInsert', { reason }))
       return
     }
 
-    setStatus('Import termine.')
+    setStatus(t('importExport.importDone'))
     markLocalChange()
   }
 
@@ -359,7 +361,7 @@ function ImportExport() {
       await runImport(payload)
       event.target.value = ''
     } catch (error) {
-      setStatus(`Erreur import: ${(error as Error).message}`)
+      setStatus(t('importExport.importError', { message: (error as Error).message }))
     }
   }
 
@@ -376,23 +378,23 @@ function ImportExport() {
 
   return (
     <main className="container page">
-      <h1>Import/Export</h1>
+      <h1>{t('importExport.title')}</h1>
       <section>
         <button type="button" onClick={handleExport}>
-          Exporter le pool
+          {t('importExport.exportPool')}
         </button>
       </section>
       <section>
-        <label htmlFor="import-json">Importer un pool</label>
+        <label htmlFor="import-json">{t('importExport.importPool')}</label>
         <input id="import-json" type="file" accept="application/json" onChange={handleImport} />
         <button type="button" onClick={handleDebugImport}>
-          Importer un echantillon (debug)
+          {t('importExport.importSample')}
         </button>
       </section>
       {status ? <p>{status}</p> : null}
       {summary ? (
         <section>
-          <h2>Resume import</h2>
+          <h2>{t('importExport.summary')}</h2>
           <ul>
             <li>parsed_cards: {summary.parsed_cards}</li>
             <li>inserted_cards: {summary.inserted_cards}</li>

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { listPacks } from '../supabase/api'
 import type { Pack } from '../supabase/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
+import { useI18n } from '../i18n/I18nProvider'
 
 function Packs() {
+  const { t } = useI18n()
   const [packs, setPacks] = useState<Pack[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -94,12 +96,12 @@ function Packs() {
   return (
     <main className="container page">
       <div className="page-header">
-        <h1>Packs</h1>
-        <p>Parcours les packs publics par dossier de tags.</p>
+        <h1>{t('packs.title')}</h1>
+        <p>{t('packs.browseByTags')}</p>
       </div>
-      {isLoading ? <p>Chargement...</p> : null}
+      {isLoading ? <p>{t('status.loading')}</p> : null}
       {error ? <p>{error}</p> : null}
-      {!isLoading && !error && packs.length === 0 ? <p>Aucun pack.</p> : null}
+      {!isLoading && !error && packs.length === 0 ? <p>{t('packs.none')}</p> : null}
       {!isLoading && !error && packs.length > 0 ? (
         <section className="card section split">
           <div className="sidebar">
@@ -109,25 +111,25 @@ function Packs() {
               className="btn btn-primary"
               onClick={() => setSelectedTag(null)}
             >
-              Tous les packs
+              {t('packs.all')}
             </button>
             {tagTree.children.length === 0 ? (
-              <p>Aucun tag.</p>
+              <p>{t('library.noTags')}</p>
             ) : (
               renderTagNodes(tagTree.children)
             )}
           </div>
           <div className="panel">
-            <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Tous les packs'}</h2>
+            <h2>{selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('packs.all')}</h2>
             {filteredPacks.length === 0 ? (
-              <p>Aucun pack.</p>
+              <p>{t('packs.none')}</p>
             ) : (
               <ul className="card-list">
                 {filteredPacks.map((pack) => (
                   <li key={pack.id} className="card list-item">
                     <h3>{pack.title}</h3>
                     <Link className="btn btn-primary" to={`/packs/${pack.slug}`}>
-                      Ouvrir
+                      {t('packs.open')}
                     </Link>
                   </li>
                 ))}
@@ -139,7 +141,7 @@ function Packs() {
       <nav>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/">{t('nav.home')}</Link>
           </li>
         </ul>
       </nav>

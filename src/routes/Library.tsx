@@ -6,8 +6,10 @@ import type { Card, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { saveTrainingQueue } from '../utils/training'
+import { useI18n } from '../i18n/I18nProvider'
 
 function Library() {
+  const { t, language } = useI18n()
   const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
@@ -25,14 +27,15 @@ function Library() {
 
   const formatDueDate = (value: string | null | undefined) => {
     if (!value) {
-      return '—'
+      return t('status.none')
     }
     const [year, month, day] = value.split('-').map(Number)
     if (!year || !month || !day) {
       return value
     }
     const date = new Date(Date.UTC(year, month - 1, day))
-    return date.toLocaleDateString('fr-FR', {
+    const locale = language === 'fr' ? 'fr-FR' : 'en-US'
+    return date.toLocaleDateString(locale, {
       timeZone: 'UTC',
       day: '2-digit',
       month: '2-digit',
@@ -257,16 +260,16 @@ function Library() {
   return (
     <main className="container page">
       <div className="page-header">
-        <h1>Library</h1>
-        <p>Explore tes cartes par dossiers de tags.</p>
+        <h1>{t('library.title')}</h1>
+        <p>{t('library.subtitle')}</p>
       </div>
       <p>
         <Link to="/card/new" className="btn btn-primary">
-          Ajouter une carte
+          {t('actions.addCard')}
         </Link>
       </p>
       {isLoading ? (
-        <p>Chargement...</p>
+        <p>{t('status.loading')}</p>
       ) : (
         <section className="card section split">
           <div className="sidebar">
@@ -276,18 +279,22 @@ function Library() {
               className="btn btn-primary"
               onClick={() => handleSelectTag(null)}
             >
-              Toutes les cartes
+              {t('library.allCards')}
             </button>
-            {tagTree.children.length === 0 ? <p>Aucun tag pour le moment.</p> : null}
+            {tagTree.children.length === 0 ? <p>{t('library.noTags')}</p> : null}
             {renderTagNodes(tagTree.children)}
           </div>
           <div className="panel">
             <div className="panel-header">
-              <h2>{selectedTag ? `Tag: ${selectedTag}` : 'Toutes les cartes'}</h2>
-              <span className="chip">Total: {totalCardsCount}</span>
+              <h2>
+                {selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('library.allCards')}
+              </h2>
+              <span className="chip">
+                {t('labels.total')}: {totalCardsCount}
+              </span>
               {selectedTag ? (
                 <button type="button" className="btn btn-secondary" onClick={handleGoUp}>
-                  Remonter
+                  {t('actions.up')}
                 </button>
               ) : null}
               <button
@@ -296,10 +303,10 @@ function Library() {
                 onClick={handleTraining}
                 disabled={cards.length === 0}
               >
-                Session d'entrainement
+                {t('actions.training')}
               </button>
               <div className="panel-actions">
-                <span className="chip">Boites</span>
+                <span className="chip">{t('labels.boxes')}</span>
                 <div className="filter-group">
                   {boxOptions.map((box) => (
                     <button
@@ -319,7 +326,7 @@ function Library() {
                     onClick={clearBoxFilter}
                     disabled={selectedBoxes.length === 0}
                   >
-                    Toutes
+                    {t('library.clearBoxes')}
                   </button>
                 </div>
               </div>
@@ -327,7 +334,7 @@ function Library() {
             {selectedTag ? (
               <div className="section">
                 <button type="button" className="btn btn-danger" onClick={openTagDelete}>
-                  Supprimer toutes les cartes de ce tag
+                  {t('library.deleteByTag')}
                 </button>
               </div>
             ) : null}
@@ -346,7 +353,7 @@ function Library() {
                 ))}
               </div>
             ) : null}
-            <label htmlFor="search">Recherche</label>
+            <label htmlFor="search">{t('labels.search')}</label>
             <input
               id="search"
               type="text"
@@ -357,7 +364,7 @@ function Library() {
                 setVisibleCount(100)
               }}
             />
-            {filteredCards.length === 0 ? <p>Aucune carte pour le moment.</p> : null}
+            {filteredCards.length === 0 ? <p>{t('library.noCards')}</p> : null}
             {filteredCards.length > 0 ? (
               <ul className="card-list">
                 {visibleCards.map(({ card, reviewState }) => (
@@ -365,9 +372,11 @@ function Library() {
                     <Link to={`/card/${card.id}/edit`} className="markdown">
                       <MarkdownRenderer value={card.front_md || '*Sans front*'} />
                     </Link>
-                    <div className="chip">Box {reviewState?.box ?? 0}</div>
+                    <div className="chip">
+                      {t('labels.box')} {reviewState?.box ?? 0}
+                    </div>
                     <p>
-                      Prochain test : {formatDueDate(reviewState?.due_date)}
+                      {t('labels.nextReview')}: {formatDueDate(reviewState?.due_date)}
                     </p>
                     {card.hint_md ? (
                       <div className="section">
@@ -381,7 +390,9 @@ function Library() {
                             }))
                           }
                         >
-                          {openHints[card.id ?? 0] ? "Masquer l'indice" : "Afficher l'indice"}
+                          {openHints[card.id ?? 0]
+                            ? t('labels.hideHint')
+                            : t('labels.showHint')}
                         </button>
                         {openHints[card.id ?? 0] ? (
                           <div className="markdown">{renderMarkdown(card.hint_md)}</div>
@@ -393,7 +404,7 @@ function Library() {
                       className="btn btn-secondary"
                       onClick={() => handleDelete(card)}
                     >
-                      Supprimer
+                      {t('actions.delete')}
                     </button>
                   </li>
                 ))}
@@ -405,7 +416,7 @@ function Library() {
                 className="btn btn-secondary section"
                 onClick={() => setVisibleCount((prev) => prev + 100)}
               >
-                Charger plus
+                {t('actions.loadMore')}
               </button>
             ) : null}
           </div>
@@ -413,13 +424,13 @@ function Library() {
       )}
       <ConfirmDialog
         open={tagDeleteOpen}
-        title="Suppression par tag"
+        title={t('library.deleteByTag')}
         message={
           selectedTag
-            ? `Supprimer toutes les cartes avec le tag "${selectedTag}" ?`
-            : 'Supprimer les cartes selectionnees ?'
+            ? `${t('library.deleteByTag')} "${selectedTag}" ?`
+            : t('actions.delete')
         }
-        confirmLabel="Supprimer"
+        confirmLabel={t('actions.delete')}
         onConfirm={handleDeleteByTag}
         onCancel={() => setTagDeleteOpen(false)}
         isDanger
@@ -433,17 +444,19 @@ function Library() {
                 checked={includeSubTags}
                 onChange={(event) => setIncludeSubTags(event.target.checked)}
               />{' '}
-              Inclure les sous-tags
+              {t('labels.includeSubTags')}
             </label>
-            <p>Cartes concernees: {tagDeleteCount}</p>
+            <p>
+              {t('labels.total')}: {tagDeleteCount}
+            </p>
           </div>
         ) : null}
       </ConfirmDialog>
       <ConfirmDialog
         open={Boolean(cardToDelete)}
-        title="Suppression"
-        message="Supprimer definitivement cette carte ? Cette action est irreversible."
-        confirmLabel="Supprimer"
+        title={t('actions.delete')}
+        message={t('review.confirmDelete')}
+        confirmLabel={t('actions.delete')}
         onConfirm={confirmDeleteCard}
         onCancel={() => setCardToDelete(null)}
         isDanger

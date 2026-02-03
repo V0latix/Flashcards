@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it } from 'vitest'
 import db from '../db'
+import { I18nProvider } from '../i18n/I18nProvider'
 import Settings from './Settings'
 import { resetDb, seedCardWithState } from '../test/utils'
 
@@ -19,9 +20,11 @@ describe('Settings danger zone', () => {
 
   it('deletes all cards after strong confirmation', async () => {
     render(
-      <MemoryRouter>
-        <Settings />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter>
+          <Settings />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
     fireEvent.click(screen.getByRole('button', { name: /Supprimer toutes les cartes/i }))

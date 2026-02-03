@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import db from '../db'
+import { I18nProvider } from '../i18n/I18nProvider'
 import ReviewSession from './ReviewSession'
 import { resetDb, seedCardWithState } from '../test/utils'
 import { saveTrainingQueue } from '../utils/training'
@@ -34,16 +35,18 @@ describe('ReviewSession', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/review']}>
-        <ReviewSession />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
     await screen.findByText(/Carte 1/)
-    fireEvent.click(screen.getByRole('button', { name: /Revealer/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
 
-    const bon = screen.getByRole('button', { name: 'Bon' })
-    const faux = screen.getByRole('button', { name: 'Faux' })
+    const bon = screen.getByRole('button', { name: 'BON' })
+    const faux = screen.getByRole('button', { name: 'FAUX' })
     expect(bon.style.order).toBe('2')
     expect(faux.style.order).toBe('1')
   })
@@ -58,14 +61,16 @@ describe('ReviewSession', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/review']}>
-        <ReviewSession />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
     await screen.findByText(/Carte 1/)
-    fireEvent.click(screen.getByRole('button', { name: /Revealer/i }))
-    fireEvent.click(screen.getByRole('button', { name: 'Bon' }))
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
 
     await waitFor(async () => {
       const state = await db.reviewStates.get(cardId)
@@ -83,16 +88,18 @@ describe('ReviewSession', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/review']}>
-        <ReviewSession />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
     await screen.findByText(/Carte 1/)
-    fireEvent.click(screen.getByRole('button', { name: /Revealer/i }))
-    fireEvent.click(screen.getByRole('button', { name: 'Bon' }))
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
 
-    await screen.findByText(/Session terminee/i)
+    await screen.findByText(/Session terminée/i)
     expect(screen.getByText('Q1')).toBeInTheDocument()
     expect(screen.getByText('A1')).toBeInTheDocument()
   })
@@ -115,9 +122,11 @@ describe('ReviewSession', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/review']}>
-        <ReviewSession />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
     await screen.findByText(/Carte 1/)
@@ -144,14 +153,16 @@ describe('ReviewSession', () => {
     saveTrainingQueue([cardId])
 
     render(
-      <MemoryRouter initialEntries={['/review?mode=training']}>
-        <ReviewSession />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review?mode=training']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
-    await screen.findByText(/Mode entrainement/i)
-    fireEvent.click(screen.getByRole('button', { name: /Revealer/i }))
-    fireEvent.click(screen.getByRole('button', { name: 'Bon' }))
+    await screen.findByText(/Mode entraînement/i)
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
 
     await waitFor(async () => {
       const state = await db.reviewStates.get(cardId)
