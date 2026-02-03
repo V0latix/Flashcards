@@ -40,6 +40,23 @@ afterEach(() => {
 })
 
 describe('autoFillBox1', () => {
+  it('sets box1 due date based on intervalDays[1]', async () => {
+    const today = '2024-01-10'
+
+    await addCardWithState({
+      front: 'Box0 1',
+      back: 'Box0 1',
+      createdAt: '2024-01-01',
+      box: 0,
+      dueDate: null
+    })
+
+    await autoFillBox1(1, today)
+
+    const box1State = await db.reviewStates.where({ box: 1 }).first()
+    expect(box1State?.due_date).toBe('2024-01-11')
+  })
+
   it('only fills what is available when box0 is insufficient', async () => {
     const today = '2024-01-10'
 

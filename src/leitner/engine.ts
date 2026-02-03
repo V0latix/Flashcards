@@ -71,7 +71,8 @@ export async function autoFillBox1(
     typeof todayOrDeckId === 'string'
       ? normalizeToday(todayOrDeckId)
       : normalizeToday(maybeToday ?? '')
-  const { box1Target } = getLeitnerSettings()
+  const { box1Target, intervalDays } = getLeitnerSettings()
+  const box1Interval = intervalDays[1] ?? 1
 
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates.where({ box: 1 }).toArray()
@@ -97,11 +98,12 @@ export async function autoFillBox1(
       return
     }
 
+    const dueDate = addDays(today, box1Interval)
     await db.reviewStates.bulkPut(
       selectedCardIds.map((cardId) => ({
         card_id: cardId,
         box: 1,
-        due_date: today
+        due_date: dueDate
       }))
     )
   })
@@ -126,12 +128,11 @@ export async function buildDailySession(
   const reviewStates = await db.reviewStates.toArray()
   const { learnedReviewIntervalDays } = getLeitnerSettings()
 
-  const box1States = reviewStates.filter((state) => state.box === 1)
   const dueStates = reviewStates.filter((state) => {
     if (state.is_learned) {
       return false
     }
-    if (state.box <= 1) {
+    if (state.box < 1) {
       return false
     }
     if (!state.due_date) {
@@ -159,9 +160,30 @@ export async function buildDailySession(
     }
   }
 
+  const dueByBox = new Map<number, ReviewState[]>()
+  for (const state of dueStateByCard.values()) {
+    const box = state.box ?? 1
+    const list = dueByBox.get(box) ?? []
+    list.push(state)
+    dueByBox.set(box, list)
+  }
+
+  const orderedDueStates: ReviewState[] = []
+  for (let box = LEITNER_BOX_COUNT; box >= 1; box -= 1) {
+    const list = dueByBox.get(box)
+    if (list && list.length > 0) {
+      list.sort((a, b) => {
+        const aDate = a.due_date ?? ''
+        const bDate = b.due_date ?? ''
+        return aDate.localeCompare(bDate)
+      })
+      orderedDueStates.push(...list)
+    }
+  }
+
   const [box1, due] = await Promise.all([
-    loadSessionCards(box1States),
-    loadSessionCards([...dueStateByCard.values()])
+    Promise.resolve([] as SessionCard[]),
+    loadSessionCards(orderedDueStates)
   ])
 
   return { box1, due }
