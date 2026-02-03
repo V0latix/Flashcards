@@ -32,6 +32,20 @@ const normalizeToday = (today: string): string => {
   return toIsoDate(new Date(today))
 }
 
+const normalizeToDateKey = (value: string | null | undefined): string | null => {
+  if (!value) {
+    return null
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return null
+  }
+  return toIsoDate(parsed)
+}
+
 const loadCardsByIds = async (cardIds: number[]): Promise<Card[]> => {
   if (cardIds.length === 0) {
     return []
@@ -123,10 +137,8 @@ export async function buildDailySession(
       ? normalizeToday(todayOrDeckId)
       : normalizeToday(maybeToday ?? '')
 
-  await autoFillBox1(today)
-
   const reviewStates = await db.reviewStates.toArray()
-  const { learnedReviewIntervalDays } = getLeitnerSettings()
+  const { learnedReviewIntervalDays, box1Target } = getLeitnerSettings()
 
   const dueStates = reviewStates.filter((state) => {
     if (state.is_learned) {
@@ -135,17 +147,21 @@ export async function buildDailySession(
     if (state.box < 1) {
       return false
     }
-    if (!state.due_date) {
+    const dueKey = normalizeToDateKey(state.due_date)
+    if (!dueKey) {
       return false
     }
-    return state.due_date <= today
+    return dueKey <= today
   })
 
   const learnedDueStates = reviewStates.filter((state) => {
     if (!state.is_learned || !state.learned_at) {
       return false
     }
-    const learnedDate = toIsoDate(new Date(state.learned_at))
+    const learnedDate = normalizeToDateKey(state.learned_at)
+    if (!learnedDate) {
+      return false
+    }
     const learnedDueDate = addDays(learnedDate, learnedReviewIntervalDays)
     return learnedDueDate <= today
   })
@@ -181,10 +197,16 @@ export async function buildDailySession(
     }
   }
 
-  const [box1, due] = await Promise.all([
-    Promise.resolve([] as SessionCard[]),
-    loadSessionCards(orderedDueStates)
-  ])
+  const due = await loadSessionCards(orderedDueStates)
+
+  if (due.length === 0) {
+    const box0States = reviewStates.filter((state) => state.box === 0)
+    const shuffled = shuffle(box0States).slice(0, box1Target)
+    const newCards = await loadSessionCards(shuffled)
+    return { box1: [], due: newCards }
+  }
+
+  const box1: SessionCard[] = []
 
   return { box1, due }
 }

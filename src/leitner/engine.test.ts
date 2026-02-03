@@ -149,6 +149,26 @@ describe('autoFillBox1', () => {
     expect(session.box1).toHaveLength(0)
     expect(session.due).toHaveLength(0)
   })
+
+  it('falls back to box0 when no due cards are available', async () => {
+    await addCardWithState({
+      front: 'New 1',
+      back: 'New 1',
+      createdAt: '2024-01-01',
+      box: 0,
+      dueDate: null
+    })
+    await addCardWithState({
+      front: 'New 2',
+      back: 'New 2',
+      createdAt: '2024-01-02',
+      box: 0,
+      dueDate: null
+    })
+
+    const session = await buildDailySession(1, '2024-03-01')
+    expect(session.due.length).toBeGreaterThan(0)
+  })
 })
 
 describe('applyReviewResult', () => {
