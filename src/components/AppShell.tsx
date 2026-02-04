@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AuthButton from '../auth/AuthButton'
-import { ChartIcon, HomeIcon, PlayIcon, PlusIcon, SettingsIcon } from './icons'
+import { ChartIcon, HomeIcon, LibraryIcon, PlayIcon, PlusIcon, SettingsIcon } from './icons'
 import { useI18n } from '../i18n/I18nProvider'
 
 type AppShellProps = {
@@ -53,6 +53,12 @@ function AppShell({ children }: AppShellProps) {
               label={t('nav.session')}
               icon={<PlayIcon className="icon" />}
               isActive={isActive('/review')}
+            />
+            <NavButton
+              to="/library"
+              label={t('nav.library')}
+              icon={<LibraryIcon className="icon" />}
+              isActive={isActive('/library')}
             />
             <div className="nav-add">
               <button
@@ -114,6 +120,12 @@ function AppShell({ children }: AppShellProps) {
             label={t('nav.session')}
             icon={<PlayIcon className="icon" />}
             isActive={isActive('/review')}
+          />
+          <NavButton
+            to="/library"
+            label={t('nav.library')}
+            icon={<LibraryIcon className="icon" />}
+            isActive={isActive('/library')}
           />
           <NavButton
             to="/card/new"

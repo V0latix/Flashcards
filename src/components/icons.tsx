@@ -23,6 +23,15 @@ export const PlusIcon = (props: IconProps) => (
   </svg>
 )
 
+export const LibraryIcon = (props: IconProps) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+    <path
+      d="M6 4h11a3 3 0 0 1 3 3v11a2 2 0 0 1-2 2H7a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2zm1 4h8v2H7V8zm0 4h8v2H7v-2z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
 export const ChartIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
     <path d="M4 19h16v2H4zM6 10h3v7H6zM11 6h3v11h-3zM16 12h3v5h-3z" fill="currentColor" />

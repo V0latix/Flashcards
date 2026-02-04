@@ -26,6 +26,9 @@
   --chart-track: #dfe6f2;
   --chart-good: #4f8cff;
   --chart-bad: #ef5d7a;
+  --danger: #ef5d7a;
+  --danger-strong: #d84a64;
+  --focus-ring: rgba(79, 140, 255, 0.45);
 }
 
 :root[data-theme='dark'] {
@@ -43,6 +46,9 @@
   --chart-track: #1c2742;
   --chart-good: #7bb3ff;
   --chart-bad: #ef5d7a;
+  --danger: #f06a87;
+  --danger-strong: #d95773;
+  --focus-ring: rgba(123, 179, 255, 0.55);
 }
 
 * {
@@ -85,12 +91,12 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid rgba(79, 140, 255, 0.45);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 :root[data-theme='dark'] :focus-visible {
-  outline-color: rgba(123, 179, 255, 0.55);
+  outline-color: var(--focus-ring);
 }
 
 h1,
@@ -245,7 +251,7 @@ ul {
 }
 
 .auth-error {
-  color: #b91c1c;
+  color: var(--danger);
   font-weight: 600;
 }
 
@@ -487,22 +493,24 @@ ul {
 }
 
 .btn-secondary {
-  background: var(--secondary);
-  color: var(--text);
+  background: var(--surface);
   border-color: var(--border);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
   background: var(--surface-muted);
+  border-color: rgba(79, 140, 255, 0.2);
 }
 
 .btn-danger {
-  background: #dc2626;
+  background: var(--danger);
   color: #fff;
+  box-shadow: 0 8px 18px rgba(239, 93, 122, 0.25);
 }
 
 .btn-danger:hover {
-  background: #b91c1c;
+  background: var(--danger-strong);
 }
 
 .input,
@@ -515,6 +523,19 @@ ul {
   font-family: inherit;
   background: var(--surface);
   color: var(--text);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: rgba(79, 140, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.18);
+}
+
+:root[data-theme='dark'] .input:focus,
+:root[data-theme='dark'] .textarea:focus {
+  border-color: rgba(123, 179, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(123, 179, 255, 0.2);
 }
 
 .textarea {

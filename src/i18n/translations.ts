@@ -6,6 +6,7 @@ export const translations = {
       home: 'Accueil',
       session: 'Session',
       add: 'Ajouter',
+      library: 'Bibliothèque',
       stats: 'Stats',
       settings: 'Paramètres'
     },
@@ -201,6 +202,7 @@ export const translations = {
       home: 'Home',
       session: 'Session',
       add: 'Add',
+      library: 'Library',
       stats: 'Stats',
       settings: 'Settings'
     },
