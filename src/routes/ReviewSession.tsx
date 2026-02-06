@@ -273,6 +273,16 @@ function ReviewSession() {
               </button>
             </div>
           ) : null}
+          {showBack ? (
+            <div className="section">
+              <Link
+                to={`/card/${currentCard.cardId}/edit`}
+                className="btn btn-secondary"
+              >
+                {t('review.editCard')}
+              </Link>
+            </div>
+          ) : null}
           <div className="section">
             <button
               type="button"
