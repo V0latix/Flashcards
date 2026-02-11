@@ -78,7 +78,9 @@ export const translations = {
       noCards: 'Aucune carte pour le moment.',
       nextReview: 'Prochain test',
       boxFilter: 'Boîtes',
-      clearBoxes: 'Toutes'
+      clearBoxes: 'Toutes',
+      exportSelection: 'Exporter la sélection',
+      exportFailed: 'Erreur export: {{message}}'
     },
     settings: {
       title: 'Paramètres',
@@ -275,7 +277,9 @@ export const translations = {
       noCards: 'No cards yet.',
       nextReview: 'Next review',
       boxFilter: 'Boxes',
-      clearBoxes: 'All'
+      clearBoxes: 'All',
+      exportSelection: 'Export selection',
+      exportFailed: 'Export error: {{message}}'
     },
     settings: {
       title: 'Settings',

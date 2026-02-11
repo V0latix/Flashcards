@@ -2,11 +2,27 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import { deleteCard, deleteCardsByTag, listCardsWithReviewState } from '../db/queries'
-import type { Card, ReviewState } from '../db/types'
+import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { saveTrainingQueue } from '../utils/training'
 import { useI18n } from '../i18n/I18nProvider'
+import db from '../db'
+
+type ExportMedia = {
+  card_id: number
+  side: MediaSide
+  mime: string
+  base64: string
+}
+
+type ExportPayload = {
+  schema_version: number
+  cards: Card[]
+  reviewStates: ReviewState[]
+  media: ExportMedia[]
+  reviewLogs?: ReviewLog[]
+}
 
 function Library() {
   const { t, language } = useI18n()
@@ -23,6 +39,7 @@ function Library() {
   const [isTagDeleting, setIsTagDeleting] = useState(false)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
   const [isCardDeleting, setIsCardDeleting] = useState(false)
+  const [exportStatus, setExportStatus] = useState('')
   const navigate = useNavigate()
 
   const formatDueDate = (value: string | null | undefined) => {
@@ -64,6 +81,7 @@ function Library() {
   const handleSelectTag = (tag: string | null) => {
     setSelectedTag(tag)
     setVisibleCount(100)
+    setExportStatus('')
   }
 
   const toggleBoxFilter = (box: number) => {
@@ -72,11 +90,13 @@ function Library() {
       return next.sort((a, b) => a - b)
     })
     setVisibleCount(100)
+    setExportStatus('')
   }
 
   const clearBoxFilter = () => {
     setSelectedBoxes([])
     setVisibleCount(100)
+    setExportStatus('')
   }
 
   const tagDeleteCount = useMemo(() => {
@@ -175,6 +195,84 @@ function Library() {
     () => filteredCards.slice(0, visibleCount),
     [filteredCards, visibleCount]
   )
+  const selectedCardIds = useMemo(
+    () =>
+      filteredCards
+        .map(({ card }) => card.id)
+        .filter((id): id is number => typeof id === 'number'),
+    [filteredCards]
+  )
+
+  const blobToBase64 = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onerror = () => reject(new Error('Failed to read blob'))
+      reader.onload = () => {
+        const result = reader.result
+        if (typeof result === 'string') {
+          const base64 = result.split(',')[1] ?? ''
+          resolve(base64)
+          return
+        }
+        reject(new Error('Unexpected reader result'))
+      }
+      reader.readAsDataURL(blob)
+    })
+
+  const downloadJson = (payload: ExportPayload) => {
+    const safeTagName = selectedTag ? selectedTag.replaceAll('/', '-') : 'all'
+    const fileName = `cards-export-${safeTagName}.json`
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: 'application/json'
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportSelection = async () => {
+    if (selectedCardIds.length === 0) {
+      return
+    }
+    setExportStatus(t('importExport.exportInProgress'))
+    try {
+      const deckCardIds = new Set(selectedCardIds)
+      const [media, reviewLogs] = await Promise.all([
+        db.media.where('card_id').anyOf(selectedCardIds).toArray(),
+        db.reviewLogs.where('card_id').anyOf(selectedCardIds).toArray()
+      ])
+
+      const exportMedia: ExportMedia[] = []
+      for (const item of media) {
+        const base64 = await blobToBase64(item.blob)
+        exportMedia.push({
+          card_id: item.card_id,
+          side: item.side,
+          mime: item.mime,
+          base64
+        })
+      }
+
+      const payload: ExportPayload = {
+        schema_version: 1,
+        cards: filteredCards.map(({ card }) => card),
+        reviewStates: filteredCards
+          .map(({ reviewState }) => reviewState)
+          .filter((state): state is ReviewState => Boolean(state)),
+        media: exportMedia,
+        reviewLogs: reviewLogs.filter((log) => deckCardIds.has(log.card_id))
+      }
+
+      downloadJson(payload)
+      setExportStatus(t('importExport.exportDone'))
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      setExportStatus(t('library.exportFailed', { message }))
+    }
+  }
 
   const handleTraining = () => {
     const sourceCards = selectedTag
@@ -305,6 +403,14 @@ function Library() {
               >
                 {t('actions.training')}
               </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => void handleExportSelection()}
+                disabled={selectedCardIds.length === 0}
+              >
+                {t('library.exportSelection')}
+              </button>
               <div className="panel-actions">
                 <span className="chip">{t('labels.boxes')}</span>
                 <div className="filter-group">
@@ -362,8 +468,10 @@ function Library() {
               onChange={(event) => {
                 setQuery(event.target.value)
                 setVisibleCount(100)
+                setExportStatus('')
               }}
             />
+            {exportStatus ? <p>{exportStatus}</p> : null}
             {filteredCards.length === 0 ? <p>{t('library.noCards')}</p> : null}
             {filteredCards.length > 0 ? (
               <ul className="card-list">
