@@ -265,6 +265,12 @@ ul {
   width: 100%;
 }
 
+.auth-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .auth-divider {
   display: flex;
   align-items: center;

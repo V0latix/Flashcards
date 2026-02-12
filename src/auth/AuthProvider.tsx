@@ -6,7 +6,8 @@ type AuthContextValue = {
   user: User | null
   session: Session | null
   loading: boolean
-  signInWithProvider: (provider: 'google') => Promise<{ error: string | null }>
+  signInWithProvider: (provider: 'github') => Promise<{ error: string | null }>
+  signInWithEmail: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<{ error: string | null }>
 }
 
@@ -57,11 +58,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error: error ? error.message : null }
   }
 
-  const signInWithProvider = async (provider: 'google') => {
+  const signInWithProvider = async (provider: 'github') => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: getRedirectUrl()
+      }
+    })
+    return { error: error ? error.message : null }
+  }
+
+  const signInWithEmail = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: getRedirectUrl()
       }
     })
     return { error: error ? error.message : null }
@@ -73,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       loading,
       signInWithProvider,
+      signInWithEmail,
       signOut
     }),
     [user, session, loading]

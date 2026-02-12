@@ -55,8 +55,15 @@ export const translations = {
       loggedInAs: 'Connecté en tant que {{email}}.',
       signOut: 'Se déconnecter',
       signedOut: 'Déconnecté.',
-      googleCta: 'Continuer avec Google',
-      googleHint: 'Connecte-toi avec Google pour synchroniser tes données.'
+      githubCta: 'Continuer avec GitHub',
+      githubHint: 'Connecte-toi avec GitHub pour synchroniser tes données.',
+      or: 'ou',
+      emailLabel: 'Email',
+      emailPlaceholder: 'ton@email.com',
+      emailHint: 'Reçois un lien magique de connexion par email.',
+      emailCta: 'Continuer avec email',
+      emailInvalid: 'Renseigne un email valide.',
+      emailSent: 'Lien de connexion envoyé à {{email}}.'
     },
     home: {
       startSession: 'Commencer une session',
@@ -254,8 +261,15 @@ export const translations = {
       loggedInAs: 'Signed in as {{email}}.',
       signOut: 'Sign out',
       signedOut: 'Signed out.',
-      googleCta: 'Continue with Google',
-      googleHint: 'Sign in with Google to sync your data.'
+      githubCta: 'Continue with GitHub',
+      githubHint: 'Sign in with GitHub to sync your data.',
+      or: 'or',
+      emailLabel: 'Email',
+      emailPlaceholder: 'you@email.com',
+      emailHint: 'Get a magic sign-in link by email.',
+      emailCta: 'Continue with email',
+      emailInvalid: 'Enter a valid email address.',
+      emailSent: 'Sign-in link sent to {{email}}.'
     },
     home: {
       startSession: 'Start a session',

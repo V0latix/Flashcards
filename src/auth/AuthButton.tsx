@@ -8,9 +8,10 @@ type AuthButtonProps = {
 }
 
 function AuthButton({ className }: AuthButtonProps) {
-  const { user, loading, signInWithProvider, signOut } = useAuth()
+  const { user, loading, signInWithProvider, signInWithEmail, signOut } = useAuth()
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
+  const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(
     null
@@ -18,21 +19,41 @@ function AuthButton({ className }: AuthButtonProps) {
 
   const openModal = () => {
     setStatus(null)
+    setEmail('')
     setOpen(true)
   }
 
   const closeModal = () => {
     setOpen(false)
+    setEmail('')
     setStatus(null)
   }
 
-  const handleGoogle = async () => {
+  const handleGithub = async () => {
     setSubmitting(true)
-    const { error } = await signInWithProvider('google')
+    const { error } = await signInWithProvider('github')
     if (error) {
       setStatus({ type: 'error', message: error })
-      setSubmitting(false)
     }
+    setSubmitting(false)
+  }
+
+  const handleEmailSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const normalizedEmail = email.trim()
+    if (!normalizedEmail) {
+      setStatus({ type: 'error', message: t('auth.emailInvalid') })
+      return
+    }
+
+    setSubmitting(true)
+    const { error } = await signInWithEmail(normalizedEmail)
+    if (error) {
+      setStatus({ type: 'error', message: error })
+    } else {
+      setStatus({ type: 'success', message: t('auth.emailSent', { email: normalizedEmail }) })
+    }
+    setSubmitting(false)
   }
 
   const handleSignOut = async () => {
@@ -89,15 +110,36 @@ function AuthButton({ className }: AuthButtonProps) {
               </>
             ) : (
               <>
-                <p className="auth-muted">{t('auth.googleHint')}</p>
+                <p className="auth-muted">{t('auth.githubHint')}</p>
                 <button
                   type="button"
                   className="btn btn-secondary auth-provider"
-                  onClick={handleGoogle}
+                  onClick={handleGithub}
                   disabled={submitting}
                 >
-                  {t('auth.googleCta')}
+                  {t('auth.githubCta')}
                 </button>
+                <div className="auth-divider">{t('auth.or')}</div>
+                <form className="auth-email-form" onSubmit={handleEmailSignIn}>
+                  <label className="sr-only" htmlFor="auth-email-input">
+                    {t('auth.emailLabel')}
+                  </label>
+                  <input
+                    id="auth-email-input"
+                    className="input"
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t('auth.emailPlaceholder')}
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    disabled={submitting}
+                    required
+                  />
+                  <p className="auth-muted">{t('auth.emailHint')}</p>
+                  <button type="submit" className="btn btn-secondary auth-provider" disabled={submitting}>
+                    {t('auth.emailCta')}
+                  </button>
+                </form>
                 {status ? (
                   <p className={status.type === 'error' ? 'auth-error' : 'auth-success'}>
                     {status.message}
