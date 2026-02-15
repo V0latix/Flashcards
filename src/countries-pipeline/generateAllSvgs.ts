@@ -19,6 +19,12 @@ export async function generateAllSvgs(): Promise<{ generated: number; skipped: n
   const { shpPath } = await downloadNaturalEarthAdmin0Countries()
   const countries = await loadCountriesFromShapefile(shpPath)
 
+  const paddingPct = (() => {
+    const v = (process.env.COUNTRIES_PADDING_PCT ?? '').trim()
+    const n = Number(v)
+    return Number.isFinite(n) && n > 0 ? n : 0.35
+  })()
+
   const metas: Record<string, RenderMeta> = {}
 
   let generated = 0
@@ -40,10 +46,10 @@ export async function generateAllSvgs(): Promise<{ generated: number; skipped: n
       continue
     }
 
-    // Slightly more "dezoom" to show neighboring context in the card UI.
-    const { svg, meta } = renderCountrySvg(countries, c.iso2, { paddingPct: 0.55, minExtentDeg: 2 })
+    // Zoom around the country with some context.
+    const { svg, meta } = renderCountrySvg(countries, c.iso2, { paddingPct, minExtentDeg: 2 })
     const { svg: svgBlue } = renderCountrySvg(countries, c.iso2, {
-      paddingPct: 0.55,
+      paddingPct,
       minExtentDeg: 2,
       theme: 'blue'
     })

@@ -19,9 +19,12 @@ function requireEnv(name: string): string {
   return s
 }
 
-function publicUrlFor(supabaseUrl: string, iso2: string): string {
+function publicUrlFor(supabaseUrl: string, iso2: string, version?: string): string {
   const base = supabaseUrl.replace(/\/$/, '')
-  return `${base}/storage/v1/object/public/${BUCKET}/svg/${iso2}.svg`
+  const url = `${base}/storage/v1/object/public/${BUCKET}/svg/${iso2}.svg`
+  // Cache busting: Supabase CDN caches objects; when we overwrite the same path,
+  // some clients may see a mix of old/new images for a few minutes.
+  return version ? `${url}?v=${encodeURIComponent(version)}` : url
 }
 
 async function ensureCountriesTable(): Promise<void> {
@@ -156,6 +159,7 @@ export async function seedCountries(): Promise<{ upserted: number }> {
 
   const meta = JSON.parse(await readFile(join(OUT_DIR, 'countries.meta.json'), 'utf8')) as MetaFile
   const iso2List = Object.keys(meta.metas).sort()
+  const version = meta.generated_at
 
   const supabase = createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false }
@@ -194,7 +198,7 @@ export async function seedCountries(): Promise<{ upserted: number }> {
     if (columns.has('iso3')) row.iso3 = m.iso3
     if (columns.has('name_en')) row.name_en = m.name_en
     if (columns.has('name_fr')) row.name_fr = m.name_fr ?? m.name_en
-    if (columns.has('image_url')) row.image_url = publicUrlFor(supabaseUrl, iso2)
+    if (columns.has('image_url')) row.image_url = publicUrlFor(supabaseUrl, iso2, version)
     if (columns.has('bbox')) row.bbox = bbox
     if (columns.has('centroid')) row.centroid = m.centroid
     if (needsUpdatedAt && columns.has('updated_at')) row.updated_at = nowIso

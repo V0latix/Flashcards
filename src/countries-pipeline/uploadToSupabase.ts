@@ -9,7 +9,9 @@ import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
 
 const BUCKET = 'country-maps'
 const PREFIX = 'svg'
-const FETCH_TIMEOUT_MS = 20_000
+// Storage uploads can sometimes take a while (TLS + network + Supabase edge).
+// Keep this high to avoid aborting valid uploads; retries handle true stalls.
+const FETCH_TIMEOUT_MS = 120_000
 
 function requireEnv(name: string): string {
   const v = process.env[name]

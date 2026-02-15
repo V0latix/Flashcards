@@ -1,16 +1,29 @@
 import './env.js'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { v5 as uuidv5 } from 'uuid'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
 
 const NAMESPACE = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+const OUT_DIR = 'out'
 
 function requireEnv(name: string): string {
   const v = process.env[name]
   const s = typeof v === 'string' ? v.trim() : ''
   if (!s) throw new Error(`Missing ${name} in environment`)
   return s
+}
+
+async function readCountriesMetaVersion(): Promise<string | null> {
+  try {
+    const raw = await readFile(join(OUT_DIR, 'countries.meta.json'), 'utf8')
+    const parsed = JSON.parse(raw) as { generated_at?: string }
+    return typeof parsed.generated_at === 'string' && parsed.generated_at.trim() ? parsed.generated_at.trim() : null
+  } catch {
+    return null
+  }
 }
 
 function packId(slug: string): string {
@@ -31,9 +44,10 @@ type CountryRow = {
   centroid?: { lon?: number; lat?: number } | null
 }
 
-function mapUrlBlue(supabaseUrl: string, iso2: string): string {
+function mapUrlBlue(supabaseUrl: string, iso2: string, version?: string | null): string {
   const base = supabaseUrl.replace(/\/$/, '')
-  return `${base}/storage/v1/object/public/country-maps/svg-blue/${iso2.toUpperCase()}.svg`
+  const url = `${base}/storage/v1/object/public/country-maps/svg-blue/${iso2.toUpperCase()}.svg`
+  return version ? `${url}?v=${encodeURIComponent(version)}` : url
 }
 
 async function listAvailableIso2FromStorage(supabase: any): Promise<Set<string>> {
@@ -107,6 +121,7 @@ export async function seedCountriesLocationPack(): Promise<{
 
   const packSlug = 'countries-locations'
   const now = new Date().toISOString()
+  const version = await readCountriesMetaVersion()
 
   const { error: packErr } = await supabase.from('packs').upsert(
     [
@@ -142,9 +157,7 @@ export async function seedCountriesLocationPack(): Promise<{
     .map((r) => {
       const iso2 = (r.iso2 ?? r.country_code ?? '').toString().trim().toUpperCase()
       const name = (r.name_fr ?? r.name_en ?? iso2).toString().trim()
-      const image = mapUrlBlue(supabaseUrl, iso2)
-      const lon = typeof r.centroid?.lon === 'number' ? r.centroid.lon : null
-      const lat = typeof r.centroid?.lat === 'number' ? r.centroid.lat : null
+      const image = mapUrlBlue(supabaseUrl, iso2, version)
 
       if (!iso2 || iso2.length !== 2) return null
       if (!availableIso2.has(iso2)) return null
@@ -152,17 +165,12 @@ export async function seedCountriesLocationPack(): Promise<{
       const id = cardId(packSlug, iso2)
       keepIds.add(id)
 
-      const coords =
-        typeof lat === 'number' && typeof lon === 'number'
-          ? `\n\nCentroid (lat, lon): ${lat.toFixed(2)}, ${lon.toFixed(2)}`
-          : ''
-
       return {
         id,
         pack_slug: packSlug,
         // Front: show the map (question). Back: reveal the country name.
         front_md: `![${iso2}](${image})\n\nQuel est ce pays ?`,
-        back_md: `**${name}**${coords}`,
+        back_md: `**${name}**`,
         tags: ['Géographie/Location'],
         created_at: now,
         updated_at: now

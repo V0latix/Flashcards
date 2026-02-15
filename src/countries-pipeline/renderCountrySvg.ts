@@ -4,8 +4,7 @@ import { bboxIntersects, bboxPadAndMinExtent, bboxToMultiPoint, computeBboxUnwra
 import type { CountryFeature, RenderMeta } from './types.js'
 
 const SIZE = 1000
-// Bigger margin => slightly more "dezoom" and less risk of clipping at edges.
-const MARGIN = 35
+const MARGIN = 25
 
 const COLORS = {
   otherFill: '#C7C7C7',
@@ -33,11 +32,13 @@ export function renderCountrySvg(
     paddingPct?: number
     minExtentDeg?: number
     theme?: 'transparent' | 'blue'
+    marginPx?: number
   }
 ): RenderResult {
   const paddingPct = opts?.paddingPct ?? 0.25
   const minExtentDeg = opts?.minExtentDeg ?? 2
   const theme = opts?.theme ?? 'transparent'
+  const marginPx = opts?.marginPx ?? MARGIN
 
   const target = countries.find((c) => c.iso2 === targetIso2)
   if (!target) throw new Error(`Target not found: ${targetIso2}`)
@@ -65,8 +66,8 @@ export function renderCountrySvg(
     .precision(0.02)
     .fitExtent(
       [
-        [MARGIN, MARGIN],
-        [SIZE - MARGIN, SIZE - MARGIN]
+        [marginPx, marginPx],
+        [SIZE - marginPx, SIZE - marginPx]
       ],
       bboxToMultiPoint(padded) as unknown as GeoJSON.GeoJSON
     )
