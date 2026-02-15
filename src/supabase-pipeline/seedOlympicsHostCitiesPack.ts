@@ -95,10 +95,6 @@ const EDITIONS: OlympicEdition[] = [
   { season: 'winter', year: 2034, city_fr: 'Salt Lake City', country_fr: 'États-Unis' }
 ]
 
-function seasonLabelFr(season: 'summer' | 'winter'): string {
-  return season === 'summer' ? "d'été" : "d'hiver"
-}
-
 export async function seedOlympicsHostCitiesPack(): Promise<{
   pack_slug: string
   cards_upserted: number

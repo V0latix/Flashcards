@@ -24,6 +24,7 @@
     "cleanup:math-seed": "npm run supabase:build && node dist-supabase/cleanupMathSeed.js",
     "seed:countries-pack": "npm run supabase:build && node dist-supabase/seedCountriesLocationPack.js",
     "seed:olympics-pack": "npm run supabase:build && node dist-supabase/seedOlympicsHostCitiesPack.js",
+    "seed:worldcup-pack": "npm run supabase:build && node dist-supabase/seedWorldCupFootballPack.js",
     "pipeline:geo-pack": "npm run supabase:build && node dist-supabase/pipelineGeoPack.js"
   },
   "dependencies": {
