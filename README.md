@@ -118,4 +118,48 @@ Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absen
 
 ## Notes
 - Supabase est utilise en lecture seule (pas d'auth).
+
+## Pipeline cartes pays (SVG -> Supabase)
+Objectif: generer 1 SVG par pays (style "zoom region"), les publier dans Supabase Storage, puis upsert la table `public.countries`.
+
+### Setup
+Creer un fichier `.env` a la racine (pour les scripts Node du pipeline), base sur `.env.example`:
+
+- `SUPABASE_URL` (ex: `https://<project-ref>.supabase.co`)
+- `SUPABASE_SERVICE_ROLE_KEY` (recommande pour creer le bucket + uploader + seed)
+- `SUPABASE_DB_URL` (necessaire pour auto-creer la table `countries` via Postgres; si tu as une erreur IPv6 `EHOSTUNREACH`, utilise la "Connection string" du pooler dans le Dashboard)
+
+Optionnel:
+- `COUNTRIES_EXCLUDE_ANTARCTICA=1` (par defaut: on)
+
+Note: ces variables `.env` sont distinctes de `.env.local` (Vite) qui contient `VITE_SUPABASE_*`.
+
+### Commandes
+- Generer tous les SVG + la page de preview:
+  - `npm run gen:country-svgs`
+- Uploader tous les SVG dans le bucket Storage `country-maps`:
+  - `npm run upload:country-svgs`
+- Creer la table si besoin + upsert dans `public.countries`:
+  - `npm run seed:countries`
+- Pipeline complet (one command):
+  - `npm run pipeline:countries`
+
+Si tu utilises pnpm: `pnpm run pipeline:countries` (meme nom de script).
+
+### Outputs
+- SVG: `out/svg/{ISO2}.svg`
+- Preview: `out/preview.html`
+- Metadonnees: `out/countries.meta.json` (bbox, centroid, bounds projetes)
+
+### Algo de cadrage (zoom region)
+- Source: Natural Earth "Admin 0 - Countries" (110m), telecharge automatiquement dans `data/`.
+- Par pays:
+  - centroid (lon/lat) + bbox (lon/lat)
+  - bbox pad de 25% + extent minimal 2 degres pour micro-etats
+  - projection `d3-geo` equirectangular, rotation sur la longitude du centroid pour stabiliser le rendu (dateline)
+  - fit de la bbox dans un viewBox `0 0 1000 1000`
+  - rendu des pays dont la bbox intersecte la zone:
+    - autres: fill `#C7C7C7`, stroke `#8A8A8A`
+    - cible: fill `#FFFFFF`, stroke `#8A8A8A` (un peu plus epais), dessine en dernier
+  - aucun texte/label, fond transparent
 - Le health check Supabase s'exécute uniquement en mode dev.

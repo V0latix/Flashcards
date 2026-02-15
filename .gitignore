@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+dist-countries/
+dist-supabase/
+data/
+out/
 
 # Editor directories and files
 .vscode/*
