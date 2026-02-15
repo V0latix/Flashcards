@@ -14,7 +14,13 @@ function ReviewSession() {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const [isLoading, setIsLoading] = useState(true)
   const [cards, setCards] = useState<
-    Array<{ cardId: number; front: string; back: string; wasReversed: boolean }>
+    Array<{
+      cardId: number
+      front: string
+      back: string
+      tags: string[]
+      wasReversed: boolean
+    }>
   >([])
   const [answers, setAnswers] = useState<Record<number, 'good' | 'bad'>>({})
   const [index, setIndex] = useState(0)
@@ -57,6 +63,7 @@ function ReviewSession() {
               cardId: card.id ?? 0,
               front: isReversed ? card.back_md : card.front_md,
               back: isReversed ? card.front_md : card.back_md,
+              tags: card.tags ?? [],
               wasReversed: isReversed
             }
           })
@@ -80,6 +87,7 @@ function ReviewSession() {
           cardId: entry.card.id ?? 0,
           front: isReversed ? entry.card.back_md : entry.card.front_md,
           back: isReversed ? entry.card.front_md : entry.card.back_md,
+          tags: entry.card.tags ?? [],
           wasReversed: isReversed
         }
       })
@@ -230,6 +238,13 @@ function ReviewSession() {
         <section className="card section">
           {isTraining ? (
             <p>{t('review.trainingMode')}</p>
+          ) : null}
+          {currentCard.tags.length > 0 ? (
+            <div className="review-tags" aria-label={t('labels.tags')}>
+              <span className="chip">
+                {currentCard.tags.join(' · ')}
+              </span>
+            </div>
           ) : null}
           {tagFilter ? <p>{t('library.tag')}: {tagFilter}</p> : null}
           <p>

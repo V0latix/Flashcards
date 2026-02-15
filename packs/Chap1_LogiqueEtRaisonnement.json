@@ -1,316 +1,414 @@
 {
   "version": 1,
-  "exported_at": "2026-01-27T00:00:00Z",
+  "exported_at": "2026-02-15T18:30:00Z",
   "cards": [
     {
-      "front_md": "Définir une assertion.",
-      "back_md": "Une assertion est une phrase mathématique qui est soit vraie soit fausse.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Qu'est-ce qu'une assertion en mathématiques ?",
+      "back_md": "Une assertion est une phrase mathématique qui est soit vraie soit fausse.\n\nExemples :\n- « $2$ est un entier impair » est une assertion (fausse)\n- « Tout entier naturel pair supérieur ou égal à $4$ est la somme de deux nombres premiers » est une assertion (conjecture de Goldbach)",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Donner un exemple d’assertion fausse.",
-      "back_md": "« $2$ est un entier impair » est une assertion fausse.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Une assertion peut-elle dépendre de paramètres ? Donner un exemple.",
+      "back_md": "Oui, une assertion peut dépendre de paramètres.\n\nExemple : L'assertion « $n$ est premier » dépend de $n$. On peut la noter $P(n)$ pour souligner cette dépendance.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Une assertion peut-elle être ni vraie ni fausse ?",
-      "back_md": "Oui. Par exemple, la conjecture de Goldbach est une assertion dont on ne sait pas actuellement si elle est vraie ou fausse.",
-      "tags": ["Maths/Bases"]
-    },
-    {
-      "front_md": "Qu’est-ce qu’une assertion dépendant de paramètres ?",
-      "back_md": "C’est une assertion dont la véracité dépend de la valeur d’un ou plusieurs paramètres, par exemple « $n$ est premier ».",
-      "tags": ["Maths/Bases"]
-    },
-    {
-      "front_md": "Comment note-t-on une assertion dépendant d’un paramètre $n$ ?",
-      "back_md": "On peut la noter $P(n)$ afin de souligner sa dépendance en $n$.",
-      "tags": ["Maths/Bases"]
-    },
-    {
-      "front_md": "Que signifie la convention « supposons $P$ » ?",
-      "back_md": "Cela signifie « supposons que l’assertion $P$ est vraie ».",
-      "tags": ["Maths/Bases"]
-    },
-    {
-      "front_md": "Définir la négation d’une assertion $P$.",
-      "back_md": "La négation de $P$, notée $\\text{non }P$, est vraie lorsque $P$ est fausse et fausse lorsque $P$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Définir la négation d'une assertion $P$.",
+      "back_md": "La négation de $P$, notée $\\text{non } P$, est l'assertion qui est :\n- vraie lorsque $P$ est fausse\n- fausse lorsque $P$ est vraie",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
       "front_md": "Définir la conjonction de deux assertions $P$ et $Q$.",
-      "back_md": "La conjonction $P \\text{ et } Q$ est vraie lorsque $P$ et $Q$ sont toutes les deux vraies, et fausse sinon.",
-      "tags": ["Maths/Bases"]
+      "back_md": "La conjonction de $P$ et $Q$, notée $P \\text{ et } Q$, est l'assertion qui est :\n- vraie lorsque $P$ et $Q$ sont toutes les deux vraies\n- fausse sinon",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
       "front_md": "Définir la disjonction de deux assertions $P$ et $Q$.",
-      "back_md": "La disjonction $P \\text{ ou } Q$ est vraie dès qu’au moins l’une des deux assertions est vraie, et fausse sinon.",
-      "tags": ["Maths/Bases"]
+      "back_md": "La disjonction de $P$ et $Q$, notée $P \\text{ ou } Q$, est l'assertion qui est :\n- vraie lorsqu'au moins l'une des deux assertions $P$, $Q$ est vraie\n- fausse sinon (i.e. lorsque $P$ et $Q$ sont toutes deux fausses)",
+      "hint_md": "Le « ou » logique n'est pas exclusif : $P \\text{ ou } Q$ est vrai même quand $P$ et $Q$ sont tous deux vrais.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Le « ou » logique est-il exclusif ?",
-      "back_md": "Non. Le connecteur logique « ou » n’est pas exclusif.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Définir l'équivalence entre deux assertions $P$ et $Q$.",
+      "back_md": "L'équivalence entre $P$ et $Q$, notée $P \\Leftrightarrow Q$, est l'assertion qui est :\n- vraie lorsque $P$ et $Q$ sont toutes les deux vraies ou toutes les deux fausses\n- fausse sinon",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Définir l’implication $P \\Rightarrow Q$.",
-      "back_md": "L’assertion $P \\Rightarrow Q$ est fausse lorsque $P$ est vraie et $Q$ est fausse, et vraie dans tous les autres cas.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Définir l'implication de $Q$ par $P$.",
+      "back_md": "L'implication de $Q$ par $P$, notée $P \\Rightarrow Q$, est l'assertion qui est :\n- fausse lorsque $P$ est vraie et $Q$ est fausse\n- vraie dans tous les autres cas",
+      "hint_md": "Donc $P \\Rightarrow Q$ est vraie si $P$ est fausse, quelle que soit la valeur de $Q$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Définir l’équivalence $P \\Leftrightarrow Q$.",
-      "back_md": "L’assertion $P \\Leftrightarrow Q$ est vraie lorsque $P$ et $Q$ sont toutes les deux vraies ou toutes les deux fausses.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Donner la table de vérité de $P \\Rightarrow Q$.",
+      "back_md": "| $P$ | $Q$ | $P \\Rightarrow Q$ |\n|-------|-------|-------------------|\n| fausse | fausse | vraie |\n| fausse | vraie | vraie |\n| vraie | fausse | **fausse** |\n| vraie | vraie | vraie |",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "À quoi est équivalente l’implication $P \\Rightarrow Q$ ?",
-      "back_md": "$P \\Rightarrow Q$ est équivalente à $(\\text{non }P) \\text{ ou } Q$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la négation de « $x = y = z$ » où $x, y, z$ sont trois réels ?",
+      "back_md": "Comme « $x = y = z$ » est équivalent à $(x = y) \\text{ et } (y = z)$, sa négation est :\n$$(x \\neq y) \\text{ ou } (y \\neq z)$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Quelle est la négation de « $x < y \\leq z$ » où $x, y, z$ sont trois réels ?",
+      "back_md": "Comme « $x < y \\leq z$ » est équivalent à $(x < y) \\text{ et } (y \\leq z)$, sa négation est :\n$$(y \\leq x) \\text{ ou } (z < y)$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Énoncer les lois de distributivité pour les conjonctions et disjonctions.",
+      "back_md": "Soit $P$, $Q$ et $R$ trois assertions :\n\n1. $P \\text{ et } (Q \\text{ ou } R) \\Leftrightarrow (P \\text{ et } Q) \\text{ ou } (P \\text{ et } R)$\n\n2. $P \\text{ ou } (Q \\text{ et } R) \\Leftrightarrow (P \\text{ ou } Q) \\text{ et } (P \\text{ ou } R)$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Quelle est la négation de $P \\text{ et } Q$ ?",
+      "back_md": "$$\\text{non}(P \\text{ et } Q) \\Leftrightarrow (\\text{non } P) \\text{ ou } (\\text{non } Q)$$",
+      "hint_md": "Loi de De Morgan",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Quelle est la négation de $P \\text{ ou } Q$ ?",
+      "back_md": "$$\\text{non}(P \\text{ ou } Q) \\Leftrightarrow (\\text{non } P) \\text{ et } (\\text{non } Q)$$",
+      "hint_md": "Loi de De Morgan",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Montrer que $P \\Rightarrow Q$ est équivalent à $(\\text{non } P) \\text{ ou } Q$.",
+      "back_md": "D'après la définition de l'implication :\n- $P \\Rightarrow Q$ est fausse ssi $P$ vraie et $Q$ fausse\n- $(\\text{non } P) \\text{ ou } Q$ est fausse ssi $\\text{non } P$ fausse et $Q$ fausse, i.e. $P$ vraie et $Q$ fausse\n\nDonc les deux assertions ont exactement les mêmes valeurs de vérité.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
       "front_md": "Quelle est la négation de $P \\Rightarrow Q$ ?",
-      "back_md": "$P \\text{ et } (\\text{non }Q)$.",
-      "tags": ["Maths/Bases"]
+      "back_md": "$$\\text{non}(P \\Rightarrow Q) \\Leftrightarrow P \\text{ et } (\\text{non } Q)$$",
+      "hint_md": "Utiliser $P \\Rightarrow Q \\Leftrightarrow (\\text{non } P) \\text{ ou } Q$ puis appliquer De Morgan.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Énoncer le principe du tiers exclu.",
-      "back_md": "L’assertion $P \\text{ ou } (\\text{non }P)$ est toujours vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Qu'appelle-t-on la contraposée de l'implication $P \\Rightarrow Q$ ?",
+      "back_md": "La contraposée de $P \\Rightarrow Q$ est l'implication :\n$$\\text{non } Q \\Rightarrow \\text{non } P$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Donner les lois de De Morgan.",
-      "back_md": "$\\text{non}(P \\text{ et } Q) \\Leftrightarrow (\\text{non }P) \\text{ ou } (\\text{non }Q)$ et $\\text{non}(P \\text{ ou } Q) \\Leftrightarrow (\\text{non }P) \\text{ et } (\\text{non }Q)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer que $P \\Rightarrow Q$ et sa contraposée sont équivalentes.",
+      "back_md": "On a :\n$$P \\Rightarrow Q \\Leftrightarrow (\\text{non } P) \\text{ ou } Q \\Leftrightarrow Q \\text{ ou } (\\text{non } P) \\Leftrightarrow (\\text{non } Q) \\Rightarrow (\\text{non } P)$$\n\nDonc une implication et sa contraposée sont équivalentes.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle est la contraposée de $P \\Rightarrow Q$ ?",
-      "back_md": "$\\text{non }Q \\Rightarrow \\text{non }P$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment démontrer $P \\Rightarrow Q$ par contraposée ?",
+      "back_md": "Pour montrer $P \\Rightarrow Q$ par contraposée, on montre sa contraposée $\\text{non } Q \\Rightarrow \\text{non } P$.\n\nRédaction : « Raisonnons par contraposée : montrons que $(\\text{non } Q) \\Rightarrow (\\text{non } P)$. Supposons $\\text{non } Q$ et montrons $\\text{non } P$. »",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "En quoi consiste le raisonnement par contraposée ?",
-      "back_md": "Il consiste à démontrer $\\text{non }Q \\Rightarrow \\text{non }P$ pour établir $P \\Rightarrow Q$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer par contraposée que si $n^2$ est pair alors $n$ l'est aussi (pour $n$ entier).",
+      "back_md": "Contraposée : $(n \\text{ impair}) \\Rightarrow (n^2 \\text{ impair})$.\n\nSupposons $n$ impair : $\\exists k \\in \\mathbb{Z}, n = 2k+1$.\n\nAlors $n^2 = (2k+1)^2 = 4k^2 + 4k + 1 = 2(2k^2 + 2k) + 1$, donc $n^2$ est impair.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "En quoi consiste un raisonnement par double implication ?",
-      "back_md": "Il consiste à démontrer $P \\Rightarrow Q$ et $Q \\Rightarrow P$ afin d’obtenir $P \\Leftrightarrow Q$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment démontrer une équivalence $P \\Leftrightarrow Q$ ?",
+      "back_md": "On peut démontrer $P \\Leftrightarrow Q$ par **double implication** :\n\n1. Montrer $P \\Rightarrow Q$\n2. Montrer $Q \\Rightarrow P$ (implication réciproque)\n\nCar $P \\Leftrightarrow Q \\Leftrightarrow (P \\Rightarrow Q) \\text{ et } (Q \\Rightarrow P)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’est-ce que l’implication réciproque de $P \\Rightarrow Q$ ?",
-      "back_md": "C’est l’implication $Q \\Rightarrow P$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Qu'appelle-t-on l'implication réciproque de $P \\Rightarrow Q$ ?",
+      "back_md": "L'implication réciproque de $P \\Rightarrow Q$ est :\n$$Q \\Rightarrow P$$",
+      "hint_md": "Attention : une implication n'implique pas sa réciproque !",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Décrire le raisonnement par disjonction de cas.",
-      "back_md": "Il consiste à distinguer plusieurs cas possibles et à démontrer le résultat dans chacun d’eux.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la méthode du raisonnement par disjonction de cas ?",
+      "back_md": "Pour démontrer un résultat, on étudie séparément différents cas de figure qui couvrent toutes les possibilités.\n\nOn conclut en constatant que le résultat est vrai dans chaque cas.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Définir le raisonnement par l’absurde.",
-      "back_md": "Pour démontrer $P$, on suppose $P$ fausse et on en déduit une contradiction.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la méthode du raisonnement par l'absurde ?",
+      "back_md": "Pour prouver qu'une assertion $P$ est vraie :\n\n1. On suppose que $P$ est fausse (i.e. on suppose $\\text{non } P$)\n2. On en déduit une contradiction\n3. Donc l'hypothèse $\\text{non } P$ est fausse, donc $P$ est vraie",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Décrire le raisonnement par analyse-synthèse.",
-      "back_md": "On suppose $P(x)$ vraie pour obtenir des conditions nécessaires (analyse), puis on vérifie lesquelles sont suffisantes (synthèse).",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer par l'absurde que $\\sqrt{2}$ est irrationnel.",
+      "back_md": "Supposons $\\sqrt{2}$ rationnel : $\\exists p, q \\in \\mathbb{Z}, q \\neq 0, \\sqrt{2} = \\frac{p}{q}$ avec $p$ et $q$ non tous deux pairs.\n\nAlors $2q^2 = p^2$, donc $p^2$ pair, donc $p$ pair : $p = 2k$.\n\nDonc $2q^2 = 4k^2$, i.e. $q^2 = 2k^2$, donc $q^2$ pair, donc $q$ pair.\n\nContradiction : $p$ et $q$ sont tous deux pairs. Donc $\\sqrt{2}$ est irrationnel.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Que signifie l’assertion $a \\in E$ ?",
-      "back_md": "L’assertion $a \\in E$ signifie que $a$ est un élément de l’ensemble $E$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la méthode du raisonnement par analyse-synthèse ?",
+      "back_md": "Pour chercher l'ensemble des éléments $x \\in E$ vérifiant une propriété $P(x)$ :\n\n**Analyse** : on suppose qu'un tel $x$ existe et vérifie $P(x)$, on en déduit des conditions nécessaires qui limitent les candidats\n\n**Synthèse** : parmi les candidats obtenus, on vérifie lesquels vérifient effectivement $P(x)$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Que signifie l’assertion $a \\notin E$ ?",
-      "back_md": "L’assertion $a \\notin E$ signifie que $a$ n’est pas un élément de l’ensemble $E$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Définir le quantificateur universel $\\forall x \\in E, P(x)$.",
+      "back_md": "L'assertion « $\\forall x \\in E, P(x)$ » est vraie si, pour tout élément $x$ de $E$, l'assertion $P(x)$ est vraie.\n\nSe lit : « pour tout $x$ dans $E$, on a $P(x)$ ».",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’est-ce que l’ensemble vide ?",
-      "back_md": "L’ensemble vide, noté $\\varnothing$, est un ensemble qui ne contient aucun élément.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Définir le quantificateur existentiel $\\exists x \\in E, P(x)$.",
+      "back_md": "L'assertion « $\\exists x \\in E, P(x)$ » est vraie s'il existe un élément $x$ appartenant à $E$ tel que l'assertion $P(x)$ soit vraie.\n\nSe lit : « il existe $x$ dans $E$ tel que $P(x)$ soit vraie ».",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Définir le quantificateur universel.",
-      "back_md": "L’assertion $\\forall x \\in E,\\; P(x)$ est vraie si, pour tout élément $x$ de $E$, l’assertion $P(x)$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Définir « $\\exists! x \\in E, P(x)$ ».",
+      "back_md": "L'assertion « $\\exists! x \\in E, P(x)$ » est vraie s'il existe un **unique** élément $x$ appartenant à $E$ tel que $P(x)$ soit vraie.\n\nÉquivaut à :\n$$\\exists x \\in E \\left(P(x) \\text{ et } \\forall y \\in E, P(y) \\Rightarrow y = x\\right)$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Définir le quantificateur existentiel.",
-      "back_md": "L’assertion $\\exists x \\in E,\\; P(x)$ est vraie s’il existe au moins un élément $x$ de $E$ tel que $P(x)$ soit vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la convention si $E$ est l'ensemble vide dans « $\\forall x \\in E, P(x)$ » ?",
+      "back_md": "Si $E = \\varnothing$, l'assertion « $\\forall x \\in E, P(x)$ » est **vraie** (vacuité).",
+      "hint_md": "Il n'y a pas de contre-exemple !",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Définir l’assertion d’unicité $\\exists ! x \\in E, P(x)$.",
-      "back_md": "Elle signifie qu’il existe un unique élément $x \\in E$ tel que $P(x)$ soit vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Qu'est-ce qu'une variable muette dans « $\\forall x \\in E, P(x)$ » ?",
+      "back_md": "La lettre $x$ dans « $\\forall x \\in E, P(x)$ » est une **variable muette** : l'assertion ne dépend pas de $x$.\n\nOn peut écrire indifféremment :\n$$\\forall x \\in E, P(x) \\quad \\text{ou} \\quad \\forall y \\in E, P(y) \\quad \\text{ou} \\quad \\forall z \\in E, P(z)$$\n\nsans modifier le sens.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Donner une écriture équivalente de $\\exists ! x \\in E, P(x)$.",
-      "back_md": "$\\exists x \\in E\\,\\big(P(x) \\text{ et } (\\forall y \\in E,\\; P(y) \\Rightarrow y = x)\\big)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment démontrer « $\\forall x \\in E, P(x)$ » ?",
+      "back_md": "Méthode standard :\n\n1. Fixer un élément $x$ **quelconque** dans $E$\n2. Démontrer que $P(x)$ est vraie pour cet $x$\n\nRédaction : « Soit $x \\in E$. Montrons $P(x)$. »",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Que vaut l’assertion $\\forall x \\in E, P(x)$ lorsque $E = \\varnothing$ ?",
-      "back_md": "Par convention, si $E$ est l’ensemble vide, l’assertion $\\forall x \\in E, P(x)$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment démontrer « $\\exists x \\in E, P(x)$ » ?",
+      "back_md": "Deux méthodes :\n\n1. **Candidat évident** : exhiber directement un élément $x \\in E$ tel que $P(x)$ soit vraie\n\n2. **Analyse-synthèse** : \n   - Analyse (au brouillon) : supposer qu'un tel $x$ existe, déduire des propriétés nécessaires\n   - Synthèse : vérifier que le(s) candidat(s) obtenu(s) vérifie(nt) bien $P$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’appelle-t-on une variable muette ?",
-      "back_md": "Dans une assertion quantifiée, la variable liée au quantificateur est dite muette car l’assertion ne dépend pas de la lettre utilisée.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment démontrer « $\\exists! x \\in E, P(x)$ » ?",
+      "back_md": "Deux parties à démontrer :\n\n**Unicité** : si $a, b \\in E$ vérifient $P(a)$ et $P(b)$, alors $a = b$\n\n**Existence** : montrer qu'il existe au moins un $x \\in E$ tel que $P(x)$ (souvent par analyse-synthèse, l'analyse donnant l'unicité)",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle est la négation de $\\forall x \\in E, P(x)$ ?",
-      "back_md": "$\\exists x \\in E,\\; \\text{non }P(x)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment utiliser une hypothèse « $\\forall x \\in E, P(x)$ » ?",
+      "back_md": "Si on sait que « $\\forall x \\in E, P(x)$ » est vraie, on peut utiliser $P(x)$ avec **n'importe quel** élément $x \\in E$.\n\nOn choisit l'élément qui convient pour la démonstration.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle est la négation de $\\exists x \\in E, P(x)$ ?",
-      "back_md": "$\\forall x \\in E,\\; \\text{non }P(x)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Comment utiliser une hypothèse « $\\exists x \\in E, P(x)$ » ?",
+      "back_md": "Si on sait que « $\\exists x \\in E, P(x)$ » est vraie :\n\n1. On introduit : « Prenons $x \\in E$ tel que $P(x)$ »\n2. On travaille avec cet élément $x$ qui nous est **donné**\n3. On ne peut pas lui attribuer d'autres propriétés sans justification",
+      "hint_md": "Attention : l'élément est choisi par l'hypothèse, pas par nous !",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle est la négation de $\\forall x \\in E,\\; A(x) \\Rightarrow B(x)$ ?",
-      "back_md": "$\\exists x \\in E,\\; A(x) \\text{ et } (\\text{non }B(x))$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la négation de « $\\forall x \\in E, P(x)$ » ?",
+      "back_md": "$$\\text{non}\\left(\\forall x \\in E, P(x)\\right) \\Leftrightarrow \\exists x \\in E, \\text{non } P(x)$$",
+      "hint_md": "« Il existe un contre-exemple »",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment se distribue le quantificateur universel sur une conjonction ?",
-      "back_md": "$\\forall x \\in E,\\; (P(x) \\text{ et } Q(x)) \\Leftrightarrow (\\forall x \\in E, P(x)) \\text{ et } (\\forall x \\in E, Q(x))$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la négation de « $\\exists x \\in E, P(x)$ » ?",
+      "back_md": "$$\\text{non}\\left(\\exists x \\in E, P(x)\\right) \\Leftrightarrow \\forall x \\in E, \\text{non } P(x)$$",
+      "hint_md": "« Aucun élément ne vérifie $P$ »",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment se distribue le quantificateur existentiel sur une disjonction ?",
-      "back_md": "$\\exists x \\in E,\\; (P(x) \\text{ ou } Q(x)) \\Leftrightarrow (\\exists x \\in E, P(x)) \\text{ ou } (\\exists x \\in E, Q(x))$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la négation de « $\\forall x \\in E, A(x) \\Rightarrow B(x)$ » ?",
+      "back_md": "$$\\text{non}\\left(\\forall x \\in E, A(x) \\Rightarrow B(x)\\right) \\Leftrightarrow \\exists x \\in E, A(x) \\text{ et } (\\text{non } B(x))$$",
+      "hint_md": "Utiliser : $\\text{non}(A \\Rightarrow B) \\Leftrightarrow A \\text{ et } (\\text{non } B)$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Donner une implication reliant $\\forall$ et une disjonction.",
-      "back_md": "$(\\forall x \\in E, P(x)) \\text{ ou } (\\forall x \\in E, Q(x)) \\Rightarrow \\forall x \\in E, (P(x) \\text{ ou } Q(x))$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle est la négation de « $\\forall x \\in E, A(x) \\Leftrightarrow B(x)$ » ?",
+      "back_md": "$$\\text{non}\\left(\\forall x \\in E, A(x) \\Leftrightarrow B(x)\\right) \\Leftrightarrow \\exists x \\in E, \\left[(A(x) \\text{ et } \\text{non } B(x)) \\text{ ou } (B(x) \\text{ et } \\text{non } A(x))\\right]$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Donner une implication reliant $\\exists$ et une conjonction.",
-      "back_md": "$\\exists x \\in E, (P(x) \\text{ et } Q(x)) \\Rightarrow (\\exists x \\in E, P(x)) \\text{ et } (\\exists x \\in E, Q(x))$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer que : $\\left(\\forall x \\in E, P(x) \\text{ et } Q(x)\\right) \\Leftrightarrow \\left(\\forall x \\in E, P(x)\\right) \\text{ et } \\left(\\forall x \\in E, Q(x)\\right)$",
+      "back_md": "$(\\Rightarrow)$ : Si tout $x$ vérifie $P(x) \\text{ et } Q(x)$, alors tout $x$ vérifie $P(x)$ et tout $x$ vérifie $Q(x)$.\n\n$(\\Leftarrow)$ : Si tout $x$ vérifie $P(x)$ et tout $x$ vérifie $Q(x)$, alors tout $x$ vérifie $P(x) \\text{ et } Q(x)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment démontrer une assertion de type $\\forall x \\in E, P(x)$ ?",
-      "back_md": "On fixe un élément arbitraire $x \\in E$ et on montre que $P(x)$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer que : $\\left(\\exists x \\in E, P(x) \\text{ ou } Q(x)\\right) \\Leftrightarrow \\left(\\exists x \\in E, P(x)\\right) \\text{ ou } \\left(\\exists x \\in E, Q(x)\\right)$",
+      "back_md": "$(\\Rightarrow)$ : Si $\\exists x$ tel que $P(x) \\text{ ou } Q(x)$, alors soit $P(x)$ soit $Q(x)$, donc $\\exists x, P(x)$ ou $\\exists x, Q(x)$.\n\n$(\\Leftarrow)$ : Si $\\exists x, P(x)$ ou $\\exists x, Q(x)$, alors il existe $x$ vérifiant $P(x) \\text{ ou } Q(x)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment démontrer une assertion de type $\\exists x \\in E, P(x)$ avec candidat évident ?",
-      "back_md": "Il suffit d’exhiber un élément $x \\in E$ et de vérifier que $P(x)$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Est-ce que $\\left(\\forall x \\in E, P(x)\\right) \\text{ ou } \\left(\\forall x \\in E, Q(x)\\right) \\Rightarrow \\forall x \\in E, P(x) \\text{ ou } Q(x)$ est toujours vraie ?",
+      "back_md": "Oui, cette implication est vraie.\n\nSi tout $x$ vérifie $P(x)$, alors tout $x$ vérifie $P(x) \\text{ ou } Q(x)$.\n\nSi tout $x$ vérifie $Q(x)$, alors tout $x$ vérifie $P(x) \\text{ ou } Q(x)$.\n\nMais la **réciproque est fausse** en général.",
+      "hint_md": "Contre-exemple pour la réciproque : $E = \\mathbb{R}$, $P(x)$: « $x \\leq 0$ », $Q(x)$: « $x > 0$ »",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle méthode utiliser pour démontrer $\\exists x \\in E, P(x)$ sans candidat évident ?",
-      "back_md": "On procède par analyse-synthèse : on déduit des conditions nécessaires puis on vérifie les candidats.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Peut-on intervertir deux quantificateurs $\\forall$ successifs ?",
+      "back_md": "Oui, deux quantificateurs $\\forall$ successifs **commutent** :\n$$\\forall x \\in E, \\forall y \\in F, P(x,y) \\Leftrightarrow \\forall y \\in F, \\forall x \\in E, P(x,y)$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment démontrer une assertion de type $\\exists ! x \\in E, P(x)$ ?",
-      "back_md": "On démontre séparément l’existence puis l’unicité en montrant que deux éléments vérifiant $P$ sont égaux.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Peut-on intervertir deux quantificateurs $\\exists$ successifs ?",
+      "back_md": "Oui, deux quantificateurs $\\exists$ successifs **commutent** :\n$$\\exists x \\in E, \\exists y \\in F, P(x,y) \\Leftrightarrow \\exists y \\in F, \\exists x \\in E, P(x,y)$$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment utiliser une hypothèse du type $\\forall x \\in E, P(x)$ ?",
-      "back_md": "On peut appliquer $P(x)$ à n’importe quel élément choisi de $E$, en particulier à un élément adapté au but.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Peut-on intervertir $\\exists$ et $\\forall$ dans cet ordre ? Quelle implication est vraie ?",
+      "back_md": "On **ne peut pas** en général intervertir $\\exists$ et $\\forall$.\n\nSeule cette implication est vraie :\n$$\\left(\\exists x \\in E, \\forall y \\in F, P(x,y)\\right) \\Rightarrow \\left(\\forall y \\in F, \\exists x \\in E, P(x,y)\\right)$$\n\nLa réciproque est **fausse** en général.",
+      "hint_md": "À gauche : un $x$ qui marche pour tous les $y$. À droite : pour chaque $y$, on peut trouver un $x$ (qui dépend de $y$).",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment utiliser une hypothèse du type $\\exists x \\in E, P(x)$ ?",
-      "back_md": "On fixe un élément $x \\in E$ tel que $P(x)$ soit vraie, sans lui attribuer d’autres propriétés non justifiées.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer par un contre-exemple que $\\left(\\forall y \\in \\mathbb{R}, \\exists x \\in \\mathbb{R}, y = x + 1\\right)$ n'implique pas $\\left(\\exists x \\in \\mathbb{R}, \\forall y \\in \\mathbb{R}, y = x + 1\\right)$.",
+      "back_md": "L'assertion $\\forall y \\in \\mathbb{R}, \\exists x \\in \\mathbb{R}, y = x + 1$ est **vraie** (prendre $x = y - 1$).\n\nL'assertion $\\exists x \\in \\mathbb{R}, \\forall y \\in \\mathbb{R}, y = x + 1$ est **fausse** (car si un tel $x_0$ existait, on aurait $0 = x_0 + 1$ et $1 = x_0 + 1$, absurde).\n\nDonc la réciproque de l'implication est fausse.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Pourquoi faut-il être prudent avec les variables dans les assertions existentielles ?",
-      "back_md": "Les variables existentiellement quantifiées sont muettes et peuvent désigner des éléments différents.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Énoncer le principe de récurrence (théorème 3).",
+      "back_md": "Soit $P$ une propriété définie sur $\\mathbb{N}$. Si :\n\n1. $P(0)$ est vraie (**initialisation**)\n2. $\\forall n \\in \\mathbb{N}, P(n) \\Rightarrow P(n+1)$ (**hérédité**)\n\nalors $\\forall n \\in \\mathbb{N}, P(n)$ est vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Dans quel cadre utilise-t-on un raisonnement par récurrence ?",
-      "back_md": "On utilise le raisonnement par récurrence pour démontrer une assertion du type $\\forall n \\in \\mathbb{N},\\; P(n)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelle propriété fondamentale de $\\mathbb{N}$ admet-on pour démontrer le principe de récurrence ?",
+      "back_md": "**Proposition** : Toute partie non vide de $\\mathbb{N}$ possède un plus petit élément.\n\nCette propriété permet de démontrer le principe de récurrence par l'absurde.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Énoncer le principe de la récurrence.",
-      "back_md": "Soit $P(n)$ une assertion définie pour tout $n \\in \\mathbb{N}$. Si :\n1) $P(0)$ est vraie (initialisation),\n2) $\\forall n \\in \\mathbb{N},\\; P(n) \\Rightarrow P(n+1)$ (hérédité),\nalors $\\forall n \\in \\mathbb{N},\\; P(n)$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Quelles sont les trois étapes d'une démonstration par récurrence ?",
+      "back_md": "1. **Expliciter** la propriété $P(n)$ faisant l'objet de la récurrence\n\n2. **Initialisation** : prouver que $P(0)$ est vraie (ou $P(n_0)$ si récurrence à partir d'un rang)\n\n3. **Hérédité** : prouver que $\\forall n \\in \\mathbb{N}, P(n) \\Rightarrow P(n+1)$",
+      "hint_md": "Ne jamais oublier l'initialisation !",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’appelle-t-on l’initialisation dans un raisonnement par récurrence ?",
-      "back_md": "L’initialisation consiste à vérifier que l’assertion $P(n)$ est vraie pour la première valeur considérée, généralement $n=0$ ou $n=1$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Pourquoi est-il crucial de vérifier l'initialisation dans une récurrence ?",
+      "back_md": "Sans initialisation, on peut « démontrer » des absurdités.\n\nExemple : la propriété $P(n)$: « $n = n+1$ » vérifie :\n$$\\forall n \\in \\mathbb{N}, P(n) \\Rightarrow P(n+1)$$\n\nmais $P(0)$ est fausse ! Sans initialisation, on « prouverait » que tous les entiers sont égaux.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’appelle-t-on l’hérédité dans un raisonnement par récurrence ?",
-      "back_md": "L’hérédité consiste à montrer que pour tout $n$, si $P(n)$ est vraie, alors $P(n+1)$ est vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Énoncer le principe de récurrence à partir d'un certain rang (corollaire 4).",
+      "back_md": "Soit $n_0 \\in \\mathbb{Z}$ et $P$ une propriété définie sur $[\\![n_0, +\\infty[\\![$. Si :\n\n1. $P(n_0)$ est vraie\n2. $\\forall n \\geq n_0, P(n) \\Rightarrow P(n+1)$\n\nalors $\\forall n \\geq n_0, P(n)$ est vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Que signifie l’hypothèse de récurrence ?",
-      "back_md": "L’hypothèse de récurrence est l’assertion $P(n)$ supposée vraie pour un entier $n$ fixé afin de démontrer $P(n+1)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Énoncer le principe de récurrence double (corollaire 5).",
+      "back_md": "Soit $P$ une propriété définie sur $\\mathbb{N}$. Si :\n\n1. $P(0)$ et $P(1)$ sont vraies (**double initialisation**)\n2. $\\forall n \\in \\mathbb{N}, \\left(P(n) \\text{ et } P(n+1)\\right) \\Rightarrow P(n+2)$\n\nalors $\\forall n \\in \\mathbb{N}, P(n)$ est vraie.",
+      "hint_md": "Ne pas oublier la double initialisation !",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle est la conclusion d’un raisonnement par récurrence réussi ?",
-      "back_md": "On conclut que l’assertion $P(n)$ est vraie pour tout entier naturel $n$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Énoncer le principe de récurrence forte (corollaire 6).",
+      "back_md": "Soit $P$ une propriété définie sur $\\mathbb{N}$. Si :\n\n1. $P(0)$ est vraie\n2. $\\forall n \\in \\mathbb{N}^*, \\left(P(0) \\text{ et } \\cdots \\text{ et } P(n-1)\\right) \\Rightarrow P(n)$\n\nalors $\\forall n \\in \\mathbb{N}, P(n)$ est vraie.",
+      "hint_md": "On peut utiliser toutes les propriétés précédentes pour démontrer $P(n)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment rédiger correctement l’étape d’hérédité ?",
-      "back_md": "On écrit : « Soit $n \\in \\mathbb{N}$. Supposons $P(n)$ vraie. Montrons que $P(n+1)$ est vraie. »",
-      "tags": ["Maths/Bases"]
+      "front_md": "Énoncer le principe de récurrence finie (corollaire 7).",
+      "back_md": "Soit $r \\in \\mathbb{N}$ et $P$ une propriété définie sur $[\\![0, r]\\!]$. Si :\n\n1. $P(0)$ est vraie\n2. $\\forall n \\in [\\![0, r-1]\\!], P(n) \\Rightarrow P(n+1)$\n\nalors $\\forall n \\in [\\![0, r]\\!], P(n)$ est vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Pourquoi ne faut-il pas dire « supposons $P(n+1)$ » dans une récurrence ?",
-      "back_md": "Parce que $P(n+1)$ est précisément ce que l’on cherche à démontrer ; seule $P(n)$ peut être supposée vraie.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Énoncer le principe de récurrence finie descendante (corollaire 8).",
+      "back_md": "Soit $r \\in \\mathbb{N}$ et $P$ une propriété définie sur $[\\![0, r]\\!]$. Si :\n\n1. $P(r)$ est vraie\n2. $\\forall n \\in [\\![1, r]\\!], P(n) \\Rightarrow P(n-1)$\n\nalors $\\forall n \\in [\\![0, r]\\!], P(n)$ est vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Sur quel ensemble d’entiers peut porter une récurrence ?",
-      "back_md": "Une récurrence peut porter sur $\\mathbb{N}$, $\\mathbb{N}^*$ ou plus généralement sur $\\{n \\in \\mathbb{N} \\mid n \\ge n_0\\}$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer par récurrence que si $f: \\mathbb{N} \\to \\mathbb{N}$ est strictement croissante, alors $\\forall n \\in \\mathbb{N}, f(n) \\geq n$.",
+      "back_md": "Notons $P(n)$: « $f(n) \\geq n$ ».\n\n**Initialisation** : $f(0) \\in \\mathbb{N}$ donc $f(0) \\geq 0$, d'où $P(0)$.\n\n**Hérédité** : Soit $n \\in \\mathbb{N}$ tel que $P(n)$. Alors $f(n) \\geq n$.\n\nComme $f$ strictement croissante : $f(n+1) > f(n) \\geq n$.\n\nDonc $f(n+1) \\in \\mathbb{N}$ et $f(n+1) > n$, i.e. $f(n+1) \\geq n+1$, d'où $P(n+1)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Comment adapter l’initialisation si l’assertion commence à partir d’un rang $n_0$ ?",
-      "back_md": "On vérifie que $P(n_0)$ est vraie, puis on montre que $\\forall n \\ge n_0,\\; P(n) \\Rightarrow P(n+1)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Dans une hérédité de récurrence, peut-on montrer $P(n-1) \\Rightarrow P(n)$ au lieu de $P(n) \\Rightarrow P(n+1)$ ?",
+      "back_md": "Oui, c'est équivalent.\n\nOn peut montrer :\n$$\\forall n \\in \\mathbb{N}^*, P(n-1) \\Rightarrow P(n)$$\n\nau lieu de :\n$$\\forall n \\in \\mathbb{N}, P(n) \\Rightarrow P(n+1)$$\n\nC'est parfois plus pratique pour certains calculs.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’est-ce qu’une récurrence simple ?",
-      "back_md": "C’est une récurrence où l’hérédité consiste à montrer $P(n) \\Rightarrow P(n+1)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Montrer par récurrence forte que tout entier $n \\geq 2$ possède au moins un diviseur premier.",
+      "back_md": "Posons $P(n)$: « $n$ possède un diviseur premier ».\n\n**Initialisation** : $P(2)$ vraie car $2$ est premier.\n\n**Hérédité** : Soit $n \\geq 3$. Supposons $P(2), \\ldots, P(n-1)$ vraies. Montrons $P(n)$.\n\n- Si $n$ premier : $n$ est diviseur premier de lui-même.\n- Si $n$ non premier : $\\exists d \\in [\\![2, n-1]\\!], d \\mid n$. Par $P(d)$, $d$ a un diviseur premier, qui divise aussi $n$.\n\nDonc $P(n)$ vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Qu’est-ce qu’une récurrence forte ?",
-      "back_md": "C’est une récurrence où l’on suppose $P(0), P(1), \\dots, P(n)$ vraies pour démontrer $P(n+1)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Soit $x \\in \\mathbb{R}_+$ tel que $\\forall \\varepsilon > 0, x \\leq \\varepsilon$. Montrer que $x = 0$.",
+      "back_md": "**Par l'absurde** : supposons $x > 0$.\n\nPrenons $\\varepsilon = \\frac{x}{2} > 0$. Par hypothèse : $x \\leq \\frac{x}{2}$, donc $x \\leq 0$.\n\nContradiction avec $x > 0$. Donc $x = 0$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Dans quel cas utilise-t-on une récurrence forte ?",
-      "back_md": "On utilise une récurrence forte lorsque $P(n+1)$ dépend de plusieurs valeurs précédentes et pas seulement de $P(n)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Rappeler la notation abrégée pour « $\\forall x \\geq 0, P(x)$ » et « $\\forall n \\geq 1, P(n)$ ».",
+      "back_md": "Par abus de notation :\n\n- « $\\forall x \\geq 0, P(x)$ » au lieu de « $\\forall x \\in \\mathbb{R}_+, P(x)$ »\n\n- « $\\forall n \\geq 1, P(n)$ » au lieu de « $\\forall n \\in \\mathbb{N}^*, P(n)$ »",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle est la structure logique d’un raisonnement par récurrence ?",
-      "back_md": "Il s’agit d’un raisonnement par implication universelle : on montre $P(0)$ puis $\\forall n,\\; P(n) \\Rightarrow P(n+1)$.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Donner des formulations alternatives de « $P \\Rightarrow Q$ ».",
+      "back_md": "« $P \\Rightarrow Q$ » peut s'exprimer comme :\n\n- Pour que $Q$ soit vraie, il suffit que $P$ le soit\n- Pour que $P$ soit vraie, il faut que $Q$ le soit\n- $P$ est une condition suffisante pour que $Q$ soit vraie\n- $Q$ est une condition nécessaire pour que $P$ soit vraie",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Pourquoi le raisonnement par récurrence est-il valide ?",
-      "back_md": "Parce qu’il repose sur la structure bien ordonnée de $\\mathbb{N}$ : chaque entier admet un successeur.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Donner des formulations alternatives de « $P \\Leftrightarrow Q$ ».",
+      "back_md": "« $P \\Leftrightarrow Q$ » peut s'exprimer comme :\n\n- $P$ est vraie si et seulement si $Q$ l'est\n- Pour que $Q$ soit vraie, il faut et il suffit que $P$ le soit\n- $P$ est une condition nécessaire et suffisante pour que $Q$ soit vraie",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     },
     {
-      "front_md": "Quelle erreur classique faut-il éviter dans une récurrence ?",
-      "back_md": "Oublier l’initialisation ou utiliser l’hypothèse de récurrence en dehors de ce qui est autorisé.",
-      "tags": ["Maths/Bases"]
+      "front_md": "Attention : peut-on utiliser le symbole $\\Rightarrow$ comme abréviation de « donc » ?",
+      "back_md": "**Non, jamais !**\n\n- « $P$ donc $Q$ » signifie que $P$ est vraie et qu'on en déduit $Q$\n- « $P \\Rightarrow Q$ » est une assertion qui peut être vraie même si $P$ est fausse\n\nÉcrire « On a $P \\Rightarrow Q$ » ne prétend **pas** que $P$ est vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "L'assertion « $(1 = 2) \\Rightarrow (6 = 8)$ » est-elle vraie ou fausse ?",
+      "back_md": "Cette assertion est **vraie** car $1 = 2$ est fausse.\n\nUne implication $P \\Rightarrow Q$ est vraie dès que $P$ est fausse.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Montrer que $n$ et $n^2$ ont la même parité (pour $n$ entier) par disjonction de cas.",
+      "back_md": "**Cas 1** : $n$ pair. Alors $\\exists k \\in \\mathbb{Z}, n = 2k$, donc $n^2 = 4k^2 = 2(2k^2)$ est pair.\n\n**Cas 2** : $n$ impair. Alors $\\exists k \\in \\mathbb{Z}, n = 2k+1$, donc $n^2 = 4k^2 + 4k + 1 = 2(2k^2 + 2k) + 1$ est impair.\n\nDans les deux cas, $n$ et $n^2$ ont la même parité.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $(u_n)$ définie par $u_0 = 2$, $u_1 = 3$ et $u_{n+2} = 3u_{n+1} - 2u_n$. Montrer par récurrence double que $u_n = 2^n + 1$.",
+      "back_md": "Posons $P(n)$: « $u_n = 2^n + 1$ ».\n\n**Initialisation** : $u_0 = 2 = 2^0 + 1$ et $u_1 = 3 = 2^1 + 1$, donc $P(0)$ et $P(1)$ vraies.\n\n**Hérédité** : Soit $n \\in \\mathbb{N}$. Supposons $P(n)$ et $P(n+1)$.\n\nAlors :\n$$u_{n+2} = 3u_{n+1} - 2u_n = 3(2^{n+1} + 1) - 2(2^n + 1) = 3 \\cdot 2^{n+1} - 2^{n+1} = 2^{n+2} + 1$$\n\nDonc $P(n+2)$ vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $(u_n)$ définie par $u_0 = 0$ et $u_{n+1} = u_n + n + 1$. Montrer que $u_n = \\frac{n(n+1)}{2}$.",
+      "back_md": "Posons $P(n)$: « $u_n = \\frac{n(n+1)}{2}$ ».\n\n**Initialisation** : $u_0 = 0 = \\frac{0 \\cdot 1}{2}$, donc $P(0)$ vraie.\n\n**Hérédité** : Soit $n \\in \\mathbb{N}^*$ tel que $P(n-1)$. Alors :\n$$u_n = u_{n-1} + n = \\frac{(n-1)n}{2} + n = \\frac{(n-1)n + 2n}{2} = \\frac{n(n+1)}{2}$$\n\nDonc $P(n)$ vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Montrer qu'à partir d'un certain rang, on a $n! \\geq 2^{n+1}$ (pour $n$ entier naturel).",
+      "back_md": "Montrons $P(n)$: « $n! \\geq 2^{n+1}$ » pour tout $n \\geq 5$.\n\n**Initialisation** : $5! = 120 \\geq 64 = 2^6$, donc $P(5)$ vraie.\n\n**Hérédité** : Soit $n \\geq 5$ tel que $P(n)$. Alors $n! \\geq 2^{n+1}$.\n\nComme $n+1 \\geq 6 > 2$, on a :\n$$(n+1)! = (n+1) \\cdot n! \\geq (n+1) \\cdot 2^{n+1} \\geq 2 \\cdot 2^{n+1} = 2^{n+2}$$\n\nDonc $P(n+1)$ vraie.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Comment démontrer l'hérédité d'une récurrence $P(n) \\Rightarrow P(n+1)$ ?",
+      "back_md": "**Rédaction type** :\n\n« Soit $n \\in \\mathbb{N}$ tel que $P(n)$ soit vraie. Montrons $P(n+1)$. »\n\nPuis on utilise l'hypothèse $P(n)$ (appelée **hypothèse de récurrence**) pour démontrer $P(n+1)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $(u_n)$ définie par $u_0 = 0$ et $\\forall n \\in \\mathbb{N}, u_{n+1} = u_n + n + 1$. Calculer $u_n$ en fonction de $n$.",
+      "back_md": "On conjecture (en calculant les premiers termes) que $u_n = \\frac{n(n+1)}{2}$.\n\n**Preuve par récurrence** : voir carte précédente avec récurrence à partir du rang 1 utilisant $P(n-1) \\Rightarrow P(n)$.",
+      "hint_md": "Formule de la somme $1 + 2 + \\cdots + n = \\frac{n(n+1)}{2}$",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $(u_n)$ définie par $u_0 = 2$, $u_1 = 3$ et $\\forall n \\in \\mathbb{N}, u_{n+2} = 3u_{n+1} - 2u_n$. Quand utilise-t-on une récurrence double ?",
+      "back_md": "On utilise une **récurrence double** quand la relation de récurrence fait intervenir les **deux rangs précédents** : $u_{n+2}$ dépend de $u_{n+1}$ **et** $u_n$.\n\nIci : pour prouver $P(n+2)$, on a besoin de $P(n+1)$ **et** $P(n)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $u$ une suite réelle telle que $\\forall n \\in \\mathbb{N}, (n+1)u_{n+1} = u_0 + u_1 + \\cdots + u_n$. Montrer que $u$ est constante.",
+      "back_md": "Posons $P(n)$: « $u_n = u_0$ ». Montrons par **récurrence forte** que $P(n)$ est vraie pour tout $n$.\n\n**Initialisation** : $P(0)$ triviale.\n\n**Hérédité** : Soit $n \\in \\mathbb{N}$. Supposons $P(0), \\ldots, P(n)$. Alors :\n$$(n+1)u_{n+1} = u_0 + \\cdots + u_n = (n+1)u_0$$\n\ndonc $u_{n+1} = u_0$, d'où $P(n+1)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Quand utilise-t-on une récurrence forte plutôt qu'une récurrence simple ?",
+      "back_md": "On utilise une **récurrence forte** quand pour démontrer $P(n)$, on a besoin d'utiliser **plusieurs** (voire **toutes**) les propriétés $P(k)$ pour $k < n$.\n\nExemple typique : démontrer que tout entier $\\geq 2$ a un diviseur premier (on utilise tous les rangs précédents selon que $n$ est premier ou non).",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $n \\in \\mathbb{N}^*$ et $i_1, \\ldots, i_n$ des entiers distincts de $[\\![1,n]\\!]$ vérifiant $\\forall k \\in [\\![1,n]\\!], i_k \\leq k$. Montrer que $\\forall k, i_k = k$.",
+      "back_md": "**Par récurrence finie forte** sur $k$ de $1$ à $n$ :\n\n**Initialisation** : $i_1 \\leq 1$ et $i_1 \\in [\\![1,n]\\!]$ donc $i_1 = 1$.\n\n**Hérédité** : Soit $k \\in [\\![1,n-1]\\!]$. Supposons $i_1 = 1, \\ldots, i_k = k$.\n\nAlors $\\{i_1, \\ldots, i_k\\} = [\\![1,k]\\!]$.\n\nComme les $i_j$ sont distincts : $i_{k+1} \\notin [\\![1,k]\\!]$.\n\nMais $i_{k+1} \\leq k+1$, donc $i_{k+1} = k+1$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Même question avec une récurrence finie **descendante** : si $\\forall k \\in [\\![1,n]\\!], i_k \\leq k$, montrer $\\forall k, i_k = k$.",
+      "back_md": "**Par récurrence finie forte descendante** de $n$ à $1$ :\n\n**Initialisation** : $i_n \\leq n$ et $i_n \\in [\\![1,n]\\!]$ donc $i_n = n$.\n\n**Hérédité** : Soit $k \\in [\\![2,n]\\!]$. Supposons $i_k = k, \\ldots, i_n = n$.\n\nAlors $\\{i_k, \\ldots, i_n\\} = [\\![k,n]\\!]$.\n\nDonc $i_{k-1} \\notin [\\![k,n]\\!]$ et $i_{k-1} \\leq k-1$, donc $i_{k-1} = k-1$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $(u_n)$ définie par $u_{n+2} = 4u_{n+1} - 4u_n$. Montrer qu'il existe un unique couple $(a,b)$ tel que $u_n = (an+b)2^n$.",
+      "back_md": "**Analyse** : Si $u_n = (an+b)2^n$, alors $u_0 = b$ et $u_1 = 2(a+b)$, donc $a = \\frac{u_1 - 2u_0}{2}$.\n\nCela prouve l'unicité.\n\n**Synthèse** : Posons $a = \\frac{u_1 - 2u_0}{2}$ et $b = u_0$. Montrons par **récurrence double** que $u_n = (an+b)2^n$ pour tout $n$.\n\n**Initialisation** : $P(0)$ et $P(1)$ vraies par construction.\n\n**Hérédité** : calcul direct utilisant $P(n)$ et $P(n+1)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Soit $n \\in \\mathbb{N}^*$. Montrer que $\\forall k \\in [\\![1,n]\\!], \\left(1 + \\frac{1}{n}\\right)^k \\leq 1 + \\frac{k}{n} + \\frac{k^2}{n^2}$.",
+      "back_md": "**Par récurrence finie** sur $k$ de $1$ à $n$ :\n\n**Initialisation** : Pour $k=1$ : $1 + \\frac{1}{n} \\leq 1 + \\frac{1}{n} + \\frac{1}{n^2}$ ✓\n\n**Hérédité** : Supposons $P(k-1)$ avec $k \\in [\\![2,n]\\!]$.\n\n$\\left(1 + \\frac{1}{n}\\right)^k = \\left(1 + \\frac{1}{n}\\right)\\left(1 + \\frac{1}{n}\\right)^{k-1} \\leq \\left(1 + \\frac{1}{n}\\right)\\left(1 + \\frac{k-1}{n} + \\frac{(k-1)^2}{n^2}\\right)$\n\nPuis développer et montrer que cela donne bien $P(k)$.",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
+    },
+    {
+      "front_md": "Quel est le piège classique à éviter dans l'initialisation d'une récurrence double ?",
+      "back_md": "**Piège** : oublier de vérifier **les deux** initialisations $P(0)$ **et** $P(1)$.\n\nSans $P(0)$ et $P(1)$, on ne peut pas démarrer l'hérédité qui utilise deux rangs consécutifs.",
+      "hint_md": "Double initialisation = récurrence double !",
+      "tags": ["Maths/Logique/Logique et raisonnement"]
     }
   ]
 }

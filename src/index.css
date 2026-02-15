@@ -584,6 +584,12 @@ ul {
   flex-wrap: wrap;
 }
 
+.review-tags {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
 .btn-toggle.is-active {
   background: var(--primary);
   border-color: var(--primary);

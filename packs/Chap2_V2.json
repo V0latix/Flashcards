@@ -1,0 +1,258 @@
+{
+  "version": 1,
+  "exported_at": "2026-02-15T20:00:00Z",
+  "cards": [
+    {
+      "front_md": "Comment définir un ensemble ? Quelles sont les deux grandes façons ?",
+      "back_md": "Deux façons de définir un ensemble :\n\n1. **En extension** : donner la liste de ses éléments\n   - Exemple : $\\{0, 1, 2, 3\\}$\n\n2. **Par compréhension** : donner une condition d'appartenance\n   - Notation : $\\{x \\in E : P(x)\\}$\n   - Exemple : $\\{n \\in \\mathbb{N} : n \\leq 3\\}$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce que le cardinal d'un ensemble ?",
+      "back_md": "Le **cardinal** de $E$, noté $\\text{card } E$, est le nombre d'éléments **distincts** de $E$.\n\nExemple : Si $x$ est un réel,\n- $\\{1, x, x^2\\}$ est de cardinal $1$ si $x = 1$\n- de cardinal $2$ si $x = 0$ ou $x = -1$\n- de cardinal $3$ sinon",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir : $F \\subset E$ (inclusion).",
+      "back_md": "On dit que $F$ est **inclus** dans $E$ (ou que $F$ est une **partie** de $E$) si tout élément de $F$ est aussi élément de $E$.\n\n**Traduction** : $F \\subset E \\Leftrightarrow \\forall x \\in F, x \\in E$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Comment démontrer l'égalité de deux ensembles $E = F$ ?",
+      "back_md": "**Point méthode (double inclusion)** :\n\nPour montrer $E = F$, on établit :\n1. $E \\subset F$\n2. $F \\subset E$\n\nCar $E = F \\Leftrightarrow (E \\subset F \\text{ et } F \\subset E)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir la réunion $E \\cup F$ et l'intersection $E \\cap F$.",
+      "back_md": "**Réunion** : $E \\cup F$ est l'ensemble des éléments qui sont dans $E$ **ou** dans $F$\n$$x \\in E \\cup F \\Leftrightarrow (x \\in E \\text{ ou } x \\in F)$$\n\n**Intersection** : $E \\cap F$ est l'ensemble des éléments qui sont **à la fois** dans $E$ et dans $F$\n$$x \\in E \\cap F \\Leftrightarrow (x \\in E \\text{ et } x \\in F)$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Énoncer les lois de distributivité pour $\\cap$ et $\\cup$.",
+      "back_md": "Soit $A$, $B$ et $C$ trois ensembles :\n\n1. $A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)$\n\n2. $A \\cup (B \\cap C) = (A \\cup B) \\cap (A \\cup C)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir la différence ensembliste $E \\setminus F$.",
+      "back_md": "La **différence** de $E$ et $F$, notée $E \\setminus F$, est l'ensemble des éléments qui sont dans $E$ mais **pas** dans $F$.\n\n$$E \\setminus F = \\{x \\in E : x \\notin F\\}$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce que le complémentaire de $A$ dans $E$ ?",
+      "back_md": "Soit $A \\subset E$. Le **complémentaire** de $A$ dans $E$ est l'ensemble $E \\setminus A$.\n\n**Notations** : $\\overline{A}$ ou $A^c$ (lorsque $E$ est fixé)\n\n**Propriétés** :\n- $\\overline{\\overline{A}} = A$\n- $A \\cup \\overline{A} = E$\n- $A \\cap \\overline{A} = \\varnothing$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Énoncer les lois de De Morgan pour le complémentaire.",
+      "back_md": "Soit $A$ et $B$ deux parties de $E$ :\n\n$$\\overline{A \\cap B} = \\overline{A} \\cup \\overline{B}$$\n\n$$\\overline{A \\cup B} = \\overline{A} \\cap \\overline{B}$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir le produit cartésien $A \\times B$.",
+      "back_md": "Le **produit cartésien** de $A$ par $B$, noté $A \\times B$, est l'ensemble des couples $(a, b)$ avec $a \\in A$ et $b \\in B$.\n\n$$A \\times B = \\{(a, b) \\mid a \\in A \\text{ et } b \\in B\\}$$\n\n**Notation** : $A \\times A$ se note $A^2$",
+      "hint_md": "Propriété fondamentale du couple : $(a, b) = (a', b') \\Leftrightarrow (a = a' \\text{ et } b = b')$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Attention : $(x, y) \\neq (0, 0)$ équivaut-il à $(x \\neq 0) \\text{ et } (y \\neq 0)$ ?",
+      "back_md": "**Non !**\n\nSi $(x, y) = (1, 0)$, alors $(x, y) \\neq (0, 0)$ est **vraie**, mais $(x \\neq 0) \\text{ et } (y \\neq 0)$ est **fausse**.\n\nOn a seulement l'implication :\n$$\\left((x \\neq 0) \\text{ et } (y \\neq 0)\\right) \\Rightarrow (x, y) \\neq (0, 0)$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce que $\\mathcal{P}(E)$, l'ensemble des parties de $E$ ?",
+      "back_md": "$\\mathcal{P}(E)$ est l'ensemble dont les éléments sont les **parties** de $E$.\n\n**Traduction** : $F \\in \\mathcal{P}(E) \\Leftrightarrow F \\subset E$\n\nExemple : Si $E = \\{1, 2\\}$, alors\n$$\\mathcal{P}(E) = \\{\\varnothing, \\{1\\}, \\{2\\}, \\{1, 2\\}\\}$$",
+      "hint_md": "Attention au double niveau d'accolades : $\\{1\\} \\subset E$ mais $1 \\notin \\mathcal{P}(E)$ !",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir : recouvrement, recouvrement disjoint, partition.",
+      "back_md": "Soit $(A_i)_{i \\in I}$ une famille de parties de $E$ :\n\n**Recouvrement** : $\\bigcup_{i \\in I} A_i = E$\n\n**Recouvrement disjoint** : recouvrement avec $\\forall (i, j) \\in I^2, i \\neq j \\Rightarrow A_i \\cap A_j = \\varnothing$\n\n**Partition** : recouvrement disjoint constitué d'ensembles **non vides**",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une application de $E$ dans $F$ ?",
+      "back_md": "Une **application** $f$ de $E$ dans $F$ associe à tout élément de $E$ un **unique** élément de $F$.\n\n- $E$ : ensemble de **départ**\n- $F$ : ensemble d'**arrivée**\n- Pour $x \\in E$, $f(x) \\in F$ est l'**image** de $x$\n- $x$ est un **antécédent** de $f(x)$\n\n**Notation** : $f : E \\to F$ ou $x \\mapsto f(x)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce que le graphe d'une application $f : E \\to F$ ?",
+      "back_md": "Le **graphe** de $f$ est l'ensemble :\n$$\\Gamma = \\{(x, f(x)) \\mid x \\in E\\} \\subset E \\times F$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Comment démontrer l'égalité de deux applications $f : E \\to F$ et $g : E' \\to F'$ ?",
+      "back_md": "**Point méthode** : Il faut montrer :\n\n1. $E = E'$ (égalité des ensembles de départ)\n2. $F = F'$ (égalité des ensembles d'arrivée)\n3. $\\forall x \\in E, f(x) = g(x)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une famille d'éléments de $E$ indexée par $I$ ?",
+      "back_md": "Une **famille** d'éléments de $E$ indexée par $I$ est une application de $I$ dans $E$.\n\nOn utilise la **notation indexée** $(x_i)_{i \\in I}$ au lieu de la notation fonctionnelle $i \\mapsto x(i)$.\n\n**Cas particuliers** :\n- Si $I = \\mathbb{N}$ : **suite** d'éléments de $E$\n- Si $I$ fini de cardinal $p$ : **$p$-liste** ou **$p$-uplet**",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir la fonction indicatrice $\\mathbb{1}_A$ d'une partie $A \\subset E$.",
+      "back_md": "La **fonction indicatrice** de $A$ est $\\mathbb{1}_A : E \\to \\{0, 1\\}$ définie par :\n\n$$\\mathbb{1}_A(x) = \\begin{cases} 1 & \\text{si } x \\in A \\\\ 0 & \\text{si } x \\notin A \\end{cases}$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Donner les formules pour $\\mathbb{1}_{A \\cap B}$, $\\mathbb{1}_{A \\cup B}$ et $\\mathbb{1}_{\\overline{A}}$.",
+      "back_md": "Si $A$ et $B$ sont deux parties de $E$ :\n\n- $\\mathbb{1}_{A \\cap B} = \\mathbb{1}_A \\times \\mathbb{1}_B$\n\n- $\\mathbb{1}_{A \\cup B} = \\mathbb{1}_A + \\mathbb{1}_B - \\mathbb{1}_A \\times \\mathbb{1}_B$\n\n- $\\mathbb{1}_{\\overline{A}} = 1 - \\mathbb{1}_A$",
+      "hint_md": "Pour montrer $A = B$, on peut montrer $\\mathbb{1}_A = \\mathbb{1}_B$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir la restriction $f|_A$ et le prolongement d'une application.",
+      "back_md": "Soit $f : E \\to F$ et $A \\subset E$ :\n\n**Restriction** : $f|_A : A \\to F$ définie par $\\forall x \\in A, f|_A(x) = f(x)$\n\n**Prolongement** de $f$ : toute application $g : E' \\to F$ avec $E \\subset E'$ et $\\forall x \\in E, g(x) = f(x)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir l'image directe $f(A)$ d'une partie $A \\subset E$ par $f$.",
+      "back_md": "Soit $f : E \\to F$ et $A \\subset E$ :\n\nL'**image directe** de $A$ par $f$ est :\n$$f(A) = \\{f(x) \\mid x \\in A\\} \\subset F$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que $f(A \\cup B) = f(A) \\cup f(B)$ mais que $f(A \\cap B) \\subset f(A) \\cap f(B)$ (inclusion éventuellement stricte).",
+      "back_md": "**Égalité** : $f(A \\cup B) = f(A) \\cup f(B)$ (toujours vraie)\n\n**Inclusion** : $f(A \\cap B) \\subset f(A) \\cap f(B)$ (peut être stricte)\n\nContre-exemple : $f : \\mathbb{R} \\to \\mathbb{R}, x \\mapsto x^2$\n- $A = \\mathbb{R}_+^*$, $B = \\mathbb{R}_-^*$\n- $f(A \\cap B) = \\varnothing$ mais $f(A) \\cap f(B) = \\mathbb{R}_+^*$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir l'image réciproque $f^{-1}(B)$ d'une partie $B \\subset F$ par $f$.",
+      "back_md": "Soit $f : E \\to F$ et $B \\subset F$ :\n\nL'**image réciproque** de $B$ par $f$ est :\n$$f^{-1}(B) = \\{x \\in E : f(x) \\in B\\} \\subset E$$\n\nC'est l'ensemble des **antécédents** des éléments de $B$.",
+      "hint_md": "Notation $f^{-1}(B)$ utilisable même si $f$ n'est pas bijective !",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que $f^{-1}(A \\cup B) = f^{-1}(A) \\cup f^{-1}(B)$ et $f^{-1}(A \\cap B) = f^{-1}(A) \\cap f^{-1}(B)$.",
+      "back_md": "Soit $f : E \\to F$ et $A, B \\subset F$. Pour tout $x \\in E$ :\n\n$$x \\in f^{-1}(A \\cup B) \\Leftrightarrow f(x) \\in A \\cup B \\Leftrightarrow f(x) \\in A \\text{ ou } f(x) \\in B$$\n$$\\Leftrightarrow x \\in f^{-1}(A) \\text{ ou } x \\in f^{-1}(B) \\Leftrightarrow x \\in f^{-1}(A) \\cup f^{-1}(B)$$\n\nDémonstration similaire pour l'intersection.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que $f^{-1}(\\overline{A}) = \\overline{f^{-1}(A)}$ (complémentaires).",
+      "back_md": "Soit $f : E \\to F$ et $A \\subset F$. Pour tout $x \\in E$ :\n\n$$x \\in f^{-1}(\\overline{A}) \\Leftrightarrow f(x) \\in \\overline{A} \\Leftrightarrow f(x) \\notin A$$\n$$\\Leftrightarrow x \\notin f^{-1}(A) \\Leftrightarrow x \\in \\overline{f^{-1}(A)}$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir la composée $g \\circ f$ de deux applications.",
+      "back_md": "Soit $f : E \\to F$ et $g : F \\to G$ :\n\nLa **composée** $g \\circ f : E \\to G$ est définie par :\n$$\\forall x \\in E, (g \\circ f)(x) = g(f(x))$$",
+      "hint_md": "Attention : en général $g \\circ f \\neq f \\circ g$ !",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que la composition d'applications est associative.",
+      "back_md": "Soit $f : E \\to F$, $g : F \\to G$ et $h : G \\to H$ :\n\n$$h \\circ (g \\circ f) = (h \\circ g) \\circ f$$\n\n**Preuve** : Pour tout $x \\in E$ :\n$$[h \\circ (g \\circ f)](x) = h[(g \\circ f)(x)] = h[g(f(x))]$$\n$$[(h \\circ g) \\circ f](x) = (h \\circ g)[f(x)] = h[g(f(x))]$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir : application injective.",
+      "back_md": "Une application $f : E \\to F$ est **injective** si tout élément de $F$ possède **au plus un** antécédent par $f$.\n\n**Traduction** : $$\\forall (x_1, x_2) \\in E^2, f(x_1) = f(x_2) \\Rightarrow x_1 = x_2$$\n\nOu par contraposée : $x_1 \\neq x_2 \\Rightarrow f(x_1) \\neq f(x_2)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir : application surjective.",
+      "back_md": "Une application $f : E \\to F$ est **surjective** si tout élément de $F$ possède **au moins un** antécédent par $f$.\n\n**Traduction** : $$\\forall y \\in F, \\exists x \\in E, y = f(x)$$\n\nAutrement dit : l'image de $f$ est égale à $F$.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir : application bijective.",
+      "back_md": "Une application $f : E \\to F$ est **bijective** si elle est **injective et surjective**.\n\n**Traduction** : tout élément de $F$ a **un et un seul** antécédent par $f$ :\n$$\\forall y \\in F, \\exists! x \\in E, y = f(x)$$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que si $f$ et $g$ sont injectives, alors $g \\circ f$ est injective.",
+      "back_md": "Soit $x, x' \\in E$ tels que $(g \\circ f)(x) = (g \\circ f)(x')$.\n\nAlors $g(f(x)) = g(f(x'))$.\n\nComme $g$ injective : $f(x) = f(x')$.\n\nComme $f$ injective : $x = x'$.\n\nDonc $g \\circ f$ est injective.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que si $f$ et $g$ sont surjectives, alors $g \\circ f$ est surjective.",
+      "back_md": "Soit $z \\in G$.\n\nComme $g$ surjective : $\\exists y \\in F, z = g(y)$.\n\nComme $f$ surjective : $\\exists x \\in E, y = f(x)$.\n\nAlors $z = g(f(x)) = (g \\circ f)(x)$.\n\nDonc $g \\circ f$ est surjective.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir l'application réciproque $f^{-1}$ d'une bijection $f$.",
+      "back_md": "Soit $f : E \\to F$ bijective.\n\nL'**application réciproque** $f^{-1} : F \\to E$ est définie par :\n\nPour tout $y \\in F$, $f^{-1}(y)$ est l'**unique** $x \\in E$ tel que $y = f(x)$.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Si $f : E \\to F$ est bijective, que valent $f^{-1} \\circ f$ et $f \\circ f^{-1}$ ?",
+      "back_md": "$$f^{-1} \\circ f = \\text{Id}_E$$\n$$f \\circ f^{-1} = \\text{Id}_F$$",
+      "hint_md": "Attention : si $E \\neq F$, alors $f^{-1} \\circ f \\neq f \\circ f^{-1}$ !",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Comment montrer qu'une application $f$ est bijective et déterminer $f^{-1}$ ?",
+      "back_md": "**Point méthode** : Exhiber $g : F \\to E$ telle que :\n$$f \\circ g = \\text{Id}_F \\quad \\text{et} \\quad g \\circ f = \\text{Id}_E$$\n\nAlors $f$ est bijective et $f^{-1} = g$.\n\n**Astuce** : Souvent, la démonstration de la surjectivité mène à expliciter $x = g(y)$. Il reste alors à vérifier $g \\circ f = \\text{Id}_E$.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Si $f$ et $g$ sont bijectives, que vaut $(g \\circ f)^{-1}$ ?",
+      "back_md": "$$(g \\circ f)^{-1} = f^{-1} \\circ g^{-1}$$\n\n**Preuve** : On vérifie que :\n$$(f^{-1} \\circ g^{-1}) \\circ (g \\circ f) = \\text{Id}_E$$\n$$(g \\circ f) \\circ (f^{-1} \\circ g^{-1}) = \\text{Id}_G$$",
+      "hint_md": "Attention à l'ordre : l'inverse d'un produit est le produit des inverses dans l'ordre **inverse** !",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une application involutive ?",
+      "back_md": "Une application $f : E \\to E$ est **involutive** (ou une **involution**) si :\n$$f \\circ f = \\text{Id}_E$$\n\nUne involution est **bijective** et est sa propre réciproque : $f^{-1} = f$.\n\nExemples :\n- $\\mathbb{R}^* \\to \\mathbb{R}^*, x \\mapsto \\frac{1}{x}$\n- $\\mathcal{P}(E) \\to \\mathcal{P}(E), A \\mapsto \\overline{A}$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une permutation de $E$ ?",
+      "back_md": "Une **permutation** de $E$ est une application **bijective** de $E$ sur $E$.\n\nL'ensemble des permutations de $E$ est noté $\\mathcal{S}(E)$.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une relation binaire sur $E$ ?",
+      "back_md": "Une **relation binaire** $\\mathcal{R}$ sur $E$ est une partie de $E \\times E$.\n\nOn dit que $x$ et $y$ sont **en relation**, noté $x \\mathcal{R} y$, si $(x, y) \\in \\mathcal{R}$.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Définir : relation réflexive, symétrique, antisymétrique, transitive.",
+      "back_md": "Une relation $\\mathcal{R}$ sur $E$ est :\n\n**Réflexive** : $\\forall x \\in E, x \\mathcal{R} x$\n\n**Symétrique** : $\\forall (x, y) \\in E^2, x \\mathcal{R} y \\Rightarrow y \\mathcal{R} x$\n\n**Antisymétrique** : $\\forall (x, y) \\in E^2, (x \\mathcal{R} y \\text{ et } y \\mathcal{R} x) \\Rightarrow x = y$\n\n**Transitive** : $\\forall (x, y, z) \\in E^3, (x \\mathcal{R} y \\text{ et } y \\mathcal{R} z) \\Rightarrow x \\mathcal{R} z$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une relation d'équivalence ?",
+      "back_md": "Une **relation d'équivalence** sur $E$ est une relation qui est :\n\n1. **Réflexive**\n2. **Symétrique**\n3. **Transitive**",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Donner un exemple de relation d'équivalence : la congruence modulo $n$.",
+      "back_md": "Soit $n \\in \\mathbb{N}$. Sur $\\mathbb{Z}$, la relation :\n$$a \\equiv b \\pmod{n} \\Leftrightarrow \\exists k \\in \\mathbb{Z}, a - b = kn$$\n\nest une **relation d'équivalence** (congruence modulo $n$).",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce que la classe d'équivalence de $x$ pour une relation $\\mathcal{R}$ ?",
+      "back_md": "Soit $\\mathcal{R}$ une relation d'équivalence sur $E$.\n\nLa **classe d'équivalence** de $x \\in E$ est :\n$$\\text{cl}(x) = \\{y \\in E : x \\mathcal{R} y\\}$$\n\n**Notations** : $\\text{cl}(x)$, $\\overline{x}$ ou $\\dot{x}$\n\n$x$ est appelé un **représentant** de la classe.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que $x \\mathcal{R} y \\Leftrightarrow \\text{cl}(x) = \\text{cl}(y)$ pour une relation d'équivalence.",
+      "back_md": "$(\\Rightarrow)$ : Supposons $x \\mathcal{R} y$. Montrons $\\text{cl}(x) = \\text{cl}(y)$ par double inclusion.\n\nSoit $z \\in \\text{cl}(x)$, i.e. $x \\mathcal{R} z$. Par transitivité et symétrie : $y \\mathcal{R} z$, donc $z \\in \\text{cl}(y)$.\n\n$(\\Leftarrow)$ : Si $\\text{cl}(x) = \\text{cl}(y)$, alors comme $x \\in \\text{cl}(x)$ (réflexivité), on a $x \\in \\text{cl}(y)$, donc $x \\mathcal{R} y$.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Montrer que les classes d'équivalence forment une partition de $E$.",
+      "back_md": "Soit $\\mathcal{R}$ une relation d'équivalence sur $E$ :\n\n1. Chaque classe est **non vide** (car $x \\in \\text{cl}(x)$ par réflexivité)\n\n2. Deux classes distinctes sont **disjointes** : si $\\text{cl}(x) \\cap \\text{cl}(y) \\neq \\varnothing$, alors il existe $z$ tel que $x \\mathcal{R} z$ et $y \\mathcal{R} z$, donc par symétrie et transitivité $x \\mathcal{R} y$, d'où $\\text{cl}(x) = \\text{cl}(y)$\n\n3. La **réunion** des classes est $E$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une relation d'ordre ?",
+      "back_md": "Une **relation d'ordre** sur $E$ est une relation qui est :\n\n1. **Réflexive**\n2. **Antisymétrique**\n3. **Transitive**\n\nLe couple $(E, \\mathcal{R})$ est appelé **ensemble ordonné**.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Donner des exemples de relations d'ordre.",
+      "back_md": "**Ordres totaux** :\n- $\\leq$ sur $\\mathbb{N}$, $\\mathbb{Z}$, $\\mathbb{Q}$, $\\mathbb{R}$\n- L'ordre alphabétique\n\n**Ordres partiels** :\n- La divisibilité $|$ sur $\\mathbb{N}$ : $a | b \\Leftrightarrow \\exists k \\in \\mathbb{N}, b = ka$\n- L'inclusion $\\subset$ sur $\\mathcal{P}(E)$ (si $\\text{card } E \\geq 2$)\n- La relation $\\leq$ sur $\\mathbb{R}^{\\mathbb{R}}$ : $f \\leq g \\Leftrightarrow \\forall x, f(x) \\leq g(x)$",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'un ordre total ? Un ordre partiel ?",
+      "back_md": "Soit $(E, \\leq)$ un ensemble ordonné :\n\n**Ordre total** : deux éléments quelconques de $E$ sont **comparables** :\n$$\\forall (x, y) \\in E^2, (x \\leq y \\text{ ou } y \\leq x)$$\n\n**Ordre partiel** : il existe des éléments **non comparables**.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    },
+    {
+      "front_md": "Qu'est-ce que le plus grand élément d'une partie $A$ d'un ensemble ordonné ?",
+      "back_md": "Soit $(E, \\leq)$ ordonné et $A \\subset E$.\n\n$a \\in A$ est le **plus grand élément** de $A$ si :\n$$\\forall x \\in A, x \\leq a$$\n\nS'il existe, il est **unique** (par antisymétrie).\n\nDe même pour le **plus petit élément**.",
+      "tags": ["Maths/Algèbre/Ensembles, Applications, Relations"]
+    }
+  ]
+}

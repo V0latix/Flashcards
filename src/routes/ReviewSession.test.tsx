@@ -169,4 +169,27 @@ describe('ReviewSession', () => {
       expect(state?.box).toBe(1)
     })
   })
+
+  it('shows the current card tags during session', async () => {
+    await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01',
+      tags: ['Geographie/Europe', 'Capitales']
+    })
+
+    render(
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Carte 1/)
+    expect(screen.getByText(/Geographie\/Europe/)).toBeInTheDocument()
+    expect(screen.getByText(/Capitales/)).toBeInTheDocument()
+  })
 })
