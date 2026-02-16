@@ -28,6 +28,10 @@
     "seed:rugby-pack": "npm run supabase:build && node dist-supabase/seedWorldCupRugbyPack.js",
     "seed:france-football-champions-pack": "npm run supabase:build && node dist-supabase/seedFrenchChampionshipWinnersPack.js",
     "seed:top14-pack": "npm run supabase:build && node dist-supabase/seedTop14WinnersPack.js",
+    "seed:currencies-pack": "npm run supabase:build && node dist-supabase/seedWorldCurrenciesPack.js",
+    "seed:f1-pack": "npm run supabase:build && node dist-supabase/seedF1ChampionsPack.js",
+    "seed:ucl-pack": "npm run supabase:build && node dist-supabase/seedChampionsLeagueWinnersPack.js",
+    "seed:tour-pack": "npm run supabase:build && node dist-supabase/seedTourDeFranceWinnersPack.js",
     "pipeline:geo-pack": "npm run supabase:build && node dist-supabase/pipelineGeoPack.js"
   },
   "dependencies": {
