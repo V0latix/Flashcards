@@ -101,6 +101,16 @@ function ReviewSession() {
   }, [isTraining, tagFilter, today])
 
   const currentCard = cards[index]
+  const nextCard = cards[index + 1]
+
+  const preloadStyle: React.CSSProperties = {
+    position: 'absolute',
+    left: '-99999px',
+    top: 0,
+    width: 1,
+    height: 1,
+    overflow: 'hidden'
+  }
 
   const handleReveal = () => {
     setShowBack(true)
@@ -111,7 +121,11 @@ function ReviewSession() {
       return
     }
     if (!isTraining) {
-      await applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed)
+      void applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed).catch(
+        (error) => {
+          console.error('applyReviewResult failed', error)
+        }
+      )
     }
     setAnswers((prev) => ({
       ...prev,
@@ -253,14 +267,34 @@ function ReviewSession() {
           <div>
             <h2>{t('cardEditor.front')}</h2>
             <div className="markdown">
-              <MarkdownRenderer value={currentCard.front || t('status.none')} />
+              <MarkdownRenderer
+                value={currentCard.front || t('status.none')}
+                imageLoading="eager"
+                imageFetchPriority="high"
+              />
             </div>
           </div>
+          {/* Preload back (KaTeX + images) so reveal is instant. */}
+          {!showBack ? (
+            <div aria-hidden="true" style={preloadStyle}>
+              <div className="markdown">
+                <MarkdownRenderer
+                  value={currentCard.back || t('status.none')}
+                  imageLoading="eager"
+                  imageFetchPriority="high"
+                />
+              </div>
+            </div>
+          ) : null}
           {showBack ? (
             <div>
               <h2>{t('cardEditor.back')}</h2>
               <div className="markdown">
-                <MarkdownRenderer value={currentCard.back || t('status.none')} />
+                <MarkdownRenderer
+                  value={currentCard.back || t('status.none')}
+                  imageLoading="eager"
+                  imageFetchPriority="high"
+                />
               </div>
             </div>
           ) : (
@@ -268,6 +302,25 @@ function ReviewSession() {
               {t('review.revealBack')}
             </button>
           )}
+          {/* Preload next card (front + back) during current card. */}
+          {nextCard ? (
+            <div aria-hidden="true" style={preloadStyle}>
+              <div className="markdown">
+                <MarkdownRenderer
+                  value={nextCard.front || t('status.none')}
+                  imageLoading="eager"
+                  imageFetchPriority="high"
+                />
+              </div>
+              <div className="markdown">
+                <MarkdownRenderer
+                  value={nextCard.back || t('status.none')}
+                  imageLoading="eager"
+                  imageFetchPriority="high"
+                />
+              </div>
+            </div>
+          ) : null}
           {showBack ? (
             <div className="button-row">
               <button

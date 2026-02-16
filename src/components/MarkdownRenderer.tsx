@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
@@ -6,6 +6,8 @@ import { resolveImageSrc } from '../utils/media'
 
 type MarkdownRendererProps = {
   value: string
+  imageLoading?: 'lazy' | 'eager'
+  imageFetchPriority?: 'auto' | 'high' | 'low'
 }
 
 const normalizeMathDelimiters = (value: string) =>
@@ -34,12 +36,14 @@ const normalizeControlEscapes = (value: string) => {
   return out
 }
 
-const MarkdownImage = ({
-  src,
-  alt,
-  ...props
-}: React.ImgHTMLAttributes<HTMLImageElement>) => {
-  const [errored, setErrored] = useState(false)
+const MarkdownImage = (
+  props: React.ImgHTMLAttributes<HTMLImageElement> & {
+    imageLoading: 'lazy' | 'eager'
+    imageFetchPriority: 'auto' | 'high' | 'low'
+  }
+) => {
+  const { src, alt, imageLoading, imageFetchPriority, ...rest } = props
+  const [erroredSrc, setErroredSrc] = useState<string | null>(null)
   const originalSrc = src ?? ''
   const resolvedSrc = originalSrc ? resolveImageSrc(originalSrc) : ''
 
@@ -49,27 +53,49 @@ const MarkdownImage = ({
     }
   }, [originalSrc, resolvedSrc])
 
-  if (!resolvedSrc || errored) {
+  if (!resolvedSrc || erroredSrc === resolvedSrc) {
     return <span className="img-error">Image introuvable</span>
   }
 
   return (
     <img
-      {...props}
+      {...rest}
       alt={alt || 'Image'}
-      loading="lazy"
+      decoding="async"
+      loading={imageLoading}
       src={resolvedSrc}
+      // React types may lag this attribute; keep it runtime-safe.
+      {...({ fetchPriority: imageFetchPriority } as unknown as Record<string, string>)}
       onError={() => {
         console.error('[IMG ERROR]', { originalSrc, resolvedSrc })
-        setErrored(true)
+        setErroredSrc(resolvedSrc)
       }}
     />
   )
 }
 
-const MarkdownRenderer = ({ value }: MarkdownRendererProps) => {
-  const normalizedValue = normalizeMathDelimiters(
-    normalizeMathEscapes(normalizeControlEscapes(value))
+const MarkdownRenderer = ({
+  value,
+  imageLoading = 'lazy',
+  imageFetchPriority = 'auto'
+}: MarkdownRendererProps) => {
+  const normalizedValue = useMemo(
+    () =>
+      normalizeMathDelimiters(normalizeMathEscapes(normalizeControlEscapes(value))),
+    [value]
+  )
+
+  const components = useMemo(
+    () => ({
+      img: (imgProps: React.ImgHTMLAttributes<HTMLImageElement>) => (
+        <MarkdownImage
+          {...imgProps}
+          imageLoading={imageLoading}
+          imageFetchPriority={imageFetchPriority}
+        />
+      )
+    }),
+    [imageFetchPriority, imageLoading]
   )
 
   return (
@@ -77,13 +103,11 @@ const MarkdownRenderer = ({ value }: MarkdownRendererProps) => {
       urlTransform={(uri) => uri}
       remarkPlugins={[remarkMath]}
       rehypePlugins={[rehypeKatex]}
-      components={{
-        img: MarkdownImage
-      }}
+      components={components}
     >
       {normalizedValue}
     </ReactMarkdown>
   )
 }
 
-export default MarkdownRenderer
+export default memo(MarkdownRenderer)
