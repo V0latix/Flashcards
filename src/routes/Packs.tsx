@@ -11,6 +11,7 @@ function Packs() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -33,7 +34,7 @@ function Packs() {
     [packs]
   )
 
-  const filteredPacks = useMemo(() => {
+  const tagFilteredPacks = useMemo(() => {
     if (!selectedTag) {
       return packs
     }
@@ -48,6 +49,24 @@ function Packs() {
       })
     })
   }, [packs, selectedTag])
+
+  const filteredPacks = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) {
+      return tagFilteredPacks
+    }
+    return tagFilteredPacks.filter((pack) => {
+      const haystack = [
+        pack.title,
+        pack.slug,
+        pack.description ?? '',
+        ...(pack.tags ?? [])
+      ]
+        .join(' ')
+        .toLowerCase()
+      return haystack.includes(normalizedQuery)
+    })
+  }, [query, tagFilteredPacks])
 
   const renderTagNodes = (nodes: TagNode[], depth = 0) => {
     if (nodes.length === 0) {
@@ -121,6 +140,14 @@ function Packs() {
           </div>
           <div className="panel">
             <h2>{selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('packs.all')}</h2>
+            <label htmlFor="packs-search">{t('packs.search')}</label>
+            <input
+              id="packs-search"
+              type="text"
+              value={query}
+              className="input"
+              onChange={(event) => setQuery(event.target.value)}
+            />
             {filteredPacks.length === 0 ? (
               <p>{t('packs.none')}</p>
             ) : (
