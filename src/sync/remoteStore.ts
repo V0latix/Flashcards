@@ -7,32 +7,61 @@ import type {
   RemoteSnapshot
 } from './types'
 
+const PAGE_SIZE = 1000
+
+async function fetchAllByUser<T>(
+  table: 'user_cards' | 'user_progress' | 'user_review_log',
+  userId: string,
+  orderColumn: string
+): Promise<T[]> {
+  const rows: T[] = []
+  let from = 0
+
+  // Supabase/PostgREST often enforces a max rows cap per request (commonly 1000).
+  // We page through results to avoid truncated snapshots.
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { data, error } = await supabase
+      .from(table)
+      .select('*')
+      .eq('user_id', userId)
+      .order(orderColumn, { ascending: true })
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    const chunk = (data ?? []) as T[]
+    rows.push(...chunk)
+
+    if (chunk.length < PAGE_SIZE) {
+      break
+    }
+
+    from += PAGE_SIZE
+  }
+
+  return rows
+}
+
 export const fetchRemoteSnapshot = async (userId: string): Promise<RemoteSnapshot> => {
-  const [cardsRes, progressRes, settingsRes, logsRes] = await Promise.all([
-    supabase.from('user_cards').select('*').eq('user_id', userId),
-    supabase.from('user_progress').select('*').eq('user_id', userId),
+  const [cards, progress, settingsRes, reviewLogs] = await Promise.all([
+    fetchAllByUser<RemoteCard>('user_cards', userId, 'id'),
+    fetchAllByUser<RemoteProgress>('user_progress', userId, 'card_id'),
     supabase.from('user_settings').select('*').eq('user_id', userId).maybeSingle(),
-    supabase.from('user_review_log').select('*').eq('user_id', userId)
+    fetchAllByUser<RemoteReviewLog>('user_review_log', userId, 'id')
   ])
 
-  if (cardsRes.error) {
-    throw new Error(cardsRes.error.message)
-  }
-  if (progressRes.error) {
-    throw new Error(progressRes.error.message)
-  }
   if (settingsRes.error && settingsRes.error.code !== 'PGRST116') {
     throw new Error(settingsRes.error.message)
   }
-  if (logsRes.error) {
-    throw new Error(logsRes.error.message)
-  }
 
   return {
-    cards: (cardsRes.data ?? []) as RemoteCard[],
-    progress: (progressRes.data ?? []) as RemoteProgress[],
+    cards,
+    progress,
     settings: (settingsRes.data ?? null) as RemoteSettings | null,
-    reviewLogs: (logsRes.data ?? []) as RemoteReviewLog[]
+    reviewLogs
   }
 }
 

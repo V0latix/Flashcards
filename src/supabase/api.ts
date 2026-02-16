@@ -1,6 +1,8 @@
 import { supabase } from './client'
 import type { Pack, PublicCard } from './types'
 
+const PAGE_SIZE = 1000
+
 export async function listPacks(): Promise<Pack[]> {
   const { data, error } = await supabase
     .from('packs')
@@ -15,15 +17,32 @@ export async function listPacks(): Promise<Pack[]> {
 }
 
 export async function listPublicCardsByPackSlug(slug: string): Promise<PublicCard[]> {
-  const { data, error } = await supabase
-    .from('public_cards')
-    .select('id, pack_slug, front_md, back_md, tags')
-    .eq('pack_slug', slug)
-    .order('created_at', { ascending: true })
+  const rows: PublicCard[] = []
+  let from = 0
 
-  if (error) {
-    throw new Error(`Supabase listPublicCardsByPackSlug failed: ${error.message}`)
+  // Page through rows to avoid the default API cap (often 1000 rows/request).
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { data, error } = await supabase
+      .from('public_cards')
+      .select('id, pack_slug, front_md, back_md, tags')
+      .eq('pack_slug', slug)
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (error) {
+      throw new Error(`Supabase listPublicCardsByPackSlug failed: ${error.message}`)
+    }
+
+    const chunk = (data ?? []) as PublicCard[]
+    rows.push(...chunk)
+
+    if (chunk.length < PAGE_SIZE) {
+      break
+    }
+    from += PAGE_SIZE
   }
 
-  return (data ?? []) as PublicCard[]
+  return rows
 }
