@@ -8,6 +8,7 @@ import type {
 } from './types'
 
 const PAGE_SIZE = 1000
+const UPSERT_CHUNK_SIZE = 500
 
 async function fetchAllByUser<T>(
   table: 'user_cards' | 'user_progress' | 'user_review_log',
@@ -69,11 +70,15 @@ export const upsertRemoteCards = async (cards: RemoteCard[]) => {
   if (cards.length === 0) {
     return
   }
-  const { error } = await supabase.from('user_cards').upsert(cards, {
-    onConflict: 'id'
-  })
-  if (error) {
-    throw new Error(error.message)
+
+  for (let i = 0; i < cards.length; i += UPSERT_CHUNK_SIZE) {
+    const chunk = cards.slice(i, i + UPSERT_CHUNK_SIZE)
+    const { error } = await supabase.from('user_cards').upsert(chunk, {
+      onConflict: 'id'
+    })
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 }
 
@@ -81,11 +86,15 @@ export const upsertRemoteProgress = async (progress: RemoteProgress[]) => {
   if (progress.length === 0) {
     return
   }
-  const { error } = await supabase.from('user_progress').upsert(progress, {
-    onConflict: 'user_id,card_id'
-  })
-  if (error) {
-    throw new Error(error.message)
+
+  for (let i = 0; i < progress.length; i += UPSERT_CHUNK_SIZE) {
+    const chunk = progress.slice(i, i + UPSERT_CHUNK_SIZE)
+    const { error } = await supabase.from('user_progress').upsert(chunk, {
+      onConflict: 'user_id,card_id'
+    })
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 }
 
@@ -102,12 +111,16 @@ export const insertRemoteReviewLogs = async (logs: RemoteReviewLog[]) => {
   if (logs.length === 0) {
     return
   }
-  const { error } = await supabase.from('user_review_log').upsert(logs, {
-    onConflict: 'user_id,client_event_id',
-    ignoreDuplicates: true
-  })
-  if (error) {
-    throw new Error(error.message)
+
+  for (let i = 0; i < logs.length; i += UPSERT_CHUNK_SIZE) {
+    const chunk = logs.slice(i, i + UPSERT_CHUNK_SIZE)
+    const { error } = await supabase.from('user_review_log').upsert(chunk, {
+      onConflict: 'user_id,client_event_id',
+      ignoreDuplicates: true
+    })
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 }
 
@@ -115,13 +128,17 @@ export const deleteRemoteCards = async (userId: string, cloudIds: string[]) => {
   if (cloudIds.length === 0) {
     return
   }
-  const { error } = await supabase
-    .from('user_cards')
-    .delete()
-    .eq('user_id', userId)
-    .in('id', cloudIds)
-  if (error) {
-    throw new Error(error.message)
+
+  for (let i = 0; i < cloudIds.length; i += UPSERT_CHUNK_SIZE) {
+    const chunk = cloudIds.slice(i, i + UPSERT_CHUNK_SIZE)
+    const { error } = await supabase
+      .from('user_cards')
+      .delete()
+      .eq('user_id', userId)
+      .in('id', chunk)
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 }
 

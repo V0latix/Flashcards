@@ -276,9 +276,11 @@ const mergeSnapshots = async (
     }
     const updatedAtMs = parseTime(card.updated_at)
     if (card.synced_at && lastSyncAt && updatedAtMs <= lastSyncMs) {
-      if (card.id) {
-        localDeleteIds.push(card.id)
-      }
+      // Defensive behavior:
+      // do not hard-delete local cards based only on "missing from remote" because
+      // a truncated remote snapshot (API row cap/network issues) can look like deletions.
+      // We re-upsert instead to avoid data loss on refresh.
+      cardsToUpsert.push(mapLocalCardToRemote(userId, card))
       return
     }
     cardsToUpsert.push(mapLocalCardToRemote(userId, card))
