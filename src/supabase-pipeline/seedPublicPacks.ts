@@ -1,10 +1,11 @@
 import { readFile, readdir } from 'node:fs/promises'
 import { join, basename } from 'node:path'
 import './env.js'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { v5 as uuidv5 } from 'uuid'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
+import { assertDestructiveOperationAllowed } from './destructive.js'
 
 type PackFile = {
   version: number
@@ -61,13 +62,12 @@ async function listPackFiles(): Promise<string[]> {
   return files.map((f) => join(dir, f))
 }
 
-async function deleteCardsNotInSet(supabase: any, packSlug: string, keepIds: Set<string>) {
+async function deleteCardsNotInSet(supabase: SupabaseClient, packSlug: string, keepIds: Set<string>) {
   // Paginate through existing IDs for the pack and delete those not in keepIds.
   const pageSize = 1000
   let offset = 0
   const toDelete: string[] = []
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { data, error } = await supabase
       .from('public_cards')
@@ -87,6 +87,8 @@ async function deleteCardsNotInSet(supabase: any, packSlug: string, keepIds: Set
   }
 
   if (toDelete.length === 0) return 0
+
+  assertDestructiveOperationAllowed('delete stale pack cards')
 
   const chunkSize = 200
   let deleted = 0
@@ -189,4 +191,3 @@ if (isMainModule(import.meta.url)) {
   const res = await seedPublicPacks()
   console.log(`packs_upserted=${res.packs_upserted} cards_upserted=${res.cards_upserted} cards_deleted=${res.cards_deleted}`)
 }
-

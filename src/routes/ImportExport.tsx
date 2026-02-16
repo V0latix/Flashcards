@@ -3,7 +3,7 @@ import db from '../db'
 import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 import { createUuid, getDeviceId } from '../sync/ids'
 import { markLocalChange } from '../sync/queue'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 function ImportExport() {
   const { t } = useI18n()

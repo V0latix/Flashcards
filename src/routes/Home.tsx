@@ -5,12 +5,50 @@ import { ChartIcon, HomeIcon, PlayIcon, PlusIcon, SettingsIcon } from '../compon
 import db from '../db'
 import type { ReviewState } from '../db/types'
 import { getLeitnerSettings } from '../leitner/settings'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 type HomeBoxSummary = {
   dueCounts: Record<number, number>
   nextDue: Record<number, string | null>
   tomorrowDueCount: number
+}
+
+const parseIsoDate = (value: string) => {
+  const [year, month, day] = value.split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day))
+}
+
+const toDateKey = (value: Date) => value.toISOString().slice(0, 10)
+
+const normalizeToDateKey = (value: string | null | undefined) => {
+  if (!value) {
+    return null
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return null
+  }
+  return toDateKey(parsed)
+}
+
+const addDays = (value: string, days: number) => {
+  const date = parseIsoDate(value)
+  date.setUTCDate(date.getUTCDate() + days)
+  return toDateKey(date)
+}
+
+const computeDueKey = (state: ReviewState, learnedIntervalDays: number) => {
+  if (state.is_learned && state.learned_at) {
+    const learnedKey = normalizeToDateKey(state.learned_at)
+    if (!learnedKey) {
+      return null
+    }
+    return addDays(learnedKey, learnedIntervalDays)
+  }
+  return normalizeToDateKey(state.due_date)
 }
 
 function Home() {
@@ -26,44 +64,6 @@ function Home() {
     nextDue: { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null },
     tomorrowDueCount: 0
   }))
-
-  const parseIsoDate = (value: string) => {
-    const [year, month, day] = value.split('-').map(Number)
-    return new Date(Date.UTC(year, month - 1, day))
-  }
-
-  const toDateKey = (value: Date) => value.toISOString().slice(0, 10)
-
-  const normalizeToDateKey = (value: string | null | undefined) => {
-    if (!value) {
-      return null
-    }
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return value
-    }
-    const parsed = new Date(value)
-    if (Number.isNaN(parsed.getTime())) {
-      return null
-    }
-    return toDateKey(parsed)
-  }
-
-  const addDays = (value: string, days: number) => {
-    const date = parseIsoDate(value)
-    date.setUTCDate(date.getUTCDate() + days)
-    return toDateKey(date)
-  }
-
-  const computeDueKey = (state: ReviewState, learnedIntervalDays: number) => {
-    if (state.is_learned && state.learned_at) {
-      const learnedKey = normalizeToDateKey(state.learned_at)
-      if (!learnedKey) {
-        return null
-      }
-      return addDays(learnedKey, learnedIntervalDays)
-    }
-    return normalizeToDateKey(state.due_date)
-  }
 
   const formatDate = (value: string | null) => {
     if (!value) {

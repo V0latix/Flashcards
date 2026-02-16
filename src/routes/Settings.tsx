@@ -5,7 +5,7 @@ import { deleteAllCards } from '../db/queries'
 import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
 import { markLocalChange } from '../sync/queue'
 import { getStoredTheme, setTheme, type ThemeMode } from '../theme'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 function Settings() {
   const { t, language, setLanguage } = useI18n()

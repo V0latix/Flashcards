@@ -20,7 +20,6 @@ async function fetchAllByUser<T>(
 
   // Supabase/PostgREST often enforces a max rows cap per request (commonly 1000).
   // We page through results to avoid truncated snapshots.
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { data, error } = await supabase
       .from(table)

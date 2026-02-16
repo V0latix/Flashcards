@@ -1,17 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../supabase/client'
-
-type AuthContextValue = {
-  user: User | null
-  session: Session | null
-  loading: boolean
-  signInWithProvider: (provider: 'github') => Promise<{ error: string | null }>
-  signInWithEmail: (email: string) => Promise<{ error: string | null }>
-  signOut: () => Promise<{ error: string | null }>
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+import { AuthContext } from './context'
 
 const getRedirectUrl = () => {
   const baseUrl = import.meta.env.BASE_URL
@@ -91,12 +81,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
 }

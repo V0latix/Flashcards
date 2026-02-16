@@ -21,7 +21,6 @@ export async function listPublicCardsByPackSlug(slug: string): Promise<PublicCar
   let from = 0
 
   // Page through rows to avoid the default API cap (often 1000 rows/request).
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { data, error } = await supabase
       .from('public_cards')

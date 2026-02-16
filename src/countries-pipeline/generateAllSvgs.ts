@@ -82,7 +82,6 @@ export async function generateAllSvgs(): Promise<{ generated: number; skipped: n
 function buildPreviewHtml(iso2List: string[]): string {
   const items = iso2List
     .map((iso2) => {
-      const src = `svg/${iso2}.svg`
       const srcBlue = `svg-blue/${iso2}.svg`
       return `<a class="card" href="${srcBlue}" target="_blank" rel="noreferrer"><img loading="lazy" src="${srcBlue}" alt="${iso2}"/><div class="label">${iso2}</div></a>`
     })

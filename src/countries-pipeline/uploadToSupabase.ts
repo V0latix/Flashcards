@@ -2,13 +2,13 @@ import { readFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import './env.js'
 import pLimit from 'p-limit'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { OUT_SVG_BLUE_DIR, OUT_SVG_DIR } from './paths.js'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
+import { assertDestructiveOperationAllowed } from './destructive.js'
 
 const BUCKET = 'country-maps'
-const PREFIX = 'svg'
 // Storage uploads can sometimes take a while (TLS + network + Supabase edge).
 // Keep this high to avoid aborting valid uploads; retries handle true stalls.
 const FETCH_TIMEOUT_MS = 120_000
@@ -52,7 +52,7 @@ async function withRetry<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
   throw lastErr instanceof Error ? lastErr : new Error(String(lastErr))
 }
 
-async function cleanupBadFilenames(supabase: any, prefix: string) {
+async function cleanupBadFilenames(supabase: SupabaseClient, prefix: string) {
   // Bug compatibility: earlier versions uploaded `AE.SVG.svg` instead of `AE.svg`.
   const { data, error } = await supabase.storage.from(BUCKET).list(prefix, {
     limit: 1000,
@@ -68,11 +68,18 @@ async function cleanupBadFilenames(supabase: any, prefix: string) {
 
   if (bad.length === 0) return
 
+  assertDestructiveOperationAllowed('remove incorrectly named SVG files', `prefix=${prefix} count=${bad.length}`)
+
   const { error: rmErr } = await supabase.storage.from(BUCKET).remove(bad)
   if (rmErr) throw new Error(`cleanup remove failed: ${rmErr.message}`)
 }
 
-async function uploadDir(supabase: any, supabaseUrl: string, localDir: string, remotePrefix: string) {
+async function uploadDir(
+  supabase: SupabaseClient,
+  supabaseUrl: string,
+  localDir: string,
+  remotePrefix: string
+) {
   await cleanupBadFilenames(supabase, remotePrefix)
 
   const files = (await readdir(localDir)).filter((f) => f.endsWith('.svg'))

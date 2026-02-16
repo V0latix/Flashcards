@@ -1,28 +1,30 @@
 import { useEffect } from 'react'
-import { useAuth } from '../auth/AuthProvider'
+import { useAuth } from '../auth/useAuth'
 import { runInitialSync, setActiveUser, syncOnce } from './engine'
 import { upsertUserProfile } from './remoteStore'
 
 export const useSync = () => {
   const { user } = useAuth()
+  const userId = user?.id ?? null
+  const userEmail = user?.email ?? null
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setActiveUser(null)
       return
     }
-    setActiveUser(user.id)
-    void upsertUserProfile({ id: user.id, email: user.email ?? null }).catch((error) => {
+    setActiveUser(userId)
+    void upsertUserProfile({ id: userId, email: userEmail }).catch((error) => {
       console.warn('[sync] profile upsert failed', error)
     })
-    void runInitialSync(user.id)
+    void runInitialSync(userId)
 
     const interval = window.setInterval(() => {
-      void syncOnce(user.id)
+      void syncOnce(userId)
     }, 15000)
 
     const onFocus = () => {
-      void syncOnce(user.id, true)
+      void syncOnce(userId, true)
     }
 
     window.addEventListener('focus', onFocus)
@@ -32,5 +34,5 @@ export const useSync = () => {
       window.removeEventListener('focus', onFocus)
       setActiveUser(null)
     }
-  }, [user?.id])
+  }, [userEmail, userId])
 }

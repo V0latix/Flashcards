@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { listPacks } from '../supabase/api'
 import type { Pack } from '../supabase/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 function Packs() {
   const { t } = useI18n()

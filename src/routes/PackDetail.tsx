@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { listPublicCardsByPackSlug } from '../supabase/api'
 import { importPackToLocal } from '../supabase/import'
 import type { PublicCard } from '../supabase/types'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 function PackDetail() {
   const { t } = useI18n()

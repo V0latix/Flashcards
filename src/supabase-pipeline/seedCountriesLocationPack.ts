@@ -1,10 +1,11 @@
 import './env.js'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { v5 as uuidv5 } from 'uuid'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
+import { assertDestructiveOperationAllowed } from './destructive.js'
 
 const NAMESPACE = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
 const OUT_DIR = 'out'
@@ -50,7 +51,7 @@ function mapUrlBlue(supabaseUrl: string, iso2: string, version?: string | null):
   return version ? `${url}?v=${encodeURIComponent(version)}` : url
 }
 
-async function listAvailableIso2FromStorage(supabase: any): Promise<Set<string>> {
+async function listAvailableIso2FromStorage(supabase: SupabaseClient): Promise<Set<string>> {
   const { data, error } = await supabase.storage.from('country-maps').list('svg-blue', {
     limit: 1000,
     offset: 0,
@@ -67,12 +68,11 @@ async function listAvailableIso2FromStorage(supabase: any): Promise<Set<string>>
   return set
 }
 
-async function deleteCardsNotInSet(supabase: any, packSlug: string, keepIds: Set<string>) {
+async function deleteCardsNotInSet(supabase: SupabaseClient, packSlug: string, keepIds: Set<string>) {
   const pageSize = 1000
   let offset = 0
   const toDelete: string[] = []
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { data, error } = await supabase
       .from('public_cards')
@@ -92,6 +92,8 @@ async function deleteCardsNotInSet(supabase: any, packSlug: string, keepIds: Set
   }
 
   if (toDelete.length === 0) return 0
+
+  assertDestructiveOperationAllowed('delete stale pack cards')
 
   const chunkSize = 200
   let deleted = 0

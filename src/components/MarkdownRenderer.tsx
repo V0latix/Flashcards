@@ -19,14 +19,20 @@ const normalizeMathEscapes = (value: string) =>
     // Some imports over-escape TeX commands like \\forall -> \forall.
     .replace(/\\\\(?=[A-Za-z{}[\]()])/g, '\\')
 
-const CONTROL_ESCAPE_MAP: Record<string, string> = {
-  '\u0008': '\\b', // \b -> backspace (e.g., \big)
-  '\u0009': '\\t', // \t -> tab (e.g., \text)
-  '\u000c': '\\f' // \f -> form feed (e.g., \frac)
-}
+const CONTROL_ESCAPE_MAP = new Map<number, string>([
+  [8, '\\b'], // \b -> backspace (e.g., \big)
+  [9, '\\t'], // \t -> tab (e.g., \text)
+  [12, '\\f'] // \f -> form feed (e.g., \frac)
+])
 
-const normalizeControlEscapes = (value: string) =>
-  value.replace(/[\u0008\u0009\u000c]/g, (char) => CONTROL_ESCAPE_MAP[char] ?? char)
+const normalizeControlEscapes = (value: string) => {
+  let out = ''
+  for (const char of value) {
+    const replacement = CONTROL_ESCAPE_MAP.get(char.charCodeAt(0))
+    out += replacement ?? char
+  }
+  return out
+}
 
 const MarkdownImage = ({
   src,

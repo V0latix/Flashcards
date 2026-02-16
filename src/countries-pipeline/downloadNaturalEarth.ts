@@ -1,6 +1,5 @@
 import { createWriteStream } from 'node:fs'
 import { mkdir, stat } from 'node:fs/promises'
-import { join } from 'node:path'
 import { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import AdmZip from 'adm-zip'

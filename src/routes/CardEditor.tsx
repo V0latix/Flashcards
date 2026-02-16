@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createCard, getCardById, updateCard } from '../db/queries'
 import MarkdownRenderer from '../components/MarkdownRenderer'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 function CardEditor() {
   const { t } = useI18n()

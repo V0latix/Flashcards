@@ -9,10 +9,8 @@
     "skipLibCheck": true,
     "outDir": "./dist-supabase",
     "rootDir": "./src/supabase-pipeline",
-    "sourceMap": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/supabase-pipeline/**/*.ts"]
 }
-

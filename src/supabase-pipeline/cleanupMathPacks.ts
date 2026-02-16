@@ -2,6 +2,7 @@ import './env.js'
 import { createClient } from '@supabase/supabase-js'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
+import { assertDestructiveOperationAllowed } from './destructive.js'
 
 function requireEnv(name: string): string {
   const v = process.env[name]
@@ -25,6 +26,8 @@ export async function cleanupMathPacks(): Promise<{ cards_deleted: number; packs
   const supabase = createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   })
+
+  assertDestructiveOperationAllowed('delete math packs and cards', `pack_slugs=${MATH_PACK_SLUGS.join(',')}`)
 
   // Delete cards for those packs.
   const { error: delCardsErr, count: cardsDeleted } = await supabase
@@ -53,4 +56,3 @@ if (isMainModule(import.meta.url)) {
   const res = await cleanupMathPacks()
   console.log(`cards_deleted=${res.cards_deleted} packs_deleted=${res.packs_deleted}`)
 }
-

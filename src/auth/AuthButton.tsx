@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { UserIcon } from '../components/icons'
-import { useAuth } from './AuthProvider'
-import { useI18n } from '../i18n/I18nProvider'
+import { useAuth } from './useAuth'
+import { useI18n } from '../i18n/useI18n'
 
 type AuthButtonProps = {
   className?: string

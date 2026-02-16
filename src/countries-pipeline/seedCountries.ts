@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import './env.js'
 import { Client } from 'pg'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { OUT_DIR } from './paths.js'
 import type { RenderMeta } from './types.js'
 import { isMainModule } from './isMain.js'
@@ -116,7 +116,7 @@ async function fetchCountriesColumns(connectionString: string): Promise<Map<stri
   }
 }
 
-async function countriesTableReady(supabase: any): Promise<boolean> {
+async function countriesTableReady(supabase: SupabaseClient): Promise<boolean> {
   // Check for required columns in schema cache (iso2 + bbox are enough to detect outdated cache).
   const { error } = await supabase.from(TABLE).select('iso2,bbox').limit(1)
   if (!error) return true
@@ -132,7 +132,7 @@ async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms))
 }
 
-async function waitForSchemaCache(supabase: any, tries = 12): Promise<void> {
+async function waitForSchemaCache(supabase: SupabaseClient, tries = 12): Promise<void> {
   for (let i = 0; i < tries; i++) {
     const { error } = await supabase.from(TABLE).select('iso2,bbox').limit(1)
     if (!error) return

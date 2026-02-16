@@ -6,7 +6,7 @@ import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { saveTrainingQueue } from '../utils/training'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 import db from '../db'
 
 type ExportMedia = {

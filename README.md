@@ -50,6 +50,19 @@ Le client frontend est dans `src/utils/supabase.ts` (anon key uniquement).
 - `npm test` : tests unitaires
 - `npm run mobile` : demarrer l'app mobile Expo
 
+## Operations destructives (pipelines)
+Les scripts qui suppriment des lignes Supabase/Storage sont bloques par defaut.
+
+- Pour autoriser une suppression dans `src/supabase-pipeline/*`: `ALLOW_DESTRUCTIVE_SUPABASE=1`
+- Pour autoriser une suppression dans `src/countries-pipeline/*`: `ALLOW_DESTRUCTIVE_COUNTRIES=1`
+
+Exemples d'operations concernees:
+- `npm run cleanup:math-packs`
+- `npm run cleanup:math-seed`
+- `npm run seed:packs` (suppression des cartes obsoletes d'un pack)
+- `npm run seed:countries-pack` (suppression des cartes obsoletes du pack geo)
+- `npm run upload:country-svgs` (suppression des anciens noms de fichiers SVG invalides)
+
 ## Deployment
 ### Web (GitHub Pages)
 - Build + deploy via GitHub Actions: `.github/workflows/deploy-web.yml`

@@ -7,7 +7,7 @@ import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteCard } from '../db/queries'
 import { consumeTrainingQueue } from '../utils/training'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 function ReviewSession() {
   const { t } = useI18n()

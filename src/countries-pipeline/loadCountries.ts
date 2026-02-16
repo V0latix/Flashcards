@@ -4,6 +4,12 @@ import { geoCentroid } from 'd3-geo'
 import { computeBboxRaw, computeBboxUnwrapped } from './geo.js'
 import type { CountryFeature } from './types.js'
 
+const NUL_CHAR = String.fromCharCode(0)
+
+function stripNulBytes(value: string): string {
+  return value.split(NUL_CHAR).join('')
+}
+
 function fixMojibake(s: string): string {
   // Fix common UTF-8-as-cp1252 mojibake: "BÃ©nin" -> "Bénin", "Ã‰mirats" -> "Émirats"
   // Heuristic: only attempt if we see telltale sequences.
@@ -68,7 +74,7 @@ function getString(props: Record<string, unknown>, ...keys: string[]): string | 
     const v = props[k]
     if (typeof v === 'string') {
       // Natural Earth DBF strings can contain trailing NUL bytes.
-      const s = fixMojibake(v.replace(/\u0000/g, '').trim())
+      const s = fixMojibake(stripNulBytes(v).trim())
       if (s) return s
     }
   }
@@ -77,7 +83,7 @@ function getString(props: Record<string, unknown>, ...keys: string[]): string | 
 
 function normalizeIso2(value: string | null): string | null {
   if (!value) return null
-  const v = value.replace(/\u0000/g, '').trim().toUpperCase()
+  const v = stripNulBytes(value).trim().toUpperCase()
   if (v === '-99') return null
   // Some DBF values can carry stray non-letters; keep only A-Z.
   const letters = v.replace(/[^A-Z]/g, '')
@@ -87,7 +93,7 @@ function normalizeIso2(value: string | null): string | null {
 
 function normalizeIso3(value: string | null): string | null {
   if (!value) return null
-  const v = value.replace(/\u0000/g, '').trim().toUpperCase()
+  const v = stripNulBytes(value).trim().toUpperCase()
   if (v === '-99') return null
   const letters = v.replace(/[^A-Z]/g, '')
   if (letters.length !== 3) return null

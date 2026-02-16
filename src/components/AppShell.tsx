@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AuthButton from '../auth/AuthButton'
 import { ChartIcon, HomeIcon, LibraryIcon, PlayIcon, PlusIcon, SettingsIcon } from './icons'
-import { useI18n } from '../i18n/I18nProvider'
+import { useI18n } from '../i18n/useI18n'
 
 type AppShellProps = {
   children: React.ReactNode

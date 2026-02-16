@@ -1,10 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import './env.js'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { v5 as uuidv5 } from 'uuid'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
+import { assertDestructiveOperationAllowed } from './destructive.js'
 
 type PackFile = {
   version: number
@@ -51,7 +52,11 @@ const MATH_PACK_FILES = [
   join(process.cwd(), 'packs', 'Chap2_EnsembleApplicationRelation.json')
 ]
 
-async function deleteByIds(supabase: any, ids: string[]): Promise<number> {
+async function deleteByIds(supabase: SupabaseClient, ids: string[]): Promise<number> {
+  if (ids.length === 0) return 0
+
+  assertDestructiveOperationAllowed('delete seeded math cards by id', `ids=${ids.length}`)
+
   const chunkSize = 200
   let deleted = 0
   for (let i = 0; i < ids.length; i += chunkSize) {
@@ -96,4 +101,3 @@ if (isMainModule(import.meta.url)) {
   const res = await cleanupMathSeed()
   console.log(`ids_targeted=${res.ids_targeted} cards_deleted=${res.cards_deleted}`)
 }
-

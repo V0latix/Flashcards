@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { v5 as uuidv5 } from 'uuid'
 import { isMainModule } from './isMain.js'
 import { assertServiceRoleKeyMatchesUrl } from './supabaseAuth.js'
+import { assertDestructiveOperationAllowed } from './destructive.js'
 
 const NAMESPACE = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
 
@@ -166,7 +167,6 @@ export async function seedF1ChampionsPack(): Promise<{
   const pageSize = 1000
   let offset = 0
   const toDelete: string[] = []
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { data, error } = await supabase
       .from('public_cards')
@@ -183,6 +183,8 @@ export async function seedF1ChampionsPack(): Promise<{
 
   let deleted = 0
   if (toDelete.length > 0) {
+    assertDestructiveOperationAllowed('delete stale pack cards')
+
     const delChunkSize = 200
     for (let i = 0; i < toDelete.length; i += delChunkSize) {
       const chunk = toDelete.slice(i, i + delChunkSize)
