@@ -10,14 +10,21 @@ import { useI18n } from '../i18n/I18nProvider'
 type HomeBoxSummary = {
   dueCounts: Record<number, number>
   nextDue: Record<number, string | null>
+  tomorrowDueCount: number
 }
 
 function Home() {
   const todayKey = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const tomorrowKey = useMemo(() => {
+    const today = new Date(`${todayKey}T00:00:00.000Z`)
+    today.setUTCDate(today.getUTCDate() + 1)
+    return today.toISOString().slice(0, 10)
+  }, [todayKey])
   const { t, language } = useI18n()
   const [boxSummary, setBoxSummary] = useState<HomeBoxSummary>(() => ({
     dueCounts: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-    nextDue: { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null }
+    nextDue: { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null },
+    tomorrowDueCount: 0
   }))
 
   const parseIsoDate = (value: string) => {
@@ -90,6 +97,7 @@ function Home() {
         4: null,
         5: null
       }
+      let tomorrowDueCount = 0
 
       states.forEach((state) => {
         const dueKey = computeDueKey(state, learnedReviewIntervalDays)
@@ -101,13 +109,16 @@ function Home() {
           dueCounts[box] = (dueCounts[box] ?? 0) + 1
           return
         }
+        if (dueKey === tomorrowKey && box >= 1 && box <= 5) {
+          tomorrowDueCount += 1
+        }
         const currentNext = nextDue[box]
         if (!currentNext || dueKey < currentNext) {
           nextDue[box] = dueKey
         }
       })
 
-      setBoxSummary({ dueCounts, nextDue })
+      setBoxSummary({ dueCounts, nextDue, tomorrowDueCount })
     }
 
     void loadSummary()
@@ -129,7 +140,7 @@ function Home() {
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibility)
     }
-  }, [todayKey])
+  }, [todayKey, tomorrowKey])
 
   return (
     <main className="home-hero">
@@ -157,6 +168,10 @@ function Home() {
               </p>
             </div>
           ))}
+          <div className="home-summary-item home-summary-item-tomorrow">
+            <div className="chip">{t('labels.tomorrow')}</div>
+            <p className="home-summary-count">{boxSummary.tomorrowDueCount}</p>
+          </div>
         </div>
       </section>
       <div className="home-grid" role="navigation" aria-label={t('nav.home')}>

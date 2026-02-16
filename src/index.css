@@ -679,30 +679,42 @@ ul {
   width: min(100%, 880px);
 }
 
+.home-summary.card {
+  padding: 16px;
+}
+
+.home-summary .panel-header {
+  gap: 10px;
+}
+
 .home-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin-top: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
 }
 
 .home-summary-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .home-summary-count {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
 }
 
 .home-summary-next {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--muted);
+}
+
+.home-summary-item-tomorrow .home-summary-count {
+  font-size: 1.15rem;
 }
 
 .home-tile {

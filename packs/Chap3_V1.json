@@ -1,0 +1,562 @@
+{
+  "version": 1,
+  "exported_at": "2026-02-16T10:30:00Z",
+  "cards": [
+    {
+      "front_md": "Qu'appelle-t-on **majorer** un réel $x$ par $a$ ?",
+      "back_md": "Majorer $x$ par $a$ signifie montrer que $x \\leq a$.\n\nDe même, minorer $x$ par $a$ signifie montrer que $x \\geq a$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Énoncer la règle d'addition terme à terme des inégalités.",
+      "back_md": "**Proposition** : On peut ajouter terme à terme des inégalités de même sens.\n\nAutrement dit, si $x, y, z, t$ sont quatre réels :\n$$(x \\leq y \\text{ et } z \\leq t) \\Rightarrow x + z \\leq y + t$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Pour majorer une somme, quelle méthode utilise-t-on souvent ?",
+      "back_md": "Pour majorer une somme, il est souvent utile de **majorer séparément chaque terme**.\n\nDe même pour minorer une somme : minorer séparément chaque terme.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Peut-on multiplier terme à terme des inégalités entre nombres positifs ?",
+      "back_md": "**Oui**. On peut multiplier terme à terme des inégalités de même sens entre des nombres **positifs**.\n\nSi $0 \\leq x \\leq y$ et $0 \\leq z \\leq t$, alors $xz \\leq yt$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Que se passe-t-il quand on multiplie une inégalité par un nombre négatif ?",
+      "back_md": "Multiplier une inégalité par un nombre négatif **change son sens**.\n\nSi $x \\leq y$ et $a \\leq 0$, alors $ax \\geq ay$.",
+      "hint_md": "Conséquence de la règle des signes.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment majorer un produit de termes positifs ?",
+      "back_md": "Pour majorer un produit de termes **positifs**, on majore séparément chaque terme.\n\nSi $0 \\leq x \\leq a$ et $0 \\leq y \\leq b$, alors $xy \\leq ab$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner l'inégalité pour l'inverse de réels strictement positifs.",
+      "back_md": "Si $x$ et $y$ sont des réels tels que $0 < x \\leq y$, alors :\n$$0 < \\frac{1}{y} \\leq \\frac{1}{x}$$",
+      "hint_md": "L'ordre est inversé.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Pour majorer un quotient de termes positifs, quelle méthode utilise-t-on ?",
+      "back_md": "Pour majorer un quotient $\\frac{N}{D}$ de termes positifs :\n\n- **Majorer le numérateur** $N$\n- **Minorer le dénominateur** $D$ par un réel strictement positif",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment établir une inégalité par étude du signe d'une expression ?",
+      "back_md": "Pour établir une inégalité, on peut :\n\n1. Se ramener à l'étude du signe d'une expression\n2. Chercher à **factoriser** cette expression\n3. Construire un **tableau de signes**",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $a_1 \\leq a_2 \\leq \\cdots \\leq a_n$ et $a_1 = a_n$, que peut-on conclure ?",
+      "back_md": "Si $a_1 \\leq a_2 \\leq \\cdots \\leq a_n$ et $a_1 = a_n$, alors :\n$$a_1 = a_2 = \\cdots = a_n$$\n\nSi l'une au moins des inégalités est stricte, alors $a_1 < a_n$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si une somme de termes positifs est nulle, que peut-on dire ?",
+      "back_md": "Si une somme de termes positifs est nulle, alors **tous les termes sont nuls**.\n\nAutrement dit : si $a_1 + \\cdots + a_n = 0$ avec $a_i \\geq 0$ pour tout $i$, alors $a_1 = \\cdots = a_n = 0$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir la **valeur absolue** d'un réel $x$.",
+      "back_md": "La **valeur absolue** de $x \\in \\mathbb{R}$ est :\n$$|x| = \\begin{cases} x & \\text{si } x \\geq 0 \\\\ -x & \\text{si } x \\leq 0 \\end{cases}$$",
+      "hint_md": "On a toujours $|x| \\geq 0$ et $|x| = 0 \\Leftrightarrow x = 0$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Pour tout $x \\in \\mathbb{R}$, donner l'encadrement de $x$ en fonction de $|x|$.",
+      "back_md": "Pour tout $x \\in \\mathbb{R}$ :\n$$-|x| \\leq x \\leq |x|$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exprimer $|x|$ en fonction de $\\sqrt{x^2}$.",
+      "back_md": "Pour tout $x \\in \\mathbb{R}$ :\n$$|x| = \\sqrt{x^2}$$",
+      "hint_md": "$\\sqrt{x^2}$ est l'unique réel positif dont le carré est $x^2$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Que représente $|y - x|$ géométriquement ?",
+      "back_md": "La **distance entre deux réels** $x$ et $y$ est la valeur absolue de leur différence :\n$$d(x,y) = |y - x|$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner la propriété multiplicative de la valeur absolue.",
+      "back_md": "Pour tout $(x, y) \\in \\mathbb{R}^2$ :\n$$|xy| = |x| \\cdot |y|$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser $|x| \\leq h$ pour $h \\in \\mathbb{R}_+$.",
+      "back_md": "Soit $h \\in \\mathbb{R}_+$ et $x \\in \\mathbb{R}$ :\n$$|x| \\leq h \\Leftrightarrow -h \\leq x \\leq h$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser $|x - a| \\leq h$ pour $a \\in \\mathbb{R}$ et $h \\in \\mathbb{R}_+$.",
+      "back_md": "Pour tout $a \\in \\mathbb{R}$, $x \\in \\mathbb{R}$ et $h \\in \\mathbb{R}_+$ :\n$$|x - a| \\leq h \\Leftrightarrow a - h \\leq x \\leq a + h$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Énoncer la **première inégalité triangulaire**.",
+      "back_md": "Pour tout $(x, y) \\in \\mathbb{R}^2$ :\n$$|x + y| \\leq |x| + |y|$$",
+      "hint_md": "Partir de $-|x| \\leq x \\leq |x|$ et $-|y| \\leq y \\leq |y|$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Énoncer la **seconde inégalité triangulaire**.",
+      "back_md": "Pour tout $(x, y) \\in \\mathbb{R}^2$ :\n$$\\big||x| - |y|\\big| \\leq |x + y|$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Combiner les deux inégalités triangulaires en une seule.",
+      "back_md": "Pour tout $(x, y) \\in \\mathbb{R}^2$ :\n$$\\big||x| - |y|\\big| \\leq |x \\pm y| \\leq |x| + |y|$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $M$ est un **majorant** d'une partie $A \\subset \\mathbb{R}$.",
+      "back_md": "Un réel $M$ est un **majorant** de $A$ si :\n$$\\forall x \\in A, \\quad x \\leq M$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $m$ est un **minorant** d'une partie $A \\subset \\mathbb{R}$.",
+      "back_md": "Un réel $m$ est un **minorant** de $A$ si :\n$$\\forall x \\in A, \\quad x \\geq m$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une partie $A \\subset \\mathbb{R}$ est **majorée**, **minorée**, **bornée**.",
+      "back_md": "- $A$ est **majorée** si $A$ admet un majorant\n- $A$ est **minorée** si $A$ admet un minorant\n- $A$ est **bornée** si $A$ est majorée **et** minorée",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser qu'une partie $A \\subset \\mathbb{R}$ est bornée à l'aide de la valeur absolue.",
+      "back_md": "**Proposition** : Une partie $A$ de $\\mathbb{R}$ est bornée si, et seulement si :\n$$\\exists R \\in \\mathbb{R}_+ \\quad \\forall x \\in A \\quad |x| \\leq R$$\n\nAutrement dit : $A \\subset [-R, R]$ pour un certain $R \\geq 0$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Montrer que $\\mathbb{R}$ n'est ni majoré, ni minoré.",
+      "back_md": "Si $M$ était un majorant de $\\mathbb{R}$, on aurait $M + 1 \\leq M$ car $M + 1 \\in \\mathbb{R}$, ce qui est absurde.\n\nDonc $\\mathbb{R}$ n'est pas majoré. De même, $\\mathbb{R}$ n'est pas minoré.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'appelle-t-on le **maximum** d'une partie $A \\subset \\mathbb{R}$ ?",
+      "back_md": "Le **maximum** de $A$ est le plus grand élément de $A$ (s'il existe).\n\nAutrement dit, $\\max A$ est l'unique élément de $A$ qui majore $A$.\n\n**Notation** : $\\max A$ ou $\\max_{x \\in A} x$.",
+      "hint_md": "S'il existe, le maximum est unique.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'appelle-t-on le **minimum** d'une partie $A \\subset \\mathbb{R}$ ?",
+      "back_md": "Le **minimum** de $A$ est le plus petit élément de $A$ (s'il existe).\n\nAutrement dit, $\\min A$ est l'unique élément de $A$ qui minore $A$.\n\n**Notation** : $\\min A$ ou $\\min_{x \\in A} x$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Une partie majorée admet-elle nécessairement un maximum ?",
+      "back_md": "**Non**. Une partie majorée n'admet pas nécessairement de maximum.\n\nContre-exemple : $A = ]0, 1]$ est majorée par $1$, mais n'a pas de minimum (pour tout $x \\in A$, $\\frac{x}{2} \\in A$ et $\\frac{x}{2} < x$).",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exprimer $\\max(a, b)$ et $\\min(a, b)$ à l'aide de $|b - a|$.",
+      "back_md": "Pour $(a, b) \\in \\mathbb{R}^2$ :\n$$\\max(a, b) = \\frac{a + b + |b - a|}{2}$$\n$$\\min(a, b) = \\frac{a + b - |b - a|}{2}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Montrer par récurrence que toute partie finie non vide de $\\mathbb{R}$ admet un maximum.",
+      "back_md": "Par récurrence sur $n \\in \\mathbb{N}^*$ : toute partie de $\\mathbb{R}$ ayant $n$ éléments admet un maximum.\n\n**Initialisation** : Un singleton $\\{a\\}$ admet $a$ comme maximum.\n\n**Hérédité** : Si $A = \\{a_0, \\ldots, a_n\\}$, écrire $A = \\{a_0\\} \\cup B$ où $B = \\{a_1, \\ldots, a_n\\}$. Par hypothèse de récurrence, $B$ admet un maximum. Alors $\\max A = \\max(a_0, \\max B)$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce que le **domaine de définition** d'une fonction $f$ ?",
+      "back_md": "Le **domaine de définition** de $f$ est l'ensemble des $x \\in \\mathbb{R}$ pour lesquels $f(x)$ a une valeur.\n\nOn le note souvent $D_f$ ou $\\text{dom}(f)$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce que le **graphe** d'une fonction $f : X \\to \\mathbb{R}$ ?",
+      "back_md": "Le **graphe** de $f$ est le sous-ensemble de $\\mathbb{R}^2$ :\n$$\\Gamma_f = \\left\\{\\big(x, f(x)\\big) \\mid x \\in X\\right\\}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **paire**.",
+      "back_md": "Soit $f : X \\to \\mathbb{R}$ où $X$ est symétrique par rapport à $0$.\n\nLa fonction $f$ est **paire** si :\n$$\\forall x \\in X \\quad f(-x) = f(x)$$",
+      "hint_md": "Le graphe de $f$ est symétrique par rapport à l'axe des ordonnées.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **impaire**.",
+      "back_md": "Soit $f : X \\to \\mathbb{R}$ où $X$ est symétrique par rapport à $0$.\n\nLa fonction $f$ est **impaire** si :\n$$\\forall x \\in X \\quad f(-x) = -f(x)$$",
+      "hint_md": "Le graphe de $f$ est symétrique par rapport à l'origine.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f : X \\to \\mathbb{R}$ est paire ou impaire, comment réduire le domaine d'étude ?",
+      "back_md": "Si $f$ est paire ou impaire, on peut restreindre son étude à $X \\cap \\mathbb{R}_+$.\n\nLe graphe de $f$ sur $X \\cap \\mathbb{R}_-$ se déduit par symétrie.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $T > 0$ est une **période** de $f : X \\to \\mathbb{R}$.",
+      "back_md": "Un réel $T > 0$ est une **période** de $f$ si :\n\n1. $\\forall x \\in \\mathbb{R}, \\quad x + T \\in X \\Leftrightarrow x \\in X$\n2. $\\forall x \\in X, \\quad f(x + T) = f(x)$",
+      "hint_md": "Si $X = \\mathbb{R}$, la condition 1 est automatique.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f : \\mathbb{R} \\to \\mathbb{R}$ est $T$-périodique, comment réduire le domaine d'étude ?",
+      "back_md": "Si $f$ est $T$-périodique, on peut restreindre son domaine d'étude à un intervalle de longueur $T$, par exemple $[0, T]$ ou $[-T/2, T/2]$.\n\nLe graphe se déduit par translations de vecteur $\\pm T \\vec{i}$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir la relation d'ordre $\\leq$ sur l'ensemble $\\mathcal{F}(X, \\mathbb{R})$ des fonctions.",
+      "back_md": "Pour $(f, g) \\in \\mathcal{F}(X, \\mathbb{R})^2$, on dit que $f \\leq g$ si :\n$$\\forall x \\in X \\quad f(x) \\leq g(x)$$",
+      "hint_md": "Cet ordre n'est pas total : deux fonctions ne sont pas toujours comparables.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **croissante**.",
+      "back_md": "La fonction $f$ est **croissante** si :\n$$\\forall (x, y) \\in X^2, \\quad x \\leq y \\Rightarrow f(x) \\leq f(y)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **strictement croissante**.",
+      "back_md": "La fonction $f$ est **strictement croissante** si :\n$$\\forall (x, y) \\in X^2, \\quad x < y \\Rightarrow f(x) < f(y)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **décroissante**.",
+      "back_md": "La fonction $f$ est **décroissante** si :\n$$\\forall (x, y) \\in X^2, \\quad x \\leq y \\Rightarrow f(x) \\geq f(y)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **strictement décroissante**.",
+      "back_md": "La fonction $f$ est **strictement décroissante** si :\n$$\\forall (x, y) \\in X^2, \\quad x < y \\Rightarrow f(x) > f(y)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser une fonction constante en termes de monotonie.",
+      "back_md": "Une fonction est **constante** si, et seulement si, elle est à la fois croissante **et** décroissante.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f$ et $g$ sont croissantes sur $X$, que dire de $f + g$ ?",
+      "back_md": "Si $f$ et $g$ sont croissantes sur $X$, alors $f + g$ est croissante.\n\nSi de plus $f$ est strictement croissante, alors $f + g$ est strictement croissante.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f$ et $g$ sont croissantes et positives sur $X$, que dire de $fg$ ?",
+      "back_md": "Si $f$ et $g$ sont croissantes et **positives** sur $X$, alors $fg$ est croissante.\n\nEn particulier, si $\\lambda \\geq 0$, alors $\\lambda f$ est croissante.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner la règle de monotonie pour la composée $g \\circ f$.",
+      "back_md": "**Proposition** : Si $f : X \\to Y$ et $g : Y \\to \\mathbb{R}$ sont monotones, alors $g \\circ f$ est monotone.\n\nPlus précisément :\n- $g \\circ f$ est **croissante** si $f$ et $g$ sont de **même monotonie**\n- $g \\circ f$ est **décroissante** sinon\n\nDe même pour la stricte monotonie.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f : X \\to \\mathbb{R}_+^*$ est monotone, que dire de $1/f$ ?",
+      "back_md": "Si $f$ est monotone à valeurs dans $\\mathbb{R}_+^*$, alors $1/f$ est monotone de **monotonie opposée**.\n\nMême résultat si $f$ à valeurs dans $\\mathbb{R}_-^*$.\n\nDe même pour la stricte monotonie.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **majorée**.",
+      "back_md": "La fonction $f$ est **majorée** si :\n$$\\exists M \\in \\mathbb{R} \\quad \\forall x \\in X \\quad f(x) \\leq M$$\n\nAutrement dit : l'ensemble image $f(X)$ est une partie majorée de $\\mathbb{R}$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **minorée**.",
+      "back_md": "La fonction $f$ est **minorée** si :\n$$\\exists m \\in \\mathbb{R} \\quad \\forall x \\in X \\quad f(x) \\geq m$$\n\nAutrement dit : l'ensemble image $f(X)$ est une partie minorée de $\\mathbb{R}$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : une fonction $f : X \\to \\mathbb{R}$ est **bornée**.",
+      "back_md": "La fonction $f$ est **bornée** si :\n$$\\exists R \\in \\mathbb{R}_+ \\quad \\forall x \\in X \\quad |f(x)| \\leq R$$\n\nAutrement dit : $f$ est majorée **et** minorée.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f$ et $g$ sont bornées sur $X$, que dire de $f + g$ et $fg$ ?",
+      "back_md": "**Proposition** : Si $f$ et $g$ sont bornées sur $X$, alors $f + g$ et $fg$ sont bornées.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $f$ admet un **maximum** en $a \\in X$.",
+      "back_md": "La fonction $f : X \\to \\mathbb{R}$ admet un **maximum** en $a \\in X$ si :\n$$\\forall x \\in X \\quad f(x) \\leq f(a)$$\n\n**Notation** : $\\max_X f$ ou $\\max_{x \\in X} f(x)$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $f$ admet un **minimum** en $a \\in X$.",
+      "back_md": "La fonction $f : X \\to \\mathbb{R}$ admet un **minimum** en $a \\in X$ si :\n$$\\forall x \\in X \\quad f(x) \\geq f(a)$$\n\n**Notation** : $\\min_X f$ ou $\\min_{x \\in X} f(x)$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir le **taux d'accroissement** de $f$ en $a$.",
+      "back_md": "Le **taux d'accroissement** de $f$ en $a$ est la fonction $\\tau_a$ définie sur $I \\setminus \\{a\\}$ par :\n$$\\forall x \\in I \\setminus \\{a\\} \\quad \\tau_a(x) = \\frac{f(x) - f(a)}{x - a}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $f$ est **dérivable en $a$**.",
+      "back_md": "La fonction $f$ est **dérivable en $a$** si son taux d'accroissement en $a$ possède une limite finie en $a$.\n\nCette limite s'appelle **nombre dérivé** de $f$ en $a$ et se note $f'(a)$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée de $f : x \\mapsto x^n$ pour $n \\in \\mathbb{N}^*$ ?",
+      "back_md": "Pour tout $n \\in \\mathbb{N}^*$, la fonction $f : x \\mapsto x^n$ est dérivable sur $\\mathbb{R}$ et :\n$$\\forall a \\in \\mathbb{R} \\quad f'(a) = n a^{n-1}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée de $f : x \\mapsto \\frac{1}{x}$ sur $\\mathbb{R}^*$ ?",
+      "back_md": "La fonction $f : x \\mapsto \\frac{1}{x}$ est dérivable sur $\\mathbb{R}^*$ et :\n$$\\forall a \\in \\mathbb{R}^* \\quad f'(a) = -\\frac{1}{a^2}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée de $f : x \\mapsto \\sqrt{x}$ sur $\\mathbb{R}_+$ ?",
+      "back_md": "La fonction $f : x \\mapsto \\sqrt{x}$ est :\n- **Dérivable** en tout $a \\in \\mathbb{R}_+^*$ avec $f'(a) = \\frac{1}{2\\sqrt{a}}$\n- **Non dérivable** en $0$ (dérivée infinie à droite)",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $f$ est **dérivable sur $I$**.",
+      "back_md": "La fonction $f$ est **dérivable sur $I$** si elle est dérivable en tout point de $I$.\n\nLa fonction définie par $x \\mapsto f'(x)$ est la **fonction dérivée** de $f$, notée $f'$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Interpréter géométriquement $f'(a)$ : tangente à la courbe.",
+      "back_md": "Si $f$ est dérivable en $a$, la **tangente** au graphe de $f$ au point $\\big(a, f(a)\\big)$ est la droite de pente $f'(a)$ passant par ce point.\n\nÉquation de la tangente :\n$$y = f'(a)(x - a) + f(a)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Énoncer la **linéarité de la dérivation**.",
+      "back_md": "Si $f$ et $g$ sont dérivables en $a$ et $\\lambda, \\mu \\in \\mathbb{R}$, alors $\\lambda f + \\mu g$ est dérivable en $a$ et :\n$$(\\lambda f + \\mu g)'(a) = \\lambda f'(a) + \\mu g'(a)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Énoncer la formule de dérivation d'un **produit** de fonctions.",
+      "back_md": "Si $f$ et $g$ sont dérivables en $a$, alors $fg$ est dérivable en $a$ et :\n$$(fg)'(a) = f'(a) g(a) + f(a) g'(a)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Énoncer la formule de dérivation d'une **composée** $g \\circ f$.",
+      "back_md": "**Proposition** : Si $f : I \\to J$ est dérivable en $a$ et $g : J \\to \\mathbb{R}$ est dérivable en $b = f(a)$, alors $g \\circ f$ est dérivable en $a$ et :\n$$(g \\circ f)'(a) = g'\\big(f(a)\\big) \\cdot f'(a)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée de $f^n$ pour $n \\in \\mathbb{N}^*$ ?",
+      "back_md": "Si $f : I \\to \\mathbb{R}$ est dérivable en $a$ et $n \\in \\mathbb{N}^*$, alors $f^n$ est dérivable en $a$ et :\n$$(f^n)'(a) = n f(a)^{n-1} f'(a)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée de $1/f$ ?",
+      "back_md": "Si $f$ est dérivable en $a$ avec $f(a) \\neq 0$, alors $1/f$ est dérivable en $a$ et :\n$$\\left(\\frac{1}{f}\\right)'(a) = -\\frac{f'(a)}{f(a)^2}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner la formule de dérivation d'un **quotient** $\\frac{f}{g}$.",
+      "back_md": "Si $f$ et $g$ sont dérivables en $a$ avec $g(a) \\neq 0$, alors $\\frac{f}{g}$ est dérivable en $a$ et :\n$$\\left(\\frac{f}{g}\\right)'(a) = \\frac{f'(a) g(a) - f(a) g'(a)}{g(a)^2}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir : $f$ est de **classe $\\mathcal{C}^1$** sur $I$.",
+      "back_md": "Une fonction $f : I \\to \\mathbb{R}$ est de **classe $\\mathcal{C}^1$** si elle est dérivable sur $I$ et si sa fonction dérivée $f'$ est **continue** sur $I$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir les **dérivées successives** d'une fonction.",
+      "back_md": "Si $f$ est dérivable sur $I$, sa dérivée $f'$ peut être elle-même dérivable. On note alors :\n- $f^{(2)} = (f')'$ : **dérivée seconde**\n- $f^{(3)} = (f^{(2)})'$ : **dérivée troisième**\n- $f^{(n)} = (f^{(n-1)})'$ : **dérivée $n$-ième**\n\nPar convention, $f^{(0)} = f$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser la **croissance** d'une fonction dérivable sur un intervalle $I$.",
+      "back_md": "**Proposition** : Soit $f : I \\to \\mathbb{R}$ dérivable.\n\n$f$ est **croissante** sur $I$ si, et seulement si, $f' \\geq 0$ sur $I$.",
+      "hint_md": "Attention : il faut travailler sur un **intervalle**.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser la **décroissance** d'une fonction dérivable sur un intervalle $I$.",
+      "back_md": "**Proposition** : Soit $f : I \\to \\mathbb{R}$ dérivable.\n\n$f$ est **décroissante** sur $I$ si, et seulement si, $f' \\leq 0$ sur $I$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Caractériser qu'une fonction dérivable sur un intervalle $I$ est **constante**.",
+      "back_md": "**Corollaire** : Une fonction dérivable sur l'intervalle $I$ est constante si, et seulement si, sa dérivée est **nulle**.\n\nSi $f' = g'$ sur $I$, alors $f$ et $g$ diffèrent d'une constante.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner une condition suffisante pour qu'une fonction soit **strictement croissante**.",
+      "back_md": "**Proposition** : Si $f : I \\to \\mathbb{R}$ est dérivable avec $f' \\geq 0$ et $f'$ ne s'annule qu'en un nombre **fini** de points, alors $f$ est **strictement croissante**.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'un **tableau de variations** d'une fonction ?",
+      "back_md": "Un **tableau de variations** résume :\n- Les intervalles où $f$ est strictement monotone\n- Le signe de $f'$\n- Les valeurs de $f$ aux bornes et aux points critiques\n- Éventuellement les limites aux bornes",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une **asymptote horizontale** au graphe de $f$ ?",
+      "back_md": "Si $\\lim_{x \\to +\\infty} f(x) = b$ (ou $\\lim_{x \\to -\\infty} f(x) = b$), la droite d'équation $y = b$ est une **asymptote horizontale** au graphe de $f$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une **asymptote verticale** au graphe de $f$ ?",
+      "back_md": "Si $\\lim_{x \\to a} f(x) = \\pm\\infty$, la droite d'équation $x = a$ est une **asymptote verticale** au graphe de $f$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f$ est strictement monotone, que peut-on dire de son injectivité ?",
+      "back_md": "**Proposition** : Une fonction $f : X \\to \\mathbb{R}$ strictement monotone est **injective**.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quel est le lien entre les graphes de $f$ et $f^{-1}$ ?",
+      "back_md": "**Proposition** : Les graphes de $f : X \\to Y$ et de sa bijection réciproque $f^{-1} : Y \\to X$ sont **symétriques** par rapport à la première bissectrice (droite $y = x$).",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f : X \\to Y$ est une bijection strictement monotone, que dire de $f^{-1}$ ?",
+      "back_md": "**Proposition** : Si $f : X \\to Y$ est une bijection strictement monotone, alors $f^{-1}$ est strictement monotone de **même monotonie** que $f$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner la condition de dérivabilité de $f^{-1}$ en un point $b = f(a)$.",
+      "back_md": "**Proposition** : Soit $f : I \\to J$ une bijection dérivable, $b \\in J$ et $a = f^{-1}(b)$.\n\n$f^{-1}$ est dérivable en $b$ si, et seulement si, $f'(a) \\neq 0$.\n\nSi $f'(a) \\neq 0$, alors :\n$$(f^{-1})'(b) = \\frac{1}{f'(a)}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée de $\\sqrt[n]{\\cdot}$ sur $\\mathbb{R}_+^*$ pour $n \\geq 2$ ?",
+      "back_md": "Pour $n \\in \\mathbb{N}$ avec $n \\geq 2$, la fonction $x \\mapsto \\sqrt[n]{x}$ est dérivable sur $\\mathbb{R}_+^*$ et :\n$$\\frac{d}{dx}\\sqrt[n]{x} = \\frac{1}{n x^{(n-1)/n}} = \\frac{1}{n (\\sqrt[n]{x})^{n-1}}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment définir la **fonction indicatrice** $\\mathbb{1}_A$ d'une partie $A \\subset E$ ?",
+      "back_md": "La **fonction indicatrice** de $A$ est $\\mathbb{1}_A : E \\to \\{0, 1\\}$ définie par :\n$$\\mathbb{1}_A(x) = \\begin{cases} 1 & \\text{si } x \\in A \\\\ 0 & \\text{si } x \\notin A \\end{cases}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exprimer $\\mathbb{1}_{A \\cap B}$ en fonction de $\\mathbb{1}_A$ et $\\mathbb{1}_B$.",
+      "back_md": "$$\\mathbb{1}_{A \\cap B} = \\mathbb{1}_A \\times \\mathbb{1}_B$$",
+      "hint_md": "Un élément est dans $A \\cap B$ ssi il est dans $A$ ET dans $B$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exprimer $\\mathbb{1}_{A \\cup B}$ en fonction de $\\mathbb{1}_A$ et $\\mathbb{1}_B$.",
+      "back_md": "$$\\mathbb{1}_{A \\cup B} = \\mathbb{1}_A + \\mathbb{1}_B - \\mathbb{1}_A \\times \\mathbb{1}_B$$",
+      "hint_md": "Formule de inclusion-exclusion.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exprimer $\\mathbb{1}_{\\overline{A}}$ en fonction de $\\mathbb{1}_A$.",
+      "back_md": "$$\\mathbb{1}_{\\overline{A}} = 1 - \\mathbb{1}_A$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir la **restriction** $f|_A$ d'une fonction $f : E \\to F$ à une partie $A \\subset E$.",
+      "back_md": "La **restriction** de $f$ à $A$ est la fonction $f|_A : A \\to F$ définie par :\n$$\\forall x \\in A, \\quad f|_A(x) = f(x)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'un **prolongement** d'une fonction $f : E \\to F$ ?",
+      "back_md": "Un **prolongement** de $f$ à un ensemble $E' \\supset E$ est toute application $g : E' \\to F$ telle que :\n$$\\forall x \\in E, \\quad g(x) = f(x)$$\n\nAutrement dit : $g|_E = f$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir la **composée** $g \\circ f$ de deux fonctions.",
+      "back_md": "Soit $f : X \\to Y$ et $g : Y \\to \\mathbb{R}$ telle que $f(X) \\subset Y$.\n\nLa **composée** $g \\circ f : X \\to \\mathbb{R}$ est définie par :\n$$\\forall x \\in X, \\quad (g \\circ f)(x) = g\\big(f(x)\\big)$$",
+      "hint_md": "Condition nécessaire : $f(X) \\subset \\text{dom}(g)$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle condition doit-on vérifier avant de considérer la composée $g \\circ f$ ?",
+      "back_md": "Pour pouvoir considérer $g \\circ f$, il faut vérifier que :\n$$f(X) \\subset \\text{dom}(g)$$\n\nL'image de $f$ doit être incluse dans le domaine de définition de $g$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f : E \\to F$ est dérivable et paire, que dire de sa dérivée $f'$ ?",
+      "back_md": "Si $f$ est une fonction **paire** dérivable, alors sa dérivée $f'$ est **impaire**.\n\nEn effet : $f(-x) = f(x)$ pour tout $x$, donc par dérivation :\n$$-f'(-x) = f'(x)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Si $f : \\mathbb{R} \\to \\mathbb{R}$ est dérivable et $T$-périodique, que dire de $f'$ ?",
+      "back_md": "Si $f$ est **$T$-périodique** dérivable, alors sa dérivée $f'$ est également **$T$-périodique**.\n\nEn effet : $f(x + T) = f(x)$ pour tout $x$, donc par dérivation :\n$$f'(x + T) = f'(x)$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une **fonction polynomiale** ?",
+      "back_md": "Une **fonction polynomiale** est une combinaison linéaire de fonctions $x \\mapsto x^k$ avec $k \\in \\mathbb{N}$.\n\nAutrement dit, $f$ est polynomiale si :\n$$f(x) = a_0 + a_1 x + a_2 x^2 + \\cdots + a_n x^n$$\navec $a_0, \\ldots, a_n \\in \\mathbb{R}$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle est la dérivée d'une fonction polynomiale $f(x) = a_0 + a_1 x + \\cdots + a_n x^n$ ?",
+      "back_md": "Par linéarité de la dérivation :\n$$f'(x) = a_1 + 2a_2 x + 3a_3 x^2 + \\cdots + n a_n x^{n-1}$$",
+      "hint_md": "La dérivée d'une constante est nulle.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment construire un **tableau de signes** pour une expression factorisée ?",
+      "back_md": "Pour une expression factorisée $e(x) = f_1(x) \\cdots f_n(x)$ :\n\n1. Étudier le signe de chaque facteur $f_i(x)$\n2. Repérer les valeurs où chaque facteur s'annule\n3. Appliquer la **règle des signes** : le signe du produit dépend du nombre de facteurs négatifs\n4. Construire le tableau avec les changements de signes",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner un exemple : résoudre l'inéquation $(x+1)(x-2) \\leq 0$.",
+      "back_md": "Tableau de signes de $e(x) = (x+1)(x-2)$ :\n\n| $x$ | $-\\infty$ | $-1$ | $2$ | $+\\infty$ |\n|-----|-----------|------|-----|------------|\n| $x+1$ | $-$ | $0$ | $+$ | $+$ |\n| $x-2$ | $-$ | $-$ | $0$ | $+$ |\n| $e(x)$ | $+$ | $0$ | $-$ | $0$ | $+$ |\n\n**Solution** : $x \\in [-1, 2]$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Quelle méthode utiliser pour démontrer une inégalité du type $f(x) \\geq 0$ ?",
+      "back_md": "**Méthode** : Introduire la fonction $f$ et étudier ses variations.\n\n1. Calculer $f'(x)$\n2. Étudier le signe de $f'$\n3. Dresser le tableau de variations\n4. Déterminer le minimum de $f$\n5. Conclure sur le signe de $f$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exemple : montrer que $\\forall x \\in ]0, \\frac{\\pi}{2}[, \\quad x \\cos(x) < \\sin(x)$.",
+      "back_md": "On pose $g(x) = \\sin(x) - x\\cos(x)$ sur $[0, \\frac{\\pi}{2}]$.\n\n**Dérivée** : $g'(x) = \\cos(x) - \\cos(x) + x\\sin(x) = x\\sin(x) \\geq 0$\n\nDonc $g$ strictement croissante (car $g'$ ne s'annule qu'en $0$).\n\n**Conclusion** : $\\forall x \\in ]0, \\frac{\\pi}{2}[, \\quad g(x) > g(0) = 0$\n\nd'où l'inégalité.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment utiliser une étude de fonction pour **discuter le nombre de solutions** d'une équation $f(x) = \\gamma$ ?",
+      "back_md": "**Méthode** :\n\n1. Dresser le tableau de variations de $f$\n2. Repérer les extrema de $f$\n3. Pour chaque valeur de $\\gamma$, compter le nombre d'intersections entre la courbe $y = f(x)$ et la droite $y = \\gamma$\n4. Utiliser le **théorème des valeurs intermédiaires** pour justifier l'existence sur chaque intervalle de monotonie",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner le **plan général** d'une étude de fonction.",
+      "back_md": "1. **Domaine de définition** $X$\n2. **Symétries** : parité, périodicité → réduction du domaine d'étude\n3. **Dérivabilité** et calcul de $f'$\n4. **Tableau de variations** (étude du signe de $f'$)\n5. **Limites et asymptotes** (horizontales/verticales)\n6. **Tracé du graphe** : points remarquables, tangentes, asymptotes",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exemple : étudier $f(x) = \\frac{x^2 + x + 1}{(x-1)^3}$ — domaine et dérivée.",
+      "back_md": "**Domaine** : $D_f = \\mathbb{R} \\setminus \\{1\\} = ]-\\infty, 1[ \\cup ]1, +\\infty[$\n\n**Dérivée** : Par quotient,\n$$f'(x) = \\frac{(2x+1)(x-1)^3 - 3(x-1)^2(x^2+x+1)}{(x-1)^6}$$\n\nSimplification par $(x-1)^2$ :\n$$f'(x) = \\frac{(2x+1)(x-1) - 3(x^2+x+1)}{(x-1)^4} = \\frac{-x^2-4x-4}{(x-1)^4} = \\frac{-(x+2)^2}{(x-1)^4}$$\n\nDonc $f' \\leq 0$ (strictement décroissante sauf en $x = -2$).",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Pour une fonction $f : \\mathbb{R}^* \\to \\mathbb{R}$, pourquoi faut-il vérifier la monotonie sur **chaque intervalle** séparément ?",
+      "back_md": "**Attention** : Les résultats de monotonie par dérivée s'appliquent sur un **intervalle**.\n\nSi $f : \\mathbb{R}^* \\to \\mathbb{R}$ avec $f'(x) < 0$ pour tout $x \\neq 0$, alors :\n- $f$ est strictement décroissante sur $]-\\infty, 0[$\n- $f$ est strictement décroissante sur $]0, +\\infty[$\n\nMais $f$ n'est **pas** décroissante sur $\\mathbb{R}^*$ !\n\nContre-exemple : $f(x) = \\frac{1}{x}$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exemple : montrer que $\\forall n \\geq 1, \\quad n \\leq \\sum_{k=n+1}^{2n} \\frac{1}{k} \\leq \\frac{1}{2}$.",
+      "back_md": "**Majoration** : Pour $k \\in [[n+1, 2n]]$, on a $\\frac{1}{k} \\leq \\frac{1}{n+1}$.\n\nDonc :\n$$\\sum_{k=n+1}^{2n} \\frac{1}{k} \\leq n \\cdot \\frac{1}{n+1} < 1$$\n\nErreur dans l'énoncé du cours : la borne est $\\geq \\frac{1}{2}$ (minoration).\n\n**Minoration** : Pour $k \\in [[n+1, 2n]]$, on a $\\frac{1}{k} \\geq \\frac{1}{2n}$.\n\nDonc :\n$$\\sum_{k=n+1}^{2n} \\frac{1}{k} \\geq n \\cdot \\frac{1}{2n} = \\frac{1}{2}$$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment démontrer qu'une fonction $f : I \\to J$ strictement monotone et continue est une **bijection** ?",
+      "back_md": "**Méthode** :\n\n1. $f$ strictement monotone ⟹ $f$ **injective**\n2. Par le **théorème des valeurs intermédiaires**, $f(I)$ est un intervalle (car $f$ continue)\n3. Calculer les limites aux bornes pour déterminer $J = f(I)$\n4. Conclure que $f : I \\to J$ est bijective",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Exemple : montrer que $f : \\mathbb{R} \\to \\mathbb{R}, x \\mapsto x^3$ est une bijection.",
+      "back_md": "**Dérivée** : $f'(x) = 3x^2 \\geq 0$ et ne s'annule qu'en $0$.\n\nDonc $f$ est **strictement croissante** sur $\\mathbb{R}$, donc **injective**.\n\n**Limites** : $\\lim_{-\\infty} f = -\\infty$ et $\\lim_{+\\infty} f = +\\infty$.\n\nPar le **théorème des valeurs intermédiaires**, $f(\\mathbb{R}) = \\mathbb{R}$.\n\n**Conclusion** : $f$ est une bijection de $\\mathbb{R}$ sur $\\mathbb{R}$.\n\nSa réciproque est $f^{-1}(y) = \\sqrt[3]{y}$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Définir la **racine cubique** $\\sqrt[3]{y}$ et donner sa dérivée.",
+      "back_md": "La **racine cubique** est la bijection réciproque de $x \\mapsto x^3$ :\n$$\\sqrt[3]{\\cdot} : \\mathbb{R} \\to \\mathbb{R}$$\n\nElle est dérivable sur $\\mathbb{R}^*$ et :\n$$\\frac{d}{dy}\\sqrt[3]{y} = \\frac{1}{3(\\sqrt[3]{y})^2}$$\n\nMais **non dérivable** en $0$ (tangente verticale).",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Comment interpréter géométriquement la tangente **verticale** au graphe de $f^{-1}$ ?",
+      "back_md": "Si $f'(a) = 0$, alors :\n- Le graphe de $f$ admet une tangente **horizontale** en $\\big(a, f(a)\\big)$\n- Par symétrie, le graphe de $f^{-1}$ admet une tangente **verticale** en $\\big(f(a), a\\big)$\n- La limite du taux d'accroissement de $f^{-1}$ en $f(a)$ est $\\pm\\infty$",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Qu'est-ce qu'une fonction de **classe $\\mathcal{C}^n$** sur $I$ ?",
+      "back_md": "Une fonction $f : I \\to \\mathbb{R}$ est de **classe $\\mathcal{C}^n$** si :\n- $f$ est $n$ fois dérivable sur $I$\n- Sa dérivée $n$-ième $f^{(n)}$ est **continue** sur $I$\n\n**Notation** : $f \\in \\mathcal{C}^n(I, \\mathbb{R})$",
+      "hint_md": "$\\mathcal{C}^0$ = fonctions continues, $\\mathcal{C}^1$ = fonctions dérivables de dérivée continue.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    },
+    {
+      "front_md": "Donner un exemple de fonction avec centre de symétrie : $f(x) = \\frac{(x+1)^2}{x^2+1}$.",
+      "back_md": "Pour tout $x \\in \\mathbb{R}$ :\n$$f(x) = \\frac{(x+1)^2}{x^2+1} = 1 + \\frac{2x}{x^2+1}$$\n\nDonc :\n$$f(-x) = 1 - \\frac{2x}{x^2+1} = 2 - f(x)$$\n\nAutrement dit : $f(-x) - 1 = -\\big(f(x) - 1\\big)$.\n\nLe point $A = (0, 1)$ est un **centre de symétrie** du graphe de $f$.\n\nOn peut donc restreindre l'étude à $[0, +\\infty[$.",
+      "tags": ["Maths/Analyse/Fonctions réelles"]
+    }
+  ]
+}
