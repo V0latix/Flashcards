@@ -362,9 +362,13 @@ function Library() {
         <p>{t('library.subtitle')}</p>
       </div>
       <p>
-        <Link to="/card/new" className="btn btn-primary">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => navigate('/card/new')}
+        >
           {t('actions.addCard')}
-        </Link>
+        </button>
       </p>
       {isLoading ? (
         <p>{t('status.loading')}</p>
