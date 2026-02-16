@@ -799,6 +799,133 @@ ul {
   border-color: rgba(123, 179, 255, 0.35);
 }
 
+.stats-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stats-grid-top {
+  display: grid;
+  gap: 16px;
+}
+
+.stats-layout > .card.section {
+  margin-top: 0;
+}
+
+.stats-grid-top > .card.section {
+  margin-top: 0;
+}
+
+@media (min-width: 1024px) {
+  .container.stats-page {
+    max-width: 1240px;
+  }
+
+  .stats-page .card {
+    padding: 16px;
+  }
+
+  .stats-layout {
+    gap: 14px;
+  }
+
+  .stats-grid-top {
+    grid-template-columns: 1.55fr 0.75fr;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .stats-overview .card-list {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stats-overview .card.list-item {
+    padding: 12px;
+    background: var(--surface-muted);
+    box-shadow: none;
+    border-color: rgba(148, 163, 184, 0.35);
+  }
+
+  .stats-overview .card.list-item h3 {
+    font-size: 0.95rem;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .stats-overview .card.list-item p {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stats-box-split .table th,
+  .stats-box-split .table td {
+    padding: 7px 8px;
+    font-size: 0.92rem;
+  }
+
+  /* Reduce height of the box split on desktop to avoid empty space under overview. */
+  .stats-box-split .table thead {
+    display: none;
+  }
+
+  .stats-box-split .table tbody {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stats-box-split .table tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    background: var(--surface-muted);
+  }
+
+  .stats-box-split .table td {
+    border-bottom: 0;
+    padding: 0;
+  }
+
+  .stats-box-split .table td:first-child {
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .stats-box-split .table td:last-child {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* Avoid "card in card" feel for the chart wrapper on desktop. */
+  .stats-progress .card.section {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    margin-top: 10px;
+  }
+
+  .stats-progress .card.section > h2 {
+    display: none;
+  }
+
+  .stats-progress .card.section > p {
+    margin-top: 8px;
+  }
+}
+
 .markdown img {
   display: block;
   max-width: 100%;

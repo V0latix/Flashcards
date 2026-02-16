@@ -236,7 +236,7 @@ function StatsPage() {
   }, [minReviewsForWeakTag, stats.tagAgg, tagReviewCounts])
 
   return (
-    <main className="container page">
+    <main className="container page stats-page">
       <div className="page-header">
         <h1>{t('stats.title')}</h1>
         <p>{t('stats.subtitle')}</p>
@@ -245,180 +245,187 @@ function StatsPage() {
       {stats.isLoading ? <p>{t('status.loading')}</p> : null}
       {stats.error ? <p>{stats.error}</p> : null}
 
-      {!stats.isLoading ? (
-        <section className="card section">
-          <h2>{t('stats.overview')}</h2>
-          <div className="card-list">
-            <div className="card list-item">
-              <h3>{t('labels.total')}</h3>
-              <p>{stats.global.totalCards}</p>
-            </div>
-            <div className="card list-item">
-              <h3>{t('stats.dueToday')}</h3>
-              <p>{stats.global.dueToday}</p>
-            </div>
-            <div className="card list-item">
-              <h3>{t('stats.learned')}</h3>
-              <p>{stats.global.learnedCount}</p>
-            </div>
-            <div className="card list-item">
-              <h3>{t('stats.reviewsToday')}</h3>
-              <p>{stats.global.reviewsToday}</p>
-            </div>
-            <div className="card list-item">
-              <h3>{t('stats.successRate7d')}</h3>
-              <p>
-                {stats.global.successRate7d === null
-                  ? t('status.none')
-                  : `${Math.round(stats.global.successRate7d * 100)}%`}
-              </p>
+      <div className="stats-layout">
+        <div className="stats-grid-top">
+          {!stats.isLoading ? (
+            <section className="card section stats-overview">
+              <h2>{t('stats.overview')}</h2>
+              <div className="card-list">
+                <div className="card list-item">
+                  <h3>{t('labels.total')}</h3>
+                  <p>{stats.global.totalCards}</p>
+                </div>
+                <div className="card list-item">
+                  <h3>{t('stats.dueToday')}</h3>
+                  <p>{stats.global.dueToday}</p>
+                </div>
+                <div className="card list-item">
+                  <h3>{t('stats.learned')}</h3>
+                  <p>{stats.global.learnedCount}</p>
+                </div>
+                <div className="card list-item">
+                  <h3>{t('stats.reviewsToday')}</h3>
+                  <p>{stats.global.reviewsToday}</p>
+                </div>
+                <div className="card list-item">
+                  <h3>{t('stats.successRate7d')}</h3>
+                  <p>
+                    {stats.global.successRate7d === null
+                      ? t('status.none')
+                      : `${Math.round(stats.global.successRate7d * 100)}%`}
+                  </p>
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          <section className="card section stats-box-split">
+            <h2>{t('stats.boxSplit')}</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>{t('labels.box')}</th>
+                  <th>{t('labels.total')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[0, 1, 2, 3, 4, 5].map((box) => (
+                  <tr key={box}>
+                    <td>
+                      {t('labels.box')} {box}
+                    </td>
+                    <td>{stats.boxDistribution.counts[box] ?? 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <section className="card section stats-progress">
+          <h2>{t('stats.progress')}</h2>
+          <div className="panel-header">
+            {([7, 30] as const).map((days) => (
+              <button
+                key={days}
+                type="button"
+                className={days === periodDays ? 'btn btn-primary' : 'btn btn-secondary'}
+                onClick={() => setPeriodDays(days)}
+              >
+                {days === 7 ? t('stats.period7') : t('stats.period30')}
+              </button>
+            ))}
+          </div>
+          <Chart data={stats.dailyReviews} />
+        </section>
+
+        <section className="card section split stats-tags">
+          <div className="sidebar">
+            <h2>Tags</h2>
+            <button type="button" className="btn btn-primary" onClick={() => setSelectedTag(null)}>
+              {t('stats.tagsAll')}
+            </button>
+            {tagTree.children.length === 0 ? <p>{t('library.noTags')}</p> : null}
+            {renderTagNodes(tagTree.children)}
+          </div>
+          <div className="panel">
+            <h2>{selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('stats.tagsAll')}</h2>
+            {selectedStat ? (
+              <div className="card list-item">
+                <p>{t('labels.total')}: {selectedStat.cardsCount}</p>
+                <p>{t('labels.box')}: {selectedStat.avgBox}</p>
+                <p>
+                  {t('stats.rate')}:{' '}
+                  {selectedStat.successRate === null
+                    ? t('status.none')
+                    : `${Math.round(selectedStat.successRate * 100)}%`}
+                </p>
+                <p>{t('stats.dueToday')}: {selectedStat.dueCount}</p>
+              </div>
+            ) : (
+              <div className="card list-item">
+                <p>{t('stats.selectTag')}</p>
+              </div>
+            )}
+            <div className="section">
+              <h3>{t('stats.aggregates')}</h3>
+              {tagRows.length === 0 ? (
+                <p>{t('stats.noData')}</p>
+              ) : (
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Tag</th>
+                      <th>{t('labels.total')}</th>
+                      <th>{t('stats.dueToday')}</th>
+                      <th>{t('labels.box')}</th>
+                      <th>{t('stats.rate')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visibleTagRows.map((row) => (
+                      <tr key={row.tagPath}>
+                        <td>{row.tagPath}</td>
+                        <td>{row.cardsCount}</td>
+                        <td>{row.dueCount}</td>
+                        <td>{row.avgBox}</td>
+                        <td>
+                          {row.successRate === null
+                            ? t('status.none')
+                            : `${Math.round(row.successRate * 100)}%`}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {tagRows.length > tagRowsLimit ? (
+                <button
+                  type="button"
+                  className="btn btn-secondary section"
+                  onClick={() =>
+                    setTagRowsLimitByKey((prev) => ({
+                      ...prev,
+                      [tagKey]: tagRowsLimit + 50
+                    }))
+                  }
+                >
+                  {t('actions.loadMore')}
+                </button>
+              ) : null}
             </div>
           </div>
         </section>
-      ) : null}
 
-      <section className="card section">
-        <h2>{t('stats.progress')}</h2>
-        <div className="panel-header">
-          {([7, 30] as const).map((days) => (
-            <button
-              key={days}
-              type="button"
-              className={days === periodDays ? 'btn btn-primary' : 'btn btn-secondary'}
-              onClick={() => setPeriodDays(days)}
-            >
-              {days === 7 ? t('stats.period7') : t('stats.period30')}
-            </button>
-          ))}
-        </div>
-        <Chart data={stats.dailyReviews} />
-      </section>
-
-      <section className="card section">
-        <h2>{t('stats.boxSplit')}</h2>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>{t('labels.box')}</th>
-              <th>{t('labels.total')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[0, 1, 2, 3, 4, 5].map((box) => (
-              <tr key={box}>
-                <td>
-                  {t('labels.box')} {box}
-                </td>
-                <td>{stats.boxDistribution.counts[box] ?? 0}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-
-      <section className="card section split">
-        <div className="sidebar">
-          <h2>Tags</h2>
-          <button type="button" className="btn btn-primary" onClick={() => setSelectedTag(null)}>
-            {t('stats.tagsAll')}
-          </button>
-          {tagTree.children.length === 0 ? <p>{t('library.noTags')}</p> : null}
-          {renderTagNodes(tagTree.children)}
-        </div>
-        <div className="panel">
-          <h2>{selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('stats.tagsAll')}</h2>
-          {selectedStat ? (
-            <div className="card list-item">
-              <p>{t('labels.total')}: {selectedStat.cardsCount}</p>
-              <p>{t('labels.box')}: {selectedStat.avgBox}</p>
-              <p>
-                {t('stats.rate')}:{' '}
-                {selectedStat.successRate === null
-                  ? t('status.none')
-                  : `${Math.round(selectedStat.successRate * 100)}%`}
-              </p>
-              <p>{t('stats.dueToday')}: {selectedStat.dueCount}</p>
-            </div>
+        <section className="card section stats-weak-tags">
+          <h2>{t('stats.workOn')}</h2>
+          <p>{t('stats.lowRateHint', { min: minReviewsForWeakTag })}</p>
+          {weakTags.length === 0 ? (
+            <p>{t('stats.noData')}</p>
           ) : (
-            <div className="card list-item">
-              <p>{t('stats.selectTag')}</p>
-            </div>
+            <ul className="card-list">
+              {weakTags.map((tag) => (
+                <li key={tag.tagPath} className="card list-item">
+                  <h3>{tag.tagPath}</h3>
+                  <p>{t('stats.reviews')}: {tag.reviews}</p>
+                  <p>
+                    {t('stats.rate')}:{' '}
+                    {tag.successRate === null
+                      ? t('status.none')
+                      : `${Math.round(tag.successRate * 100)}%`}
+                  </p>
+                  <Link
+                    to={`/review?tag=${encodeURIComponent(tag.tagPath)}`}
+                    className="btn btn-primary"
+                  >
+                    {t('stats.reviewTag')}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           )}
-          <div className="section">
-            <h3>{t('stats.aggregates')}</h3>
-            {tagRows.length === 0 ? (
-              <p>{t('stats.noData')}</p>
-            ) : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Tag</th>
-                    <th>{t('labels.total')}</th>
-                    <th>{t('stats.dueToday')}</th>
-                    <th>{t('labels.box')}</th>
-                    <th>{t('stats.rate')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleTagRows.map((row) => (
-                    <tr key={row.tagPath}>
-                      <td>{row.tagPath}</td>
-                      <td>{row.cardsCount}</td>
-                      <td>{row.dueCount}</td>
-                      <td>{row.avgBox}</td>
-                      <td>
-                        {row.successRate === null
-                          ? t('status.none')
-                          : `${Math.round(row.successRate * 100)}%`}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            {tagRows.length > tagRowsLimit ? (
-              <button
-                type="button"
-                className="btn btn-secondary section"
-                onClick={() =>
-                  setTagRowsLimitByKey((prev) => ({
-                    ...prev,
-                    [tagKey]: tagRowsLimit + 50
-                  }))
-                }
-              >
-                {t('actions.loadMore')}
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      <section className="card section">
-        <h2>{t('stats.workOn')}</h2>
-        <p>{t('stats.lowRateHint', { min: minReviewsForWeakTag })}</p>
-        {weakTags.length === 0 ? (
-          <p>{t('stats.noData')}</p>
-        ) : (
-          <ul className="card-list">
-            {weakTags.map((tag) => (
-              <li key={tag.tagPath} className="card list-item">
-                <h3>{tag.tagPath}</h3>
-                <p>{t('stats.reviews')}: {tag.reviews}</p>
-                <p>
-                  {t('stats.rate')}:{' '}
-                  {tag.successRate === null
-                    ? t('status.none')
-                    : `${Math.round(tag.successRate * 100)}%`}
-                </p>
-                <Link to={`/review?tag=${encodeURIComponent(tag.tagPath)}`} className="btn btn-primary">
-                  {t('stats.reviewTag')}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        </section>
+      </div>
     </main>
   )
 }
