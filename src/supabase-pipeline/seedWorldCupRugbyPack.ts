@@ -88,7 +88,7 @@ export async function seedWorldCupRugbyPack(): Promise<{
       id,
       pack_slug: packSlug,
       front_md: `Hote et vainqueur coupe du monde ${e.year}`,
-      back_md: `${e.host_fr}, ${e.winner_fr}`,
+      back_md: `Hôte: ${e.host_fr}\nVainqueur: ${e.winner_fr}`,
       tags,
       created_at: now,
       updated_at: now
@@ -141,4 +141,3 @@ if (isMainModule(import.meta.url)) {
   const res = await seedWorldCupRugbyPack()
   console.log(`pack_slug=${res.pack_slug} cards_upserted=${res.cards_upserted} cards_deleted=${res.cards_deleted}`)
 }
-
