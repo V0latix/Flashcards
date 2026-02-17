@@ -32,6 +32,8 @@
     "seed:f1-pack": "npm run supabase:build && node dist-supabase/seedF1ChampionsPack.js",
     "seed:ucl-pack": "npm run supabase:build && node dist-supabase/seedChampionsLeagueWinnersPack.js",
     "seed:tour-pack": "npm run supabase:build && node dist-supabase/seedTourDeFranceWinnersPack.js",
+    "seed:atomic-packs": "npm run supabase:build && node dist-supabase/seedAtomicElementsPacks.js",
+    "supabase:reclaim-space:phase1": "npm run supabase:build && node dist-supabase/reclaimSpacePhase1.js",
     "pipeline:geo-pack": "npm run supabase:build && node dist-supabase/pipelineGeoPack.js"
   },
   "dependencies": {

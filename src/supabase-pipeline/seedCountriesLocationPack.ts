@@ -37,7 +37,6 @@ function cardId(slug: string, iso2: string): string {
 
 type CountryRow = {
   country_code?: string | null
-  iso2?: string | null
   iso3?: string | null
   name_en?: string | null
   name_fr?: string | null
@@ -145,7 +144,7 @@ export async function seedCountriesLocationPack(): Promise<{
   // Pull countries. Table uses PK country_code (iso2 lowercase) in this project.
   const { data: countries, error: cErr } = await supabase
     .from('countries')
-    .select('iso2,iso3,name_en,name_fr,image_url,centroid,country_code')
+    .select('iso3,name_en,name_fr,image_url,centroid,country_code')
     .order('country_code', { ascending: true })
 
   if (cErr) throw new Error(`countries select failed: ${cErr.message}`)
@@ -157,7 +156,7 @@ export async function seedCountriesLocationPack(): Promise<{
 
   const cards = rows
     .map((r) => {
-      const iso2 = (r.iso2 ?? r.country_code ?? '').toString().trim().toUpperCase()
+      const iso2 = (r.country_code ?? '').toString().trim().toUpperCase()
       const name = (r.name_fr ?? r.name_en ?? iso2).toString().trim()
       const image = mapUrlBlue(supabaseUrl, iso2, version)
 

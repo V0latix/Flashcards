@@ -62,9 +62,9 @@ async function ensureCountriesTable(): Promise<void> {
   try {
     // Non-destructive schema ensure:
     // - If the table doesn't exist: create it.
-    // - If it exists (possibly with a different schema): add missing columns and a UNIQUE constraint on iso2.
-    await client.query(`CREATE TABLE IF NOT EXISTS public.${TABLE} (iso2 text);`)
-    await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS iso2 text;`)
+    // - If it exists (possibly with a different schema): add missing columns and a UNIQUE constraint on country_code.
+    await client.query(`CREATE TABLE IF NOT EXISTS public.${TABLE} (country_code text PRIMARY KEY);`)
+    await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS country_code text;`)
     await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS iso3 text;`)
     await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS name_en text;`)
     await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS name_fr text;`)
@@ -72,8 +72,8 @@ async function ensureCountriesTable(): Promise<void> {
     await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS bbox jsonb;`)
     await client.query(`ALTER TABLE public.${TABLE} ADD COLUMN IF NOT EXISTS centroid jsonb;`)
 
-    // Unique index is enough for PostgREST upsert onConflict=iso2 without breaking any existing PK.
-    await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS ${TABLE}_iso2_key ON public.${TABLE} (iso2);`)
+    // Unique index is enough for PostgREST upsert onConflict=country_code without breaking any existing PK.
+    await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS ${TABLE}_country_code_key ON public.${TABLE} (country_code);`)
 
     // Supabase uses PostgREST which caches the schema; after DDL, request a schema reload.
     // This avoids "Could not find the 'bbox' column ... in the schema cache" right after ALTER TABLE.
@@ -117,15 +117,21 @@ async function fetchCountriesColumns(connectionString: string): Promise<Map<stri
 }
 
 async function countriesTableReady(supabase: SupabaseClient): Promise<boolean> {
-  // Check for required columns in schema cache (iso2 + bbox are enough to detect outdated cache).
-  const { error } = await supabase.from(TABLE).select('iso2,bbox').limit(1)
-  if (!error) return true
-  const msg = error.message.toLowerCase()
-  // Common PostgREST message when table isn't present in schema cache.
-  if (msg.includes('schema cache') || msg.includes('could not find') || msg.includes('not found')) return false
-  // Table exists but schema doesn't match what we need.
-  if (msg.includes('column') && msg.includes('does not exist')) return false
-  throw new Error(`Table existence check failed: ${error.message}`)
+  // Prefer current schema (country_code), but tolerate legacy schema (iso2).
+  for (const probe of ['country_code,bbox', 'iso2,bbox']) {
+    const { error } = await supabase.from(TABLE).select(probe).limit(1)
+    if (!error) return true
+    const msg = error.message.toLowerCase()
+    // Common PostgREST messages when table/column isn't in schema cache.
+    const missing =
+      msg.includes('schema cache') ||
+      msg.includes('could not find') ||
+      msg.includes('not found') ||
+      (msg.includes('column') && msg.includes('does not exist'))
+    if (missing) continue
+    throw new Error(`Table existence check failed: ${error.message}`)
+  }
+  return false
 }
 
 async function sleep(ms: number) {
@@ -134,20 +140,22 @@ async function sleep(ms: number) {
 
 async function waitForSchemaCache(supabase: SupabaseClient, tries = 12): Promise<void> {
   for (let i = 0; i < tries; i++) {
-    const { error } = await supabase.from(TABLE).select('iso2,bbox').limit(1)
-    if (!error) return
-    const msg = error.message.toLowerCase()
-    if (msg.includes('schema cache') && msg.includes('bbox')) {
-      await sleep(500)
-      continue
+    for (const probe of ['country_code,bbox', 'iso2,bbox']) {
+      const { error } = await supabase.from(TABLE).select(probe).limit(1)
+      if (!error) return
+      const msg = error.message.toLowerCase()
+      const waiting =
+        (msg.includes('schema cache') && (msg.includes('bbox') || msg.includes('country_code') || msg.includes('iso2'))) ||
+        (msg.includes('could not find') && (msg.includes('bbox') || msg.includes('country_code') || msg.includes('iso2'))) ||
+        (msg.includes('column') && msg.includes('does not exist'))
+      if (waiting) {
+        await sleep(500)
+        continue
+      }
+      throw new Error(`Schema cache did not refresh: ${error.message}`)
     }
-    if (msg.includes('could not find') && msg.includes('bbox')) {
-      await sleep(500)
-      continue
-    }
-    throw new Error(`Schema cache did not refresh: ${error.message}`)
   }
-  throw new Error(`Schema cache did not refresh after DDL (still missing bbox). Try again in a few seconds.`)
+  throw new Error(`Schema cache did not refresh after DDL (still missing expected columns). Try again in a few seconds.`)
 }
 
 export async function seedCountries(): Promise<{ upserted: number }> {
@@ -204,7 +212,9 @@ export async function seedCountries(): Promise<{ upserted: number }> {
     if (needsUpdatedAt && columns.has('updated_at')) row.updated_at = nowIso
 
     // Ensure conflict key is present even if schema is unexpected.
-    if (row[conflictKey] === undefined) row[conflictKey] = iso2
+    if (row[conflictKey] === undefined) {
+      row[conflictKey] = conflictKey === 'country_code' ? iso2.toLowerCase() : iso2
+    }
 
     return row
   })

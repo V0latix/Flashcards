@@ -17,7 +17,6 @@ export type RemoteCard = {
   source_public_id: string | null
   front_md: string
   back_md: string
-  hint_md: string | null
   tags: string[]
   created_at: string
   updated_at: string
@@ -30,8 +29,6 @@ export type RemoteProgress = {
   learned: boolean
   due_at: string | null
   last_reviewed_at: string | null
-  correct_count: number
-  wrong_count: number
   updated_at: string
 }
 

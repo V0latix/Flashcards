@@ -3,7 +3,7 @@
 -- when `SUPABASE_DB_URL` is set, but you can also apply this manually.
 
 create table if not exists public.countries (
-  iso2 text primary key,
+  country_code text primary key,
   iso3 text,
   name_en text not null,
   name_fr text,
@@ -11,4 +11,3 @@ create table if not exists public.countries (
   bbox jsonb,
   centroid jsonb
 );
-

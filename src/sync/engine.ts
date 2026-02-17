@@ -101,7 +101,6 @@ const mapLocalCardToRemote = (userId: string, card: Card): RemoteCard => ({
   source_public_id: card.source_id ?? null,
   front_md: card.front_md,
   back_md: card.back_md,
-  hint_md: card.hint_md ?? null,
   tags: card.tags ?? [],
   created_at: card.created_at,
   updated_at: card.updated_at
@@ -111,7 +110,7 @@ const mapRemoteCardToLocal = (card: RemoteCard): Card => ({
   cloud_id: card.id,
   front_md: card.front_md,
   back_md: card.back_md,
-  hint_md: card.hint_md,
+  hint_md: null,
   tags: card.tags ?? [],
   created_at: card.created_at,
   updated_at: card.updated_at,
@@ -133,8 +132,6 @@ const mapLocalProgressToRemote = (
   learned: Boolean(state.is_learned),
   due_at: state.due_date,
   last_reviewed_at: state.last_reviewed_at ?? null,
-  correct_count: 0,
-  wrong_count: 0,
   updated_at: state.updated_at ?? new Date().toISOString()
 })
 

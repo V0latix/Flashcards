@@ -141,7 +141,6 @@ describe('sync engine', () => {
           source_public_id: null,
           front_md: 'Remote Q',
           back_md: 'Remote A',
-          hint_md: null,
           tags: [],
           created_at: localUpdatedAt,
           updated_at: remoteUpdatedAt

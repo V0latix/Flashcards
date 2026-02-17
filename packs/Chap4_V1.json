@@ -1,0 +1,338 @@
+{
+  "version": 1,
+  "exported_at": "2026-02-16T10:30:00Z",
+  "cards": [
+    {
+      "front_md": "Définir l'ensemble $\\mathbb{C}$ des nombres complexes.",
+      "back_md": "L'ensemble $\\mathbb{C}$ des **nombres complexes** est l'ensemble des expressions de la forme :\n$$z = a + ib$$\noù $(a, b) \\in \\mathbb{R}^2$ et $i$ est un nombre vérifiant $i^2 = -1$.\n\n- $a$ est la **partie réelle** de $z$, notée $\\text{Re}(z)$ ou $a = \\mathfrak{Re}(z)$\n- $b$ est la **partie imaginaire** de $z$, notée $\\text{Im}(z)$ ou $b = \\mathfrak{Im}(z)$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Quelle est la **forme algébrique** d'un nombre complexe ?",
+      "back_md": "La **forme algébrique** d'un nombre complexe $z$ est :\n$$z = a + ib$$\navec $a = \\text{Re}(z)$ et $b = \\text{Im}(z)$, où $a, b \\in \\mathbb{R}$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que vaut $i^2$ pour le nombre imaginaire $i$ ?",
+      "back_md": "$$i^2 = -1$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Quand deux nombres complexes $z = a + ib$ et $z' = a' + ib'$ sont-ils égaux ?",
+      "back_md": "$$z = z' \\Leftrightarrow (a = a' \\text{ et } b = b')$$\n\nAutrement dit, deux nombres complexes sont égaux si et seulement si leurs parties réelles sont égales **et** leurs parties imaginaires sont égales.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment additionner deux nombres complexes $z = a + ib$ et $z' = a' + ib'$ ?",
+      "back_md": "$$z + z' = (a + a') + i(b + b')$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment multiplier deux nombres complexes $z = a + ib$ et $z' = a' + ib'$ ?",
+      "back_md": "$$z \\times z' = (aa' - bb') + i(ab' + ba')$$",
+      "hint_md": "On développe comme un produit usuel en se rappelant que $i^2 = -1$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Qu'appelle-t-on un **nombre réel** dans $\\mathbb{C}$ ?",
+      "back_md": "Un nombre complexe $z = a + ib$ est **réel** si et seulement si $b = 0$.\n\nOn peut alors identifier $\\mathbb{R}$ à l'ensemble des nombres complexes de partie imaginaire nulle :\n$$\\mathbb{R} = \\{ a + i \\cdot 0 \\mid a \\in \\mathbb{R} \\}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Qu'appelle-t-on un **nombre imaginaire pur** ?",
+      "back_md": "Un nombre complexe $z = a + ib$ est **imaginaire pur** si et seulement si $a = 0$ (et $b \\neq 0$).\n\nL'ensemble des imaginaires purs est :\n$$i\\mathbb{R} = \\{ ib \\mid b \\in \\mathbb{R} \\}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir le **conjugué** d'un nombre complexe $z = a + ib$.",
+      "back_md": "Le **conjugué** de $z = a + ib$ est le nombre complexe :\n$$\\overline{z} = a - ib$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer les propriétés du conjugué : $\\overline{z + z'}$, $\\overline{z \\times z'}$, $\\overline{\\overline{z}}$.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^2$ :\n\n$$\\overline{z + z'} = \\overline{z} + \\overline{z'}$$\n$$\\overline{z \\times z'} = \\overline{z} \\times \\overline{z'}$$\n$$\\overline{\\overline{z}} = z$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Exprimer la partie réelle et la partie imaginaire de $z$ en fonction de $z$ et $\\overline{z}$.",
+      "back_md": "Pour tout $z \\in \\mathbb{C}$ :\n\n$$\\text{Re}(z) = \\frac{z + \\overline{z}}{2}$$\n$$\\text{Im}(z) = \\frac{z - \\overline{z}}{2i}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Caractériser les nombres réels et les imaginaires purs à l'aide du conjugué.",
+      "back_md": "Pour tout $z \\in \\mathbb{C}$ :\n\n- $z \\in \\mathbb{R} \\Leftrightarrow \\overline{z} = z$\n- $z \\in i\\mathbb{R} \\Leftrightarrow \\overline{z} = -z$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir le **module** d'un nombre complexe $z = a + ib$.",
+      "back_md": "Le **module** de $z = a + ib$ est le nombre réel positif :\n$$|z| = \\sqrt{a^2 + b^2}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner une formule reliant $|z|^2$, $z$ et $\\overline{z}$.",
+      "back_md": "Pour tout $z \\in \\mathbb{C}$ :\n$$|z|^2 = z \\times \\overline{z}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer les propriétés du module : $|z \\times z'|$, $|\\overline{z}|$, $|z|^n$.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^2$ et $n \\in \\mathbb{N}$ :\n\n$$|z \\times z'| = |z| \\times |z'|$$\n$$|\\overline{z}| = |z|$$\n$$|z^n| = |z|^n$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer l'**inégalité triangulaire** pour les modules dans $\\mathbb{C}$.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^2$ :\n$$|z + z'| \\leq |z| + |z'|$$\n\nÉgalité si et seulement si $z$ et $z'$ ont des arguments égaux (ou l'un est nul).",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer la **seconde inégalité triangulaire** pour les modules.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^2$ :\n$$\\big| |z| - |z'| \\big| \\leq |z - z'|$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Caractériser les nombres complexes de module $1$.",
+      "back_md": "Un nombre complexe $z$ est de module $1$ si et seulement si :\n$$|z| = 1$$\n\nL'ensemble des nombres complexes de module $1$ forme le **cercle unité** (ou cercle trigonométrique) dans le plan complexe :\n$$\\mathbb{U} = \\{ z \\in \\mathbb{C} \\mid |z| = 1 \\}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Pour $z$ de module $1$, que vaut $\\overline{z}$ en fonction de $z$ ?",
+      "back_md": "Si $|z| = 1$, alors :\n$$\\overline{z} = \\frac{1}{z}$$",
+      "hint_md": "Car $z \\overline{z} = |z|^2 = 1$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer les **formules d'Euler** reliant $\\cos \\theta$ et $\\sin \\theta$ aux exponentielles complexes.",
+      "back_md": "Pour tout $\\theta \\in \\mathbb{R}$ :\n\n$$\\cos \\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2}$$\n$$\\sin \\theta = \\frac{e^{i\\theta} - e^{-i\\theta}}{2i}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer la **formule de Moivre**.",
+      "back_md": "Pour tout $\\theta \\in \\mathbb{R}$ et $n \\in \\mathbb{Z}$ :\n$$\\left( \\cos \\theta + i \\sin \\theta \\right)^n = \\cos(n\\theta) + i \\sin(n\\theta)$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment linéariser $\\cos^n \\theta$ ou $\\sin^n \\theta$ à l'aide des nombres complexes ?",
+      "back_md": "On utilise les formules d'Euler :\n$$\\cos \\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2}, \\quad \\sin \\theta = \\frac{e^{i\\theta} - e^{-i\\theta}}{2i}$$\n\nPuis on développe $\\cos^n \\theta$ ou $\\sin^n \\theta$ par la formule du binôme, et on regroupe les termes pour faire apparaître des $\\cos(k\\theta)$ et $\\sin(k\\theta)$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Qu'est-ce que la **forme trigonométrique** (ou **forme polaire**) d'un nombre complexe $z \\neq 0$ ?",
+      "back_md": "Tout nombre complexe $z \\neq 0$ s'écrit sous la forme :\n$$z = r(\\cos \\theta + i \\sin \\theta)$$\navec $r = |z| > 0$ et $\\theta \\in \\mathbb{R}$.\n\n$\\theta$ est appelé un **argument** de $z$, noté $\\arg(z)$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir l'**argument** d'un nombre complexe $z \\neq 0$.",
+      "back_md": "Un **argument** de $z \\neq 0$ est un réel $\\theta$ tel que :\n$$z = |z| (\\cos \\theta + i \\sin \\theta)$$\n\nL'argument est défini **modulo $2\\pi$** :\n$$\\theta \\in \\arg(z) \\Leftrightarrow z = |z| e^{i\\theta}$$\n\nOn note $\\arg(z) = \\theta + 2\\pi \\mathbb{Z}$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner la formule de l'argument d'un produit : $\\arg(zz')$.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^* \\times \\mathbb{C}^*$ :\n$$\\arg(zz') = \\arg(z) + \\arg(z') \\quad [2\\pi]$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner la formule de l'argument d'un quotient : $\\arg\\left(\\frac{z}{z'}\\right)$.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^* \\times \\mathbb{C}^*$ :\n$$\\arg\\left(\\frac{z}{z'}\\right) = \\arg(z) - \\arg(z') \\quad [2\\pi]$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner la formule de l'argument d'une puissance : $\\arg(z^n)$.",
+      "back_md": "Pour tout $z \\in \\mathbb{C}^*$ et $n \\in \\mathbb{Z}$ :\n$$\\arg(z^n) = n \\arg(z) \\quad [2\\pi]$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que vaut $\\arg(\\overline{z})$ en fonction de $\\arg(z)$ ?",
+      "back_md": "Pour tout $z \\in \\mathbb{C}^*$ :\n$$\\arg(\\overline{z}) = -\\arg(z) \\quad [2\\pi]$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir l'**exponentielle complexe** $e^{i\\theta}$.",
+      "back_md": "Pour tout $\\theta \\in \\mathbb{R}$ :\n$$e^{i\\theta} = \\cos \\theta + i \\sin \\theta$$\n\nC'est un nombre complexe de module $1$ et d'argument $\\theta$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que vaut $e^{i\\theta} \\times e^{i\\theta'}$ ?",
+      "back_md": "$$e^{i\\theta} \\times e^{i\\theta'} = e^{i(\\theta + \\theta')}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que vaut $\\overline{e^{i\\theta}}$ ?",
+      "back_md": "$$\\overline{e^{i\\theta}} = e^{-i\\theta}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Écrire la **forme exponentielle** d'un nombre complexe $z \\neq 0$.",
+      "back_md": "Tout nombre complexe $z \\neq 0$ s'écrit :\n$$z = r e^{i\\theta}$$\navec $r = |z|$ et $\\theta = \\arg(z) \\pmod{2\\pi}$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer la formule donnant les **racines carrées** d'un nombre complexe non nul $z = re^{i\\theta}$.",
+      "back_md": "Les deux racines carrées de $z = re^{i\\theta}$ sont :\n$$\\pm \\sqrt{r} e^{i\\theta/2}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner la formule des racines d'une **équation du second degré** $az^2 + bz + c = 0$ dans $\\mathbb{C}$.",
+      "back_md": "Pour $a \\neq 0$, on calcule le **discriminant** :\n$$\\Delta = b^2 - 4ac$$\n\nSi $\\delta$ est une racine carrée de $\\Delta$ dans $\\mathbb{C}$, les deux racines sont :\n$$z_1 = \\frac{-b - \\delta}{2a}, \\quad z_2 = \\frac{-b + \\delta}{2a}$$",
+      "hint_md": "Toute équation du second degré dans $\\mathbb{C}$ possède toujours deux racines (comptées avec multiplicité).",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment résoudre $z^2 = w$ dans $\\mathbb{C}$, où $w \\in \\mathbb{C}^*$ ?",
+      "back_md": "**Méthode 1 (forme exponentielle)** : Si $w = re^{i\\theta}$, alors :\n$$z = \\pm \\sqrt{r} e^{i\\theta/2}$$\n\n**Méthode 2 (forme algébrique)** : Poser $z = x + iy$ et résoudre le système :\n$$\\begin{cases} x^2 - y^2 = \\text{Re}(w) \\\\ 2xy = \\text{Im}(w) \\end{cases}$$\navec la contrainte $x^2 + y^2 = |w|$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Qu'appelle-t-on les **racines $n$-ièmes de l'unité** ?",
+      "back_md": "Les **racines $n$-ièmes de l'unité** sont les solutions de l'équation :\n$$z^n = 1$$\n\nElles sont au nombre de $n$ et s'écrivent :\n$$e^{2ik\\pi/n}, \\quad k \\in \\{0, 1, \\ldots, n-1\\}$$\n\nOn note souvent $\\omega_n = e^{2i\\pi/n}$ une racine primitive.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner la formule des **racines $n$-ièmes** d'un nombre complexe $w \\neq 0$.",
+      "back_md": "Si $w = re^{i\\theta}$, les $n$ racines $n$-ièmes de $w$ sont :\n$$z_k = \\sqrt[n]{r} \\, e^{i(\\theta + 2k\\pi)/n}, \\quad k \\in \\{0, 1, \\ldots, n-1\\}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment caractériser l'**alignement** de trois points $A, B, C$ du plan complexe ?",
+      "back_md": "Trois points $A, B, C$ d'affixes respectives $a, b, c$ (avec $a \\neq b$ et $c \\neq b$) sont alignés si et seulement si :\n$$\\frac{c - b}{a - b} \\in \\mathbb{R}$$",
+      "hint_md": "Cela équivaut à dire que les vecteurs $\\overrightarrow{BA}$ et $\\overrightarrow{BC}$ sont colinéaires.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment caractériser l'**orthogonalité** de deux vecteurs $\\overrightarrow{BA}$ et $\\overrightarrow{BC}$ dans le plan complexe ?",
+      "back_md": "Les vecteurs $\\overrightarrow{BA}$ et $\\overrightarrow{BC}$ d'affixes respectives $a - b$ et $c - b$ sont orthogonaux si et seulement si :\n$$\\frac{c - b}{a - b} \\in i\\mathbb{R}$$",
+      "hint_md": "Cela équivaut à $\\arg\\left(\\frac{c-b}{a-b}\\right) \\equiv \\pm \\frac{\\pi}{2} \\pmod{\\pi}$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir une **translation** de vecteur $\\vec{u}$ dans le plan complexe.",
+      "back_md": "Soit $\\vec{u}$ d'affixe $u_0$. La **translation** de vecteur $\\vec{u}$ est la transformation du plan qui à tout point $M$ d'affixe $z$ associe le point $M'$ d'affixe $z'$ tel que :\n$$z' = z + u_0$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir une **homothétie** de centre $\\Omega$ d'affixe $\\omega$ et de rapport $k \\in \\mathbb{R}^*$.",
+      "back_md": "L'**homothétie** de centre $\\Omega$ (affixe $\\omega$) et de rapport $k$ est la transformation qui à tout point $M$ d'affixe $z$ associe le point $M'$ d'affixe $z'$ tel que :\n$$z' - \\omega = k(z - \\omega)$$\n\nOu encore :\n$$z' = kz + (1-k)\\omega$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir une **rotation** de centre $\\Omega$ (affixe $\\omega$) et d'angle $\\theta$.",
+      "back_md": "La **rotation** de centre $\\Omega$ (affixe $\\omega$) et d'angle $\\theta$ est la transformation qui à tout point $M$ d'affixe $z$ associe le point $M'$ d'affixe $z'$ tel que :\n$$z' - \\omega = e^{i\\theta} (z - \\omega)$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Définir une **similitude directe** de centre $\\Omega$ (affixe $\\omega$), de rapport $k > 0$ et d'angle $\\theta$.",
+      "back_md": "La **similitude directe** de centre $\\Omega$, de rapport $k$ et d'angle $\\theta$ est la transformation qui à tout point $M$ d'affixe $z$ associe le point $M'$ d'affixe $z'$ tel que :\n$$z' - \\omega = k e^{i\\theta} (z - \\omega)$$\n\nC'est la composée d'une homothétie de rapport $k$ et d'une rotation d'angle $\\theta$, toutes deux de centre $\\Omega$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment déterminer le centre d'une similitude directe d'écriture complexe $z' = az + b$ avec $a \\neq 1$ ?",
+      "back_md": "Le centre $\\Omega$ d'affixe $\\omega$ est le point fixe de la similitude, donc :\n$$\\omega = a\\omega + b$$\n\nD'où :\n$$\\omega = \\frac{b}{1 - a}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner l'écriture complexe générale d'une **similitude directe**.",
+      "back_md": "Une similitude directe s'écrit sous la forme :\n$$z' = az + b$$\navec $a \\in \\mathbb{C}^*$ et $b \\in \\mathbb{C}$.\n\n- Le **rapport** est $k = |a|$\n- L'**angle** est $\\theta = \\arg(a)$\n- Le **centre** $\\omega$ vérifie $\\omega = a\\omega + b$, d'où $\\omega = \\frac{b}{1-a}$ si $a \\neq 1$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment caractériser une **transformation** du plan qui conserve les distances ?",
+      "back_md": "Une transformation du plan qui conserve les distances (on parle d'**isométrie**) admet une écriture complexe de la forme :\n$$z' = az + b \\quad \\text{ou} \\quad z' = a\\overline{z} + b$$\navec $|a| = 1$.\n\n- Si $z' = az + b$ : isométrie directe (translation, rotation, ou composée)\n- Si $z' = a\\overline{z} + b$ : isométrie indirecte (symétrie axiale, symétrie glissée)",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que représente la transformation d'écriture complexe $z' = \\overline{z}$ ?",
+      "back_md": "C'est la **symétrie par rapport à l'axe réel** (l'axe des abscisses).",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Calculer $i^3$, $i^4$, $i^5$ et généraliser pour $i^n$ avec $n \\in \\mathbb{Z}$.",
+      "back_md": "$$i^3 = i^2 \\times i = -i$$\n$$i^4 = (i^2)^2 = 1$$\n$$i^5 = i^4 \\times i = i$$\n\nEn général, $i^n$ est **périodique de période $4$** :\n- $i^{4k} = 1$\n- $i^{4k+1} = i$\n- $i^{4k+2} = -1$\n- $i^{4k+3} = -i$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que vaut $(1 + i)^2$ ?",
+      "back_md": "$$(1 + i)^2 = 1 + 2i + i^2 = 1 + 2i - 1 = 2i$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Calculer le module et un argument de $1 + i$.",
+      "back_md": "$$|1 + i| = \\sqrt{1^2 + 1^2} = \\sqrt{2}$$\n\nUn argument est $\\theta = \\frac{\\pi}{4}$ car :\n$$1 + i = \\sqrt{2} \\left( \\cos \\frac{\\pi}{4} + i \\sin \\frac{\\pi}{4} \\right) = \\sqrt{2} e^{i\\pi/4}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Calculer le module et un argument de $-1 + i\\sqrt{3}$.",
+      "back_md": "$$|-1 + i\\sqrt{3}| = \\sqrt{(-1)^2 + (\\sqrt{3})^2} = \\sqrt{1 + 3} = 2$$\n\nUn argument est $\\theta = \\frac{2\\pi}{3}$ car :\n$$-1 + i\\sqrt{3} = 2\\left( \\cos \\frac{2\\pi}{3} + i \\sin \\frac{2\\pi}{3} \\right) = 2 e^{i \\cdot 2\\pi/3}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Montrer que pour tout $z \\in \\mathbb{C}$, on a $|\\text{Re}(z)| \\leq |z|$ et $|\\text{Im}(z)| \\leq |z|$.",
+      "back_md": "Soit $z = a + ib$ avec $(a,b) \\in \\mathbb{R}^2$. On a :\n$$|z|^2 = a^2 + b^2 \\geq a^2$$\ndonc $|z| \\geq |a| = |\\text{Re}(z)|$.\n\nDe même :\n$$|z|^2 = a^2 + b^2 \\geq b^2$$\ndonc $|z| \\geq |b| = |\\text{Im}(z)|$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que représente géométriquement l'ensemble $\\{ z \\in \\mathbb{C} \\mid |z - z_0| = r \\}$ ?",
+      "back_md": "C'est le **cercle** de centre le point d'affixe $z_0$ et de rayon $r > 0$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Que représente géométriquement l'ensemble $\\{ z \\in \\mathbb{C} \\mid |z - a| = |z - b| \\}$ ?",
+      "back_md": "C'est la **médiatrice** du segment $[AB]$ où $A$ et $B$ sont les points d'affixes respectives $a$ et $b$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Énoncer l'**identité du parallélogramme** dans $\\mathbb{C}$.",
+      "back_md": "Pour tout $(z, z') \\in \\mathbb{C}^2$ :\n$$|z + z'|^2 + |z - z'|^2 = 2\\left( |z|^2 + |z'|^2 \\right)$$",
+      "hint_md": "Cette identité traduit la relation entre les diagonales et les côtés d'un parallélogramme.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment linéariser $\\cos^3 \\theta$ en utilisant les nombres complexes ?",
+      "back_md": "On utilise la formule d'Euler :\n$$\\cos \\theta = \\frac{e^{i\\theta} + e^{-i\\theta}}{2}$$\n\nDonc :\n$$\\cos^3 \\theta = \\frac{1}{8}\\left( e^{i\\theta} + e^{-i\\theta} \\right)^3$$\n\nPar la formule du binôme, on développe et on regroupe les termes :\n$$\\cos^3 \\theta = \\frac{1}{4}\\cos(3\\theta) + \\frac{3}{4}\\cos \\theta$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Exprimer $\\cos(5\\theta)$ en fonction de $\\cos \\theta$ en utilisant la formule de Moivre.",
+      "back_md": "Par la formule de Moivre :\n$$(\\cos \\theta + i \\sin \\theta)^5 = \\cos(5\\theta) + i \\sin(5\\theta)$$\n\nEn développant le membre de gauche par la formule du binôme et en identifiant les parties réelles, on obtient :\n$$\\cos(5\\theta) = 16\\cos^5 \\theta - 20\\cos^3 \\theta + 5\\cos \\theta$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Calculer les racines cubiques de l'unité (résoudre $z^3 = 1$).",
+      "back_md": "Les racines cubiques de l'unité sont :\n$$z_k = e^{2ik\\pi/3}, \\quad k \\in \\{0, 1, 2\\}$$\n\nC'est-à-dire :\n$$z_0 = 1, \\quad z_1 = e^{2i\\pi/3} = j = -\\frac{1}{2} + i\\frac{\\sqrt{3}}{2}, \\quad z_2 = e^{4i\\pi/3} = \\overline{j} = -\\frac{1}{2} - i\\frac{\\sqrt{3}}{2}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Donner les propriétés remarquables des racines cubiques de l'unité $1, j, \\overline{j}$.",
+      "back_md": "$$j = e^{2i\\pi/3} = -\\frac{1}{2} + i\\frac{\\sqrt{3}}{2}$$\n$$\\overline{j} = e^{-2i\\pi/3} = -\\frac{1}{2} - i\\frac{\\sqrt{3}}{2}$$\n\nPropriétés :\n- $j^3 = 1$\n- $1 + j + j^2 = 0$ (car $j^2 = \\overline{j}$)\n- $j \\overline{j} = |j|^2 = 1$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Résoudre dans $\\mathbb{C}$ l'équation $z^4 = -1$.",
+      "back_md": "On écrit $-1 = e^{i\\pi}$. Les solutions sont :\n$$z_k = e^{i(\\pi + 2k\\pi)/4} = e^{i\\pi(2k+1)/4}, \\quad k \\in \\{0, 1, 2, 3\\}$$\n\nC'est-à-dire :\n$$z_0 = e^{i\\pi/4}, \\quad z_1 = e^{i3\\pi/4}, \\quad z_2 = e^{i5\\pi/4}, \\quad z_3 = e^{i7\\pi/4}$$\n\nOu en forme algébrique :\n$$z_0 = \\frac{1+i}{\\sqrt{2}}, \\quad z_1 = \\frac{-1+i}{\\sqrt{2}}, \\quad z_2 = \\frac{-1-i}{\\sqrt{2}}, \\quad z_3 = \\frac{1-i}{\\sqrt{2}}$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Résoudre dans $\\mathbb{C}$ l'équation $z^2 = i$.",
+      "back_md": "On écrit $i = e^{i\\pi/2}$. Les deux racines carrées sont :\n$$z = \\pm e^{i\\pi/4} = \\pm \\frac{1+i}{\\sqrt{2}}$$\n\nOu en forme algébrique :\n$$z_1 = \\frac{\\sqrt{2}}{2}(1 + i), \\quad z_2 = -\\frac{\\sqrt{2}}{2}(1 + i)$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Factoriser $a^n - b^n$ dans $\\mathbb{C}$ pour $n \\in \\mathbb{N}^*$.",
+      "back_md": "$$a^n - b^n = (a - b)\\left( a^{n-1} + a^{n-2}b + \\cdots + ab^{n-2} + b^{n-1} \\right)$$\n\nOu encore :\n$$a^n - b^n = (a - b) \\sum_{k=0}^{n-1} a^{n-1-k} b^k$$",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Factoriser $a^n + b^n$ dans $\\mathbb{C}$ pour $n$ **impair**.",
+      "back_md": "Si $n = 2p + 1$ est impair, alors :\n$$a^n + b^n = a^n - (-b)^n = (a - (-b)) \\sum_{k=0}^{n-1} a^{n-1-k} (-b)^k$$\n\nSoit :\n$$a^n + b^n = (a + b) \\sum_{k=0}^{n-1} (-1)^k a^{n-1-k} b^k$$",
+      "hint_md": "Pour $n$ pair, $a^n + b^n$ n'admet pas de factorisation simple sur $\\mathbb{R}$, mais peut se factoriser sur $\\mathbb{C}$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Comment déterminer l'ensemble des points $M$ d'affixe $z$ tels que $|z - z_1| = |z - z_2|$ ?",
+      "back_md": "L'ensemble des points $M$ d'affixe $z$ tels que :\n$$|z - z_1| = |z - z_2|$$\nest la **médiatrice** du segment $[Z_1 Z_2]$ où $Z_1$ et $Z_2$ sont les points d'affixes $z_1$ et $z_2$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    },
+    {
+      "front_md": "Déterminer l'ensemble des points $M$ d'affixe $z$ tels que $\\arg\\left(\\frac{z - a}{z - b}\\right) = \\frac{\\pi}{2} \\pmod{2\\pi}$.",
+      "back_md": "Cette condition signifie que :\n$$\\frac{z - a}{z - b} \\in i\\mathbb{R}$$\n\nC'est-à-dire que les vecteurs $\\overrightarrow{BM}$ et $\\overrightarrow{AM}$ sont orthogonaux.\n\nL'ensemble cherché est donc le **cercle de diamètre $[AB]$**, privé des points $A$ et $B$.",
+      "tags": ["Maths/Algèbre/Nombres complexes"]
+    }
+  ]
+}
