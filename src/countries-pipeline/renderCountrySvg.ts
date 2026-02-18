@@ -28,12 +28,12 @@ type AtlasRegion = {
 
 const ATLAS_REGIONS: AtlasRegion[] = [
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
-  { id: 'caribbean', refLon: -72, frame: [-90, 7, -54, 31] },
+  { id: 'caribbean', refLon: -69, frame: [-83, 10, -58, 25] },
   { id: 'north_america', refLon: -100, frame: [-170, 5, -45, 83] },
   { id: 'south_america', refLon: -62, frame: [-92, -60, -28, 16] },
   // Split Europe for a tighter zoom than the previous single large frame.
   { id: 'europe_west', refLon: 5, frame: [-30, 34, 25, 72] },
-  { id: 'europe_east', refLon: 30, frame: [15, 34, 60, 72] },
+  { id: 'europe_east', refLon: 36, frame: [22, 35, 64, 71] },
   { id: 'africa', refLon: 20, frame: [-25, -40, 60, 40] },
   { id: 'west_asia', refLon: 75, frame: [30, 0, 125, 55] },
   { id: 'east_asia', refLon: 120, frame: [90, -5, 160, 60] },
