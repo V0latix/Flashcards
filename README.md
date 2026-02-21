@@ -1,178 +1,278 @@
 # Flashcards Leitner
 
-Application de flashcards personnelle basee sur la methode de Leitner, avec support Markdown + KaTeX, stockage local via IndexedDB (Dexie) et packs publics via Supabase (lecture seule).
+Application de revision espacee (web + mobile) basee sur la methode de Leitner, avec edition Markdown/LaTeX, stockage local, synchronisation cloud optionnelle, et catalogue de packs publics via Supabase.
+
+## Sommaire
+- [Apercu](#apercu)
+- [Fonctionnalites](#fonctionnalites)
+- [Stack technique](#stack-technique)
+- [Comment lapplication fonctionne pas a pas](#comment-lapplication-fonctionne-pas-a-pas)
+- [Architecture des donnees](#architecture-des-donnees)
+- [Demarrage rapide web](#demarrage-rapide-web)
+- [Demarrage rapide mobile expo](#demarrage-rapide-mobile-expo)
+- [Variables denvironnement](#variables-denvironnement)
+- [Scripts utiles](#scripts-utiles)
+- [Pipelines de contenu et geo](#pipelines-de-contenu-et-geo)
+- [Tests](#tests)
+- [Deploiement](#deploiement)
+- [Structure du projet](#structure-du-projet)
+- [Limites connues](#limites-connues)
+- [Licence](#licence)
+
+## Apercu
+Le projet est organise en monorepo avec:
+- une app web React/Vite (`src/`),
+- une app mobile Expo (`apps/mobile/`),
+- un moteur Leitner deterministe (boites 0 a 5),
+- un stockage local-first (IndexedDB sur web, AsyncStorage sur mobile),
+- une sync optionnelle vers Supabase apres connexion,
+- des scripts de generation/import de packs publics.
 
 ## Fonctionnalites
-- Leitner strict (Box 0..5, intervalles 1/3/7/15/30, box1_target=10)
-- Session quotidienne avec cartes Box 1 + cartes dues (Box 2..5)
-- Cartes "learned" apres Box 5 + maintenance periodique (defaut 90 jours)
-- Cards avec Markdown + KaTeX + tags hierarchiques (format `A/B/C`)
-- Champs optionnels cartes: `hint_md`, `source_type`, `source_id`
-- Library tags-first avec explorateur d'arbre
-- Suppression avec confirmation (session, par tag, suppression totale)
-- Import/Export JSON tolerant + diagnostic d'import
-- Packs publics (Supabase) + import idempotent vers la base locale
-- Dashboard Stats (global, progression, tags, Leitner, insights)
-- Settings pour box1_target + intervalles
-- Accueil en grille d'icones + navigation header/bottom
-- Parametre de maintien learned_review_interval_days (defaut 90)
-- Parametre reverse_probability (0..1) pour inverser question/reponse
+- Sessions de revision quotidiennes avec progression Leitner.
+- Support Markdown + KaTeX (formules) sur front/back.
+- Tags hierarchiques (`Maths/Algebre`, `Geo/Europe/...`).
+- Import/export JSON (avec media et logs).
+- Bibliotheque avec filtres par tags, texte et boites.
+- Packs publics Supabase importables en local (idempotent).
+- Dashboard stats (volume, progression, boites, tags, taux de reussite).
+- Parametres Leitner: intervalles, objectif quotidien, maintenance learned, reverse Q/A.
+- Sync cloud optionnelle (auth + fusion locale/distante).
 
-## Tech
-- React + TypeScript + Vite
-- IndexedDB via Dexie
-- Supabase (lecture seule)
-- Vitest pour les tests unitaires
+## Stack technique
+- Frontend web: React 19, TypeScript, Vite, React Router.
+- Mobile: React Native + Expo.
+- Stockage local web: Dexie (IndexedDB).
+- Stockage local mobile: AsyncStorage.
+- Backend externe: Supabase (auth, tables user_*, packs publics).
+- Tests: Vitest + Testing Library.
 
-## Installation
+## Comment lapplication fonctionne pas a pas
+
+### 1) Creation ou import des cartes
+- Une carte creee manuellement ou importee est stockee localement.
+- Un `ReviewState` est cree automatiquement avec `box=0` et `due_date=null`.
+- Les packs publics importes sont marques avec `source_type='supabase_public'` pour eviter les doublons.
+
+### 2) Construction de la session du jour
+- Le moteur charge les `ReviewState` locaux.
+- Il selectionne les cartes dues (`box>=1` et `due_date <= today`).
+- Il ajoute aussi les cartes `learned` dues en maintenance (`learned_at + learnedReviewIntervalDays <= today`).
+- Si aucune carte nest due, il prend un echantillon aleatoire de cartes `box=0` (jusqua `box1Target`) pour demarrer la session.
+
+### 3) Deroulement dune carte en session
+- La question est affichee, puis la reponse apres action utilisateur.
+- Selon `reverseProbability`, front/back peuvent etre inverses aleatoirement.
+- Lutilisateur repond `Good` ou `Bad`.
+
+### 4) Mise a jour Leitner apres reponse
+- `Good`: promotion de boite (jusqua 5).
+- `Good` depuis la boite 5: carte marquee `learned`, sortie du flux standard.
+- `Bad`: retour en boite 1.
+- Chaque reponse cree un `ReviewLog`.
+
+### 5) Stats et visualisation
+- Les stats sont calculees depuis les donnees locales (cartes, review states, logs).
+- Les ecrans montrent: due du jour, repartition par boites, progression 7/30 jours, perf par tags.
+
+### 6) Synchronisation cloud optionnelle
+- Si lutilisateur se connecte (Supabase Auth), la sync est activee.
+- Sync initiale au login, puis toutes les 15 secondes et au focus.
+- Strategie de merge: local-first defensive + upserts distants (`user_cards`, `user_progress`, `user_review_log`, `user_settings`).
+
+```mermaid
+flowchart LR
+  A["Create / Import Card"] --> B["Local DB: box=0"]
+  B --> C["Build Daily Session"]
+  C --> D["Review Card"]
+  D -->|Good| E["Promote Box"]
+  D -->|Bad| F["Back to Box 1"]
+  E --> G["If Box 5 + Good => learned"]
+  F --> H["Write ReviewLog"]
+  G --> H["Write ReviewLog"]
+  H --> I["Update Stats"]
+  H --> J["Optional Cloud Sync (if logged in)"]
+```
+
+## Architecture des donnees
+
+### Web (IndexedDB / Dexie)
+- `cards`: contenu des cartes + metadata source/sync.
+- `reviewStates`: etat Leitner courant par carte.
+- `reviewLogs`: historique des reponses.
+- `media`: blobs associes aux cartes.
+
+### Mobile (AsyncStorage)
+- Snapshot structure (`cards`, `reviewStates`, `reviewLogs`, `packs`) versionne.
+- Meme logique Leitner appliquee cote app mobile.
+
+## Demarrage rapide web
+
+### Prerequis
+- Node.js 20+ recommande.
+- npm.
+- Un projet Supabase (URL + anon key) pour packs/auth/sync.
+
+### Installation
 ```bash
 npm install
+```
+
+### Configuration
+Creer `/.env.local`:
+```bash
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon-key>
+```
+
+### Lancer en dev
+```bash
 npm run dev
 ```
 
-## Configuration Supabase (lecture seule)
-Creer un fichier `.env.local` a la racine du projet :
+### Verification manuelle (5 minutes)
+1. Ouvrir lapp web.
+2. Aller dans `Packs`, ouvrir un pack, cliquer `Import`.
+3. Aller dans `Library` et verifier les cartes.
+4. Lancer `Review`, repondre a quelques cartes.
+5. Ouvrir `Stats` puis `Settings` pour verifier la persistance.
 
+## Demarrage rapide mobile (Expo)
+
+### Prerequis
+- Expo Go installe sur iOS/Android.
+
+### Lancer
+```bash
+npm run mobile
 ```
-VITE_SUPABASE_URL=https://<ton-projet>.supabase.co
-VITE_SUPABASE_ANON_KEY=<ta-cle-anon>
+
+Equivalent:
+```bash
+cd apps/mobile
+npx expo start -c
 ```
 
-Les valeurs se trouvent dans Supabase :
-Project Settings -> API -> Project URL + anon/public key.
+### Smoke check mobile
+1. Ouvrir le QR code dans Expo Go.
+2. `Home` puis `Play Session`.
+3. `Settings` -> `Open Media Test`.
+4. `Packs` -> ouvrir un pack -> `Download pack`.
+5. Verifier dans `Library`.
 
-Le client frontend est dans `src/utils/supabase.ts` (anon key uniquement).
+## Variables denvironnement
+
+### App web (`.env.local`)
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+### App mobile (EAS secrets ou env Expo)
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+### Pipelines Node (`.env`)
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_DB_URL` (requis pour certaines operations SQL/seed)
+- `COUNTRIES_EXCLUDE_ANTARCTICA=1` (optionnel)
+
+### Gardes de securite (operations destructives)
+- `ALLOW_DESTRUCTIVE_SUPABASE=1`
+- `ALLOW_DESTRUCTIVE_COUNTRIES=1`
 
 ## Scripts utiles
-- `npm run dev` : demarrer l'app
-- `npm run build` : build production
-- `npm run lint` : lint
-- `npm test` : tests unitaires
-- `npm run mobile` : demarrer l'app mobile Expo
 
-## Operations destructives (pipelines)
-Les scripts qui suppriment des lignes Supabase/Storage sont bloques par defaut.
+### Developpement
+- `npm run dev`: demarre lapp web.
+- `npm run build`: build TypeScript + Vite.
+- `npm run preview`: sert le build.
+- `npm run lint`: lint ESLint.
+- `npm run mobile`: demarre lapp mobile Expo.
 
-- Pour autoriser une suppression dans `src/supabase-pipeline/*`: `ALLOW_DESTRUCTIVE_SUPABASE=1`
-- Pour autoriser une suppression dans `src/countries-pipeline/*`: `ALLOW_DESTRUCTIVE_COUNTRIES=1`
+### Qualite
+- `npm run test`: tests unitaires.
+- `npm run test:watch`: tests en watch.
+- `npm run test:ui`: interface Vitest.
+- `npm run check`: lint + typecheck + tests.
 
-Exemples d'operations concernees:
-- `npm run cleanup:math-packs`
-- `npm run cleanup:math-seed`
-- `npm run seed:packs` (suppression des cartes obsoletes d'un pack)
-- `npm run seed:countries-pack` (suppression des cartes obsoletes du pack geo)
-- `npm run upload:country-svgs` (suppression des anciens noms de fichiers SVG invalides)
+### Packs publics Supabase
+- `npm run supabase:build`
+- `npm run seed:packs`
+- `npm run seed:countries-pack`
+- `npm run seed:departements-pack`
+- `npm run pipeline:geo-pack`
 
-## Deployment
+### Pipelines geographiques
+- `npm run pipeline:countries`
+- `npm run pipeline:departements`
+- `npm run pipeline:departements-pack`
+
+## Pipelines de contenu et geo
+
+### Pipeline pays (SVG -> Storage -> table `countries`)
+1. Generation SVG (`out/svg/{ISO2}.svg` + `out/preview.html`).
+2. Upload vers bucket Supabase `country-maps`.
+3. Seed/upsert SQL de `public.countries`.
+
+Commandes:
+```bash
+npm run gen:country-svgs
+npm run upload:country-svgs
+npm run seed:countries
+# ou pipeline complet
+npm run pipeline:countries
+```
+
+### Pipeline departements
+```bash
+npm run gen:departement-svgs
+npm run upload:departement-svgs
+npm run seed:departements-table
+npm run pipeline:departements
+```
+
+## Tests
+Voir `docs/testing.md`.
+
+Commandes principales:
+```bash
+npm run test
+npm run check
+```
+
+Couverture actuelle:
+- moteur Leitner,
+- logique de sync,
+- composants Markdown/media,
+- smoke tests des routes principales.
+
+## Deploiement
+
 ### Web (GitHub Pages)
-- Build + deploy via GitHub Actions: `.github/workflows/deploy-web.yml`
-- URL: https://v0latix.github.io/Flashcards/
-- Configure repo secrets for deploy:
-  - `VITE_SUPABASE_URL`
-  - `VITE_SUPABASE_ANON_KEY`
+- Workflow: `/.github/workflows/deploy-web.yml`
+- URL: <https://v0latix.github.io/Flashcards/>
+- Secrets requis: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 
 ### Mobile (TestFlight)
 Voir `docs/mobile-release.md`.
 
-## Mobile (Expo)
-Voir `docs/mobile-dev.md` pour les prerequis et la config.
+## Structure du projet
+```text
+.
+├── src/                     # app web (routes, db, leitner, sync)
+├── apps/mobile/             # app Expo
+├── supabase/                # migrations / seed SQL
+├── packs/                   # packs JSON locaux
+├── docs/                    # specs, tests, release notes
+├── src/countries-pipeline/  # generation & seed geo pays
+├── src/departements-pipeline/
+└── src/supabase-pipeline/   # seed packs publics
+```
 
-Smoke check rapide :
-1) `npm run mobile`
-2) Accueil -> "Play Session" ouvre une session
-3) Settings -> Open Media Test (image + drapeau SVG + LaTeX)
-4) Packs -> ouvrir un pack -> Download pack -> Library affiche les cartes
+## Limites connues
+- Pas de vraie suite E2E complete (tests majoritairement unit/smoke).
+- Les appels Supabase ne sont pas executes en reseau reel pendant les tests.
+- Le rendu LaTeX mobile depend dun chargement reseau (WebView + KaTeX CDN).
 
-## Pages principales
-- `/` Home
-- `/review` ReviewSession
-- `/library` Library (tags arborescents)
-- `/card/new` CardEditor
-- `/card/:cardId/edit` CardEditor
-- `/packs` Packs (Supabase)
-- `/packs/:slug` PackDetail
-- `/import-export` Import/Export
-- `/stats` Stats (dashboard)
-- `/settings` Settings
-
-## Import/Export JSON
-Formats acceptes :
-- `{ "schema_version": 1, "cards": [ ... ] }`
-- `{ "cards": [ ... ] }`
-- `[ ... ]`
-
-Champs cartes acceptes : `front_md`/`back_md` ou `front`/`back`.
-Chaque carte importee obtient un ReviewState (`box=0`, `due_date=null`) si absent.
-
-## Packs publics (Supabase)
-- Liste des packs sur `/packs`
-- Detail d'un pack sur `/packs/:slug`
-- Import d'un pack vers la base locale (idempotent via `source` + `source_id`)
-
-## Donnees locales
-- Cards stockees en IndexedDB (Dexie)
-- ReviewState et ReviewLog generes localement
-- Metadonnees optionnelles: `hint_md`, `source_type`, `source_id`
-- ReviewState: `is_learned`, `learned_at`
-
-## Verification rapide
-1) `npm run dev`
-2) Importer un pack public, puis ouvrir `/library`
-3) Lancer une session `/review`
-4) Ouvrir `/stats` pour le dashboard
-5) Ouvrir `/settings` et ajuster box1_target/intervalles
-
-## Structure rapide
-- `src/leitner/` : moteur Leitner
-- `src/db/` : Dexie + queries
-- `src/routes/` : pages
-- `src/supabase/` : client + API + import
-- `packs/` : packs JSON locaux
-
-## Notes
-- Supabase est utilise en lecture seule (pas d'auth).
-
-## Pipeline cartes pays (SVG -> Supabase)
-Objectif: generer 1 SVG par pays (style "zoom region"), les publier dans Supabase Storage, puis upsert la table `public.countries`.
-
-### Setup
-Creer un fichier `.env` a la racine (pour les scripts Node du pipeline), base sur `.env.example`:
-
-- `SUPABASE_URL` (ex: `https://<project-ref>.supabase.co`)
-- `SUPABASE_SERVICE_ROLE_KEY` (recommande pour creer le bucket + uploader + seed)
-- `SUPABASE_DB_URL` (necessaire pour auto-creer la table `countries` via Postgres; si tu as une erreur IPv6 `EHOSTUNREACH`, utilise la "Connection string" du pooler dans le Dashboard)
-
-Optionnel:
-- `COUNTRIES_EXCLUDE_ANTARCTICA=1` (par defaut: on)
-
-Note: ces variables `.env` sont distinctes de `.env.local` (Vite) qui contient `VITE_SUPABASE_*`.
-
-### Commandes
-- Generer tous les SVG + la page de preview:
-  - `npm run gen:country-svgs`
-- Uploader tous les SVG dans le bucket Storage `country-maps`:
-  - `npm run upload:country-svgs`
-- Creer la table si besoin + upsert dans `public.countries`:
-  - `npm run seed:countries`
-- Pipeline complet (one command):
-  - `npm run pipeline:countries`
-
-Si tu utilises pnpm: `pnpm run pipeline:countries` (meme nom de script).
-
-### Outputs
-- SVG: `out/svg/{ISO2}.svg`
-- Preview: `out/preview.html`
-- Metadonnees: `out/countries.meta.json` (bbox, centroid, bounds projetes)
-
-### Algo de cadrage (zoom region)
-- Source: Natural Earth "Admin 0 - Countries" (110m), telecharge automatiquement dans `data/`.
-- Par pays:
-  - centroid (lon/lat) + bbox (lon/lat)
-  - bbox pad de 25% + extent minimal 2 degres pour micro-etats
-  - projection `d3-geo` equirectangular, rotation sur la longitude du centroid pour stabiliser le rendu (dateline)
-  - fit de la bbox dans un viewBox `0 0 1000 1000`
-  - rendu des pays dont la bbox intersecte la zone:
-    - autres: fill `#C7C7C7`, stroke `#8A8A8A`
-    - cible: fill `#FFFFFF`, stroke `#8A8A8A` (un peu plus epais), dessine en dernier
-  - aucun texte/label, fond transparent
-- Le health check Supabase s'exécute uniquement en mode dev.
+## Licence
+MIT. Voir `LICENSE`.
