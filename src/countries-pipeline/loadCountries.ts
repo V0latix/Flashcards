@@ -100,6 +100,13 @@ function normalizeIso3(value: string | null): string | null {
   return letters
 }
 
+function isoAliasForMissingIso2(props: Record<string, unknown>): { iso2: string; iso3: string } | null {
+  const name = (getString(props, 'NAME_EN', 'NAME', 'ADMIN') ?? '').toLowerCase()
+  // Natural Earth ships Somaliland without ISO2 (-99). Merge it into Somalia for card rendering.
+  if (name.includes('somaliland')) return { iso2: 'SO', iso3: 'SOM' }
+  return null
+}
+
 export async function loadCountriesFromShapefile(shpPath: string): Promise<CountryFeature[]> {
   const fc = (await shapefile.read(shpPath)) as GeoJSON.FeatureCollection<GeoJSON.Geometry, Record<string, unknown>>
 
@@ -109,12 +116,12 @@ export async function loadCountriesFromShapefile(shpPath: string): Promise<Count
     if (!f.geometry) continue
     const props = (f.properties ?? {}) as Record<string, unknown>
 
-    const iso2 =
+    let iso2 =
       normalizeIso2(getString(props, 'ISO_A2')) ??
       normalizeIso2(getString(props, 'ISO_A2_EH')) ??
       null
 
-    const iso3 =
+    let iso3 =
       normalizeIso3(getString(props, 'ISO_A3')) ??
       normalizeIso3(getString(props, 'ISO_A3_EH')) ??
       normalizeIso3(getString(props, 'ADM0_A3')) ??
@@ -122,8 +129,13 @@ export async function loadCountriesFromShapefile(shpPath: string): Promise<Count
       null
 
     if (!iso2) {
-      skippedMissingIso2++
-      continue
+      const alias = isoAliasForMissingIso2(props)
+      if (!alias) {
+        skippedMissingIso2++
+        continue
+      }
+      iso2 = alias.iso2
+      iso3 = iso3 ?? alias.iso3
     }
 
     const name_en = getString(props, 'NAME_EN', 'NAME', 'ADMIN') ?? iso2

@@ -1,6 +1,6 @@
 import type * as GeoJSON from 'geojson'
-import { geoNaturalEarth1, geoPath } from 'd3-geo'
-import { bboxIntersects, bboxPadAndMinExtent, bboxToMultiPoint, computeBboxUnwrapped, unwrapLon } from './geo.js'
+import { geoCentroid, geoNaturalEarth1, geoPath } from 'd3-geo'
+import { bboxIntersects, bboxPadAndMinExtent, bboxToMultiPoint, computeBboxRaw, computeBboxUnwrapped, unwrapLon } from './geo.js'
 import type { BBox, CountryFeature, RenderMeta } from './types.js'
 
 const SIZE = 1000
@@ -87,6 +87,60 @@ type RenderOptions = {
   mode?: 'zoom' | 'atlas'
 }
 
+function geometryToMultiPolygonCoordinates(geometry: GeoJSON.Geometry): number[][][][] {
+  if (geometry.type === 'Polygon') return [geometry.coordinates]
+  if (geometry.type === 'MultiPolygon') return geometry.coordinates
+  if (geometry.type === 'GeometryCollection') {
+    const out: number[][][][] = []
+    for (const g of geometry.geometries) out.push(...geometryToMultiPolygonCoordinates(g))
+    return out
+  }
+  return []
+}
+
+function mergeCountryGroup(group: CountryFeature[]): CountryFeature {
+  if (group.length === 1) return group[0]
+  const base = group[0]
+  const coordinates: number[][][][] = []
+  for (const c of group) {
+    coordinates.push(...geometryToMultiPolygonCoordinates(c.feature.geometry))
+  }
+
+  const mergedGeometry: GeoJSON.MultiPolygon = { type: 'MultiPolygon', coordinates }
+  const mergedFeature: GeoJSON.Feature<GeoJSON.MultiPolygon, Record<string, unknown>> = {
+    type: 'Feature',
+    properties: { ...(base.feature.properties ?? {}) },
+    geometry: mergedGeometry
+  }
+
+  const centroid = geoCentroid(mergedFeature as unknown as GeoJSON.GeoJSON) as [number, number]
+  const bbox_raw = computeBboxRaw(mergedGeometry)
+  const ref = centroid[0]
+  const bbox_unwrapped = computeBboxUnwrapped(mergedGeometry, ref)
+
+  return {
+    ...base,
+    feature: mergedFeature,
+    centroid,
+    bbox_raw,
+    bbox_unwrapped_ref: ref,
+    bbox_unwrapped
+  }
+}
+
+function aggregateCountriesByIso2(countries: CountryFeature[]): CountryFeature[] {
+  const byIso2 = new Map<string, CountryFeature[]>()
+  for (const c of countries) {
+    const list = byIso2.get(c.iso2)
+    if (list) list.push(c)
+    else byIso2.set(c.iso2, [c])
+  }
+
+  return [...byIso2.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([, group]) => mergeCountryGroup(group))
+}
+
 function findTarget(countries: CountryFeature[], targetIso2: string): CountryFeature {
   const target = countries.find((c) => c.iso2 === targetIso2)
   if (!target) throw new Error(`Target not found: ${targetIso2}`)
@@ -124,21 +178,32 @@ function selectRegionForTarget(target: CountryFeature): AtlasRegion {
 
 function targetMarkerSvg(
   targetBounds: [[number, number], [number, number]],
-  targetCenter?: [number, number] | null
+  targetCenter?: [number, number] | null,
+  targetProjectedArea?: number
 ): string {
   const [[x0, y0], [x1, y1]] = targetBounds
   const w = Math.max(0, x1 - x0)
   const h = Math.max(0, y1 - y0)
   const minDim = Math.min(w, h)
   const maxDim = Math.max(w, h)
-  const area = w * h
-  const shouldMark = maxDim <= 30 || minDim <= 12 || area <= 1200
+  const boundsArea = w * h
+  const projectedArea = Math.max(0, targetProjectedArea ?? 0)
+  const fillRatio = boundsArea > 0 ? projectedArea / boundsArea : 0
+
+  // Handle far-apart tiny islands (large bbox, tiny actual filled area).
+  const shouldMark =
+    maxDim <= 34 ||
+    minDim <= 14 ||
+    boundsArea <= 1600 ||
+    projectedArea <= 2200 ||
+    (projectedArea <= 6000 && fillRatio <= 0.08)
   if (!shouldMark) return ''
 
   const cx = targetCenter?.[0] ?? (x0 + x1) / 2
   const cy = targetCenter?.[1] ?? (y0 + y1) / 2
-  const base = Math.max(maxDim * 0.65, 8)
-  const r = Math.max(16, Math.min(38, base + 10))
+  const tinyBoost = projectedArea <= 300 ? 18 : projectedArea <= 1200 ? 12 : 8
+  const base = Math.max(maxDim * 0.7, 10)
+  const r = Math.max(22, Math.min(54, base + tinyBoost))
   const outerR = r + 5
   return [
     // Visible zone for tiny islands/micro-states: soft filled disc + strong contour.
@@ -226,8 +291,12 @@ function renderAtlas(
   )
 
   const targetBounds = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
-  const targetCenter = projection(target.centroid as [number, number])
-  const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null)
+  const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
+  const centerByPath = path.centroid(target.feature as unknown as GeoJSON.GeoJSON)
+  const fallbackCenter = projection(target.centroid as [number, number])
+  const targetCenter =
+    Number.isFinite(centerByPath[0]) && Number.isFinite(centerByPath[1]) ? centerByPath : fallbackCenter
+  const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
   if (marker) parts.push(marker)
 
   parts.push(`</svg>`)
@@ -344,8 +413,12 @@ function renderZoom(
   )
 
   const targetBounds = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
-  const targetCenter = projection(target.centroid as [number, number])
-  const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null)
+  const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
+  const centerByPath = path.centroid(target.feature as unknown as GeoJSON.GeoJSON)
+  const fallbackCenter = projection(target.centroid as [number, number])
+  const targetCenter =
+    Number.isFinite(centerByPath[0]) && Number.isFinite(centerByPath[1]) ? centerByPath : fallbackCenter
+  const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
   if (marker) parts.push(marker)
 
   parts.push(`</svg>`)
@@ -379,12 +452,13 @@ export function renderCountrySvg(
   targetIso2: string,
   opts?: RenderOptions
 ): RenderResult {
+  const mergedCountries = aggregateCountriesByIso2(countries)
   const mode = opts?.mode ?? 'atlas'
   const paddingPct = opts?.paddingPct ?? 0.25
   const minExtentDeg = opts?.minExtentDeg ?? 2
   const theme = opts?.theme ?? 'transparent'
   const marginPx = opts?.marginPx ?? MARGIN
 
-  if (mode === 'zoom') return renderZoom(countries, targetIso2, paddingPct, minExtentDeg, theme, marginPx)
-  return renderAtlas(countries, targetIso2, theme, marginPx)
+  if (mode === 'zoom') return renderZoom(mergedCountries, targetIso2, paddingPct, minExtentDeg, theme, marginPx)
+  return renderAtlas(mergedCountries, targetIso2, theme, marginPx)
 }
