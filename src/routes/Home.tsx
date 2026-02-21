@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AuthButton from '../auth/AuthButton'
 import LeitnerInfo from '../components/LeitnerInfo'
+import StreakBadge from '../components/StreakBadge'
 import { ChartIcon, HomeIcon, PlayIcon, PlusIcon, SettingsIcon } from '../components/icons'
 import db from '../db'
 import type { ReviewState } from '../db/types'
@@ -146,6 +147,7 @@ function Home() {
   return (
     <main className="home-hero">
       <div className="home-account">
+        <StreakBadge />
         <AuthButton className="btn btn-secondary auth-button" />
         <LeitnerInfo />
       </div>

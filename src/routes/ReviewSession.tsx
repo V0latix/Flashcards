@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import db from '../db'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
@@ -8,10 +8,14 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteCard } from '../db/queries'
 import { consumeTrainingQueue } from '../utils/training'
 import { useI18n } from '../i18n/useI18n'
+import { useAuth } from '../auth/useAuth'
+import { supabase } from '../supabase/client'
 
 function ReviewSession() {
   const { t } = useI18n()
+  const { user } = useAuth()
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const completedSaveKey = useRef<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [cards, setCards] = useState<
     Array<{
@@ -160,6 +164,41 @@ function ReviewSession() {
   const isDone = !isLoading && index >= cards.length
   const goodCards = cards.filter((card) => answers[card.cardId] === 'good')
   const badCards = cards.filter((card) => answers[card.cardId] === 'bad')
+
+  useEffect(() => {
+    if (isTraining || !isDone || !user || cards.length === 0) {
+      return
+    }
+
+    const saveKey = `${user.id}:${today}`
+    if (completedSaveKey.current === saveKey) {
+      return
+    }
+    completedSaveKey.current = saveKey
+
+    const saveDoneStatus = async () => {
+      const now = new Date().toISOString()
+      const { error } = await supabase.from('daily_cards_status').upsert(
+        [
+          {
+            user_id: user.id,
+            day: today,
+            done: true,
+            done_at: now
+          }
+        ],
+        { onConflict: 'user_id,day' }
+      )
+      if (error) {
+        completedSaveKey.current = null
+        console.error('daily_cards_status upsert failed', error.message)
+        return
+      }
+      window.dispatchEvent(new Event('daily-status-updated'))
+    }
+
+    void saveDoneStatus()
+  }, [cards.length, isDone, isTraining, today, user])
 
   return (
     <main className="container page">

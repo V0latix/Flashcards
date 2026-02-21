@@ -233,10 +233,47 @@ ul {
   font-weight: 600;
 }
 
-.auth-trigger {
+.account-cluster {
   margin-left: auto;
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.auth-trigger {
+  display: flex;
+  align-items: center;
+}
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(255, 183, 77, 0.18), rgba(255, 122, 0, 0.08));
+  color: var(--text);
+  font-weight: 700;
+}
+
+.streak-badge-active {
+  border-color: rgba(255, 145, 0, 0.42);
+  box-shadow: 0 0 0 1px rgba(255, 145, 0, 0.14) inset;
+}
+
+.streak-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.92rem;
+  line-height: 1;
+}
+
+.streak-value {
+  font-size: 0.88rem;
+  line-height: 1;
 }
 
 .leitner-info {
@@ -752,6 +789,8 @@ ul {
   z-index: 2;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
 }
 

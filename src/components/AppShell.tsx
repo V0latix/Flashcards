@@ -4,6 +4,7 @@ import AuthButton from '../auth/AuthButton'
 import { ChartIcon, HomeIcon, LibraryIcon, PlayIcon, PlusIcon, SettingsIcon } from './icons'
 import { useI18n } from '../i18n/useI18n'
 import LeitnerInfo from './LeitnerInfo'
+import StreakBadge from './StreakBadge'
 
 type AppShellProps = {
   children: React.ReactNode
@@ -99,10 +100,13 @@ function AppShell({ children }: AppShellProps) {
               icon={<SettingsIcon className="icon" />}
               isActive={isActive('/settings')}
             />
-            <div className="auth-trigger">
-              <AuthButton />
+            <div className="account-cluster">
+              <StreakBadge />
+              <div className="auth-trigger">
+                <AuthButton />
+              </div>
+              <LeitnerInfo />
             </div>
-            <LeitnerInfo />
           </div>
         </header>
       ) : null}

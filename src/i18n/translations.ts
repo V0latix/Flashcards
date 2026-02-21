@@ -28,6 +28,14 @@ export const translations = {
       why:
         'Ce système concentre l’effort sur ce que tu oublies et espace les rappels sur ce que tu sais déjà, ce qui améliore la mémoire à long terme.'
     },
+    streak: {
+      label: 'Streak',
+      loading: 'Chargement de la streak...',
+      signedOut: 'Connecte-toi pour suivre ta streak.',
+      todayDone: "Aujourd'hui validé",
+      todayPending: "Aujourd'hui non validé",
+      error: 'Streak indisponible'
+    },
     actions: {
       addCard: 'Ajouter une carte',
       import: 'Importer',
@@ -254,6 +262,14 @@ export const translations = {
         'Correct answer: the card moves up one box. Incorrect answer: it drops back toward box 1.',
       why:
         'This system focuses effort on what you forget and spaces repetition for what you already know, which improves long-term memory.'
+    },
+    streak: {
+      label: 'Streak',
+      loading: 'Loading streak...',
+      signedOut: 'Sign in to track your streak.',
+      todayDone: 'Today completed',
+      todayPending: 'Today not completed',
+      error: 'Streak unavailable'
     },
     actions: {
       addCard: 'Add a card',
