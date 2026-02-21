@@ -142,10 +142,10 @@ function targetMarkerSvg(
   const outerR = r + 5
   return [
     // Visible zone for tiny islands/micro-states: soft filled disc + strong contour.
-    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="#FFFFFF" opacity="0.22"/>`,
-    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="#0F172A" stroke-width="6.5" opacity="0.82"/>`,
-    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="#FFFFFF" stroke-width="3.8" opacity="1"/>`,
-    `<circle cx="${cx}" cy="${cy}" r="2.8" fill="#0F172A" opacity="0.95"/>`
+    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="#FF4D4D" opacity="0.24"/>`,
+    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="#7A0A0A" stroke-width="6.5" opacity="0.86"/>`,
+    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="#FF6B6B" stroke-width="3.8" opacity="1"/>`,
+    `<circle cx="${cx}" cy="${cy}" r="2.8" fill="#B30000" opacity="0.98"/>`
   ].join('')
 }
 
