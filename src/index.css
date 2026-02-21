@@ -239,6 +239,84 @@ ul {
   align-items: center;
 }
 
+.leitner-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.leitner-info-trigger {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: help;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+}
+
+.leitner-tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(480px, calc(100vw - 36px));
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.leitner-info:hover .leitner-tooltip,
+.leitner-info:focus-within .leitner-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.leitner-tooltip h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.leitner-tooltip p {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.leitner-tooltip ul {
+  margin: 0 0 8px;
+  padding-left: 18px;
+}
+
+.leitner-tooltip li {
+  margin-bottom: 4px;
+  font-size: 0.88rem;
+}
+
+.leitner-tooltip-subtitle {
+  margin-top: 10px;
+  font-weight: 700;
+}
+
 .auth-button {
   display: inline-flex;
   align-items: center;
@@ -672,6 +750,9 @@ ul {
   top: 24px;
   right: 24px;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .home-grid {

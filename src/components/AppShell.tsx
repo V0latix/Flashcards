@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import AuthButton from '../auth/AuthButton'
 import { ChartIcon, HomeIcon, LibraryIcon, PlayIcon, PlusIcon, SettingsIcon } from './icons'
 import { useI18n } from '../i18n/useI18n'
+import LeitnerInfo from './LeitnerInfo'
 
 type AppShellProps = {
   children: React.ReactNode
@@ -101,6 +102,7 @@ function AppShell({ children }: AppShellProps) {
             <div className="auth-trigger">
               <AuthButton />
             </div>
+            <LeitnerInfo />
           </div>
         </header>
       ) : null}

@@ -10,6 +10,24 @@ export const translations = {
       stats: 'Stats',
       settings: 'Paramètres'
     },
+    info: {
+      aria: 'Aide: flashcards et méthode de Leitner',
+      title: 'Comment ça marche ?',
+      flashcard1: 'Une flashcard est une carte de révision: une question (recto) et une réponse (verso).',
+      flashcard2:
+        "Tu t'auto-interroges, tu essaies de répondre de mémoire, puis tu vérifies la réponse. Ce rappel actif renforce l'apprentissage.",
+      leitnerTitle: 'Principe des boîtes de Leitner',
+      leitner1:
+        'Les cartes sont rangées par niveau. Plus une carte est maîtrisée, plus elle est revue tard.',
+      box1: 'Boîte 1: nouvelles cartes ou cartes ratées, revues très souvent.',
+      box2: 'Boîte 2: cartes partiellement acquises, revues régulièrement.',
+      box3: 'Boîte 3: cartes plutôt solides, revues à intervalles plus longs.',
+      box4: 'Boîte 4: cartes bien retenues, revues peu souvent.',
+      box5: 'Boîte 5: cartes maîtrisées; elles passent en maintien.',
+      cadence: "Réponse correcte: la carte monte d'une boîte. Réponse incorrecte: elle redescend vers la boîte 1.",
+      why:
+        'Ce système concentre l’effort sur ce que tu oublies et espace les rappels sur ce que tu sais déjà, ce qui améliore la mémoire à long terme.'
+    },
     actions: {
       addCard: 'Ajouter une carte',
       import: 'Importer',
@@ -217,6 +235,25 @@ export const translations = {
       library: 'Library',
       stats: 'Stats',
       settings: 'Settings'
+    },
+    info: {
+      aria: 'Help: flashcards and Leitner method',
+      title: 'How it works',
+      flashcard1: 'A flashcard is a study card: a question on the front and an answer on the back.',
+      flashcard2:
+        'You test yourself, try to answer from memory, then check the answer. This active recall strengthens learning.',
+      leitnerTitle: 'Leitner box method',
+      leitner1:
+        'Cards are grouped by level. The better a card is known, the less often it is reviewed.',
+      box1: 'Box 1: new or failed cards, reviewed very frequently.',
+      box2: 'Box 2: partly learned cards, reviewed regularly.',
+      box3: 'Box 3: fairly solid cards, reviewed at longer intervals.',
+      box4: 'Box 4: well retained cards, reviewed less often.',
+      box5: 'Box 5: mastered cards; they move to maintenance review.',
+      cadence:
+        'Correct answer: the card moves up one box. Incorrect answer: it drops back toward box 1.',
+      why:
+        'This system focuses effort on what you forget and spaces repetition for what you already know, which improves long-term memory.'
     },
     actions: {
       addCard: 'Add a card',
