@@ -26,16 +26,48 @@ type AtlasRegion = {
   frame: BBox
 }
 
+const PACIFIC_ISLANDS_GLOBAL: AtlasRegion = {
+  id: 'pacific_islands_global',
+  refLon: 170,
+  // Global Pacific view centered on oceanic islands (unwrapped longitude space).
+  frame: [120, -35, 250, 30]
+}
+
+const PACIFIC_ISLAND_ISO2 = new Set([
+  'AS',
+  'CK',
+  'FJ',
+  'FM',
+  'GU',
+  'KI',
+  'MH',
+  'MP',
+  'NC',
+  'NF',
+  'NR',
+  'NU',
+  'PF',
+  'PG',
+  'PN',
+  'PW',
+  'SB',
+  'TK',
+  'TO',
+  'TV',
+  'VU',
+  'WF',
+  'WS'
+])
+
 const ATLAS_REGIONS: AtlasRegion[] = [
+  PACIFIC_ISLANDS_GLOBAL,
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
   { id: 'caribbean', refLon: -69, frame: [-83, 10, -58, 25] },
-  // Dedicated central Pacific frame for French Polynesia and nearby islands.
-  { id: 'pacific_central', refLon: -145, frame: [-176, -30, -112, 5] },
   { id: 'north_america', refLon: -100, frame: [-170, 5, -45, 83] },
   { id: 'south_america', refLon: -62, frame: [-92, -60, -28, 16] },
   // Split Europe for a tighter zoom than the previous single large frame.
   { id: 'europe_west', refLon: 9, frame: [-22, 36, 24, 70] },
-  { id: 'europe_east', refLon: 40, frame: [28, 36, 66, 70] },
+  { id: 'europe_east', refLon: 40, frame: [26, 35, 68, 71] },
   { id: 'africa', refLon: 20, frame: [-25, -40, 60, 40] },
   { id: 'west_asia', refLon: 75, frame: [30, 0, 125, 55] },
   { id: 'east_asia', refLon: 120, frame: [90, -5, 160, 60] },
@@ -62,6 +94,8 @@ function findTarget(countries: CountryFeature[], targetIso2: string): CountryFea
 }
 
 function selectRegionForTarget(target: CountryFeature): AtlasRegion {
+  if (PACIFIC_ISLAND_ISO2.has(target.iso2)) return PACIFIC_ISLANDS_GLOBAL
+
   const [lon, lat] = target.centroid
   for (const region of ATLAS_REGIONS) {
     const lonU = unwrapLon(lon, region.refLon)
