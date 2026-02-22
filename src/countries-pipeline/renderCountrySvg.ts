@@ -67,7 +67,8 @@ const ATLAS_REGIONS: AtlasRegion[] = [
   { id: 'south_america', refLon: -62, frame: [-92, -60, -28, 16] },
   // Split Europe for a tighter zoom than the previous single large frame.
   { id: 'europe_west', refLon: 9, frame: [-22, 36, 24, 70] },
-  { id: 'europe_east', refLon: 40, frame: [26, 35, 68, 71] },
+  // Slightly wider to the west so countries like Bulgaria fit entirely.
+  { id: 'europe_east', refLon: 40, frame: [20, 34, 70, 72] },
   { id: 'africa', refLon: 20, frame: [-25, -40, 60, 40] },
   { id: 'west_asia', refLon: 75, frame: [30, 0, 125, 55] },
   { id: 'east_asia', refLon: 120, frame: [90, -5, 160, 60] },
