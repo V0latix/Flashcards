@@ -114,7 +114,7 @@ function StatsPage() {
     return (
       <ul className="tree">
         {nodes.map((node) => {
-          const isCollapsed = collapsed[node.path] ?? false
+          const isCollapsed = collapsed[node.path] ?? true
           const hasChildren = node.children.length > 0
           return (
             <li key={node.path}>

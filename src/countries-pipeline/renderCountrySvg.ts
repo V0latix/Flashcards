@@ -63,7 +63,8 @@ const ATLAS_REGIONS: AtlasRegion[] = [
   PACIFIC_ISLANDS_GLOBAL,
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
   { id: 'caribbean', refLon: -69, frame: [-83, 10, -58, 25] },
-  { id: 'north_america', refLon: -100, frame: [-170, 5, -45, 83] },
+  // Slightly tighter framing for North America.
+  { id: 'north_america', refLon: -100, frame: [-165, 8, -50, 82] },
   { id: 'south_america', refLon: -62, frame: [-92, -60, -28, 16] },
   // Split Europe for a tighter zoom than the previous single large frame.
   { id: 'europe_west', refLon: 9, frame: [-22, 36, 24, 70] },
