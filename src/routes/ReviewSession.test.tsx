@@ -25,7 +25,7 @@ describe('ReviewSession', () => {
     setSettings()
   })
 
-  it('shows a card and buttons, bon on the right', async () => {
+  it('shows a card and buttons, bon on the left', async () => {
     await seedCardWithState({
       front: 'Q1',
       back: 'A1',
@@ -47,8 +47,33 @@ describe('ReviewSession', () => {
 
     const bon = screen.getByRole('button', { name: 'BON' })
     const faux = screen.getByRole('button', { name: 'FAUX' })
-    expect(bon.style.order).toBe('2')
-    expect(faux.style.order).toBe('1')
+    expect(bon.style.order).toBe('1')
+    expect(faux.style.order).toBe('2')
+  })
+
+  it('supports keyboard shortcuts during review', async () => {
+    await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+
+    render(
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/review']}>
+          <ReviewSession />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Carte 1/)
+    fireEvent.keyDown(window, { key: ' ', code: 'Space' })
+    await screen.findByText('A1')
+    fireEvent.keyDown(window, { key: 'ArrowLeft' })
+
+    await screen.findByText(/Session terminée/i)
   })
 
   it('good answer advances the box', async () => {

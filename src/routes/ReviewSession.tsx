@@ -200,6 +200,49 @@ function ReviewSession() {
     void saveDoneStatus()
   }, [cards.length, isDone, isTraining, today, user])
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat || isLoading || isDone || isDeleteOpen || !currentCard) {
+        return
+      }
+
+      const target = event.target as HTMLElement | null
+      if (target) {
+        const tagName = target.tagName.toLowerCase()
+        if (tagName === 'input' || tagName === 'textarea' || target.isContentEditable) {
+          return
+        }
+      }
+
+      const isSpace = event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar'
+      if (!showBack && isSpace) {
+        event.preventDefault()
+        handleReveal()
+        return
+      }
+
+      if (!showBack) {
+        return
+      }
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        void handleAnswer('good')
+        return
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        void handleAnswer('bad')
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [currentCard, handleAnswer, isDeleteOpen, isDone, isLoading, showBack])
+
   return (
     <main className="container page">
       <h1>{t('review.title')}</h1>
@@ -364,7 +407,7 @@ function ReviewSession() {
             <div className="button-row">
               <button
                 type="button"
-                style={{ order: 2, flex: 1 }}
+                style={{ order: 1, flex: 1 }}
                 className="btn btn-primary"
                 onClick={() => handleAnswer('good')}
               >
@@ -372,7 +415,7 @@ function ReviewSession() {
               </button>
               <button
                 type="button"
-                style={{ order: 1, flex: 1 }}
+                style={{ order: 2, flex: 1 }}
                 className="btn btn-secondary"
                 onClick={() => handleAnswer('bad')}
               >
