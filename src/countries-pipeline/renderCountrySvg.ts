@@ -29,8 +29,8 @@ type AtlasRegion = {
 const PACIFIC_ISLANDS_GLOBAL: AtlasRegion = {
   id: 'pacific_islands_global',
   refLon: 170,
-  // Global Pacific view centered on oceanic islands (unwrapped longitude space).
-  frame: [120, -35, 250, 30]
+  // Slightly tighter Pacific framing for better island visibility.
+  frame: [130, -30, 240, 24]
 }
 
 const PACIFIC_ISLAND_ISO2 = new Set([
