@@ -128,7 +128,7 @@ export async function seedFrenchDepartmentsPack(): Promise<{
       {
         id: packId(packSlug),
         slug: packSlug,
-        title: 'Départements français : localisation',
+        title: 'Départements Français : localisation',
         description: 'Reconnaître le département français mis en surbrillance.',
         tags: ['Géographie/France/Départements'],
         created_at: now,

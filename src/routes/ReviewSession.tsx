@@ -245,7 +245,6 @@ function ReviewSession() {
 
   return (
     <main className="container page">
-      <h1>{t('review.title')}</h1>
       {isLoading ? (
         <p>{t('status.loading')}</p>
       ) : isDone ? (

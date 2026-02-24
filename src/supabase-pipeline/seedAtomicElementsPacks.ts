@@ -13,7 +13,7 @@ type ElementEntry = {
   symbol: string
 }
 
-const ELEMENTS: ElementEntry[] = [
+export const ELEMENTS: ElementEntry[] = [
   { atomic_number: 1, name_fr: 'Hydrogene', symbol: 'H' },
   { atomic_number: 2, name_fr: 'Helium', symbol: 'He' },
   { atomic_number: 3, name_fr: 'Lithium', symbol: 'Li' },

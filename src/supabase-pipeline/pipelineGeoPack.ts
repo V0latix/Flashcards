@@ -10,12 +10,13 @@ export async function pipelineGeoPack() {
   console.log('--- Geo Pack Pipeline ---')
   console.log(`math_cards_deleted: ${cleanup.cards_deleted}`)
   console.log(`math_packs_deleted: ${cleanup.packs_deleted}`)
-  console.log(`new_pack_slug: ${seed.pack_slug}`)
-  console.log(`cards_upserted: ${seed.cards_upserted}`)
-  console.log(`cards_deleted_in_pack: ${seed.cards_deleted}`)
+  for (const pack of seed.packs) {
+    console.log(`pack_slug: ${pack.pack_slug}`)
+    console.log(`cards_upserted: ${pack.cards_upserted}`)
+    console.log(`cards_deleted_in_pack: ${pack.cards_deleted}`)
+  }
 }
 
 if (isMainModule(import.meta.url)) {
   await pipelineGeoPack()
 }
-
