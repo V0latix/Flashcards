@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthProvider } from '../auth/AuthProvider'
 import db from '../db'
 import { I18nProvider } from '../i18n/I18nProvider'
 import ReviewSession from './ReviewSession'
@@ -19,10 +20,23 @@ const setSettings = (box1Target = 2) => {
   )
 }
 
+const renderReviewSession = (entry = '/review') =>
+  render(
+    <I18nProvider>
+      <AuthProvider>
+        <MemoryRouter initialEntries={[entry]}>
+          <ReviewSession />
+        </MemoryRouter>
+      </AuthProvider>
+    </I18nProvider>
+  )
+
 describe('ReviewSession', () => {
   beforeEach(async () => {
     await resetDb()
     setSettings()
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
   })
 
   it('shows a card and buttons, bon on the left', async () => {
@@ -34,15 +48,9 @@ describe('ReviewSession', () => {
       dueDate: '2024-01-01'
     })
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession()
 
-    await screen.findByText(/Carte 1/)
+    await screen.findByRole('heading', { name: /Recto/i })
     fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
 
     const bon = screen.getByRole('button', { name: 'BON' })
@@ -60,15 +68,9 @@ describe('ReviewSession', () => {
       dueDate: '2024-01-01'
     })
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession()
 
-    await screen.findByText(/Carte 1/)
+    await screen.findByRole('heading', { name: /Recto/i })
     fireEvent.keyDown(window, { key: ' ', code: 'Space' })
     await screen.findByText('A1')
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
@@ -85,15 +87,9 @@ describe('ReviewSession', () => {
       dueDate: '2024-01-01'
     })
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession()
 
-    await screen.findByText(/Carte 1/)
+    await screen.findByRole('heading', { name: /Recto/i })
     fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
     fireEvent.click(screen.getByRole('button', { name: 'BON' }))
 
@@ -112,15 +108,9 @@ describe('ReviewSession', () => {
       dueDate: '2024-01-01'
     })
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession()
 
-    await screen.findByText(/Carte 1/)
+    await screen.findByRole('heading', { name: /Recto/i })
     fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
     fireEvent.click(screen.getByRole('button', { name: 'BON' }))
 
@@ -146,15 +136,9 @@ describe('ReviewSession', () => {
       dueDate: '2024-01-01'
     })
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession()
 
-    await screen.findByText(/Carte 1/)
+    await screen.findByRole('heading', { name: /Recto/i })
     fireEvent.click(screen.getByRole('button', { name: /Supprimer la carte/i }))
     fireEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
 
@@ -163,7 +147,7 @@ describe('ReviewSession', () => {
       expect(card).toBeUndefined()
     })
 
-    await screen.findByText(/Carte 1 \/ 1/)
+    await screen.findByText(/1 carte\(s\) restante\(s\)/i)
     randomSpy.mockRestore()
   })
 
@@ -177,13 +161,7 @@ describe('ReviewSession', () => {
     })
     saveTrainingQueue([cardId])
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review?mode=training']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession('/review?mode=training')
 
     await screen.findByText(/Mode entraînement/i)
     fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
@@ -205,15 +183,9 @@ describe('ReviewSession', () => {
       tags: ['Geographie/Europe', 'Capitales']
     })
 
-    render(
-      <I18nProvider>
-        <MemoryRouter initialEntries={['/review']}>
-          <ReviewSession />
-        </MemoryRouter>
-      </I18nProvider>
-    )
+    renderReviewSession()
 
-    await screen.findByText(/Carte 1/)
+    await screen.findByRole('heading', { name: /Recto/i })
     expect(screen.getByText(/Geographie\/Europe/)).toBeInTheDocument()
     expect(screen.getByText(/Capitales/)).toBeInTheDocument()
   })

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import db from '../db'
 import { applyReviewResult, buildDailySession } from '../leitner/engine'
@@ -116,33 +116,36 @@ function ReviewSession() {
     overflow: 'hidden'
   }
 
-  const handleReveal = () => {
+  const handleReveal = useCallback(() => {
     setShowBack(true)
-  }
+  }, [])
 
-  const handleAnswer = async (result: 'good' | 'bad') => {
-    if (!currentCard) {
-      return
-    }
-    if (!isTraining) {
-      void applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed).catch(
-        (error) => {
-          console.error('applyReviewResult failed', error)
-        }
-      )
-    }
-    setAnswers((prev) => ({
-      ...prev,
-      [currentCard.cardId]: result
-    }))
-    setShowBack(false)
-    setIndex((prev) => prev + 1)
-    if (result === 'good') {
-      setGoodCount((prev) => prev + 1)
-    } else {
-      setBadCount((prev) => prev + 1)
-    }
-  }
+  const handleAnswer = useCallback(
+    async (result: 'good' | 'bad') => {
+      if (!currentCard) {
+        return
+      }
+      if (!isTraining) {
+        void applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed).catch(
+          (error) => {
+            console.error('applyReviewResult failed', error)
+          }
+        )
+      }
+      setAnswers((prev) => ({
+        ...prev,
+        [currentCard.cardId]: result
+      }))
+      setShowBack(false)
+      setIndex((prev) => prev + 1)
+      if (result === 'good') {
+        setGoodCount((prev) => prev + 1)
+      } else {
+        setBadCount((prev) => prev + 1)
+      }
+    },
+    [currentCard, isTraining, today]
+  )
 
   const handleDelete = async () => {
     if (!currentCard || isDeleting) {
@@ -164,6 +167,10 @@ function ReviewSession() {
   const isDone = !isLoading && index >= cards.length
   const goodCards = cards.filter((card) => answers[card.cardId] === 'good')
   const badCards = cards.filter((card) => answers[card.cardId] === 'bad')
+  const reviewedCount = Math.min(index, cards.length)
+  const remainingCount = Math.max(cards.length - index, 0)
+  const progressPercent =
+    cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0
 
   useEffect(() => {
     if (isTraining || !isDone || !user || cards.length === 0) {
@@ -206,8 +213,8 @@ function ReviewSession() {
         return
       }
 
-      const target = event.target as HTMLElement | null
-      if (target) {
+      const target = event.target
+      if (target instanceof HTMLElement) {
         const tagName = target.tagName.toLowerCase()
         if (tagName === 'input' || tagName === 'textarea' || target.isContentEditable) {
           return
@@ -241,10 +248,10 @@ function ReviewSession() {
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [currentCard, handleAnswer, isDeleteOpen, isDone, isLoading, showBack])
+  }, [currentCard, handleAnswer, handleReveal, isDeleteOpen, isDone, isLoading, showBack])
 
   return (
-    <main className="container page">
+    <main className="container page review-page">
       {isLoading ? (
         <p>{t('status.loading')}</p>
       ) : isDone ? (
@@ -330,31 +337,109 @@ function ReviewSession() {
           </Link>
         </section>
       ) : currentCard ? (
-        <section className="card section">
-          {isTraining ? (
-            <p>{t('review.trainingMode')}</p>
-          ) : null}
-          {currentCard.tags.length > 0 ? (
-            <div className="review-tags" aria-label={t('labels.tags')}>
-              <span className="chip">
-                {currentCard.tags.join(' · ')}
-              </span>
+        <section className="card section review-session">
+          <div className="review-session-meta">
+            {isTraining ? (
+              <p className="review-session-mode">{t('review.trainingMode')}</p>
+            ) : null}
+            {currentCard.tags.length > 0 ? (
+              <div className="review-tags" aria-label={t('labels.tags')}>
+                <span className="chip">{currentCard.tags.join(' · ')}</span>
+              </div>
+            ) : null}
+            {tagFilter ? <p>{t('library.tag')}: {tagFilter}</p> : null}
+          </div>
+
+          <div className="review-progress" aria-label={t('review.progress')}>
+            <div className="review-progress-head">
+              <p className="review-progress-title">{t('review.progress')}</p>
+              <p className="review-progress-count">
+                {t('review.remaining', { count: remainingCount })}
+              </p>
             </div>
-          ) : null}
-          {tagFilter ? <p>{t('library.tag')}: {tagFilter}</p> : null}
-          <p>
-            {t('labels.card')} {index + 1} / {cards.length}
-          </p>
-          <div>
-            <h2>{t('cardEditor.front')}</h2>
-            <div className="markdown">
-              <MarkdownRenderer
-                value={currentCard.front || t('status.none')}
-                imageLoading="eager"
-                imageFetchPriority="high"
+            <div
+              className="review-progress-track"
+              role="progressbar"
+              aria-label={t('review.progress')}
+              aria-valuemin={0}
+              aria-valuemax={cards.length}
+              aria-valuenow={reviewedCount}
+            >
+              <span
+                className="review-progress-fill"
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
+
+          <div className="review-session-shell">
+            <div className={showBack ? 'review-card-stack review-card-stack-revealed' : 'review-card-stack'}>
+              <article className="review-face">
+                <h2>{t('cardEditor.front')}</h2>
+                <div className="markdown">
+                  <MarkdownRenderer
+                    value={currentCard.front || t('status.none')}
+                    imageLoading="eager"
+                    imageFetchPriority="high"
+                  />
+                </div>
+              </article>
+              {showBack ? (
+                <article className="review-face">
+                  <h2>{t('cardEditor.back')}</h2>
+                  <div className="markdown">
+                    <MarkdownRenderer
+                      value={currentCard.back || t('status.none')}
+                      imageLoading="eager"
+                      imageFetchPriority="high"
+                    />
+                  </div>
+                </article>
+              ) : null}
+            </div>
+            <aside className="review-session-actions">
+              {!showBack ? (
+                <button type="button" className="btn btn-primary" onClick={handleReveal}>
+                  {t('review.revealBack')}
+                </button>
+              ) : (
+                <div className="review-answer-buttons">
+                  <button
+                    type="button"
+                    style={{ order: 1 }}
+                    className="btn btn-primary"
+                    onClick={() => handleAnswer('good')}
+                  >
+                    {t('review.good')}
+                  </button>
+                  <button
+                    type="button"
+                    style={{ order: 2 }}
+                    className="btn btn-secondary"
+                    onClick={() => handleAnswer('bad')}
+                  >
+                    {t('review.bad')}
+                  </button>
+                </div>
+              )}
+              {showBack ? (
+                <Link
+                  to={`/card/${currentCard.cardId}/edit`}
+                  className="btn btn-secondary"
+                >
+                  {t('review.editCard')}
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => setIsDeleteOpen(true)}
+              >
+                {t('review.deleteCard')}
+              </button>
+            </aside>
+          </div>
+
           {/* Preload back (KaTeX + images) so reveal is instant. */}
           {!showBack ? (
             <div aria-hidden="true" style={preloadStyle}>
@@ -367,22 +452,6 @@ function ReviewSession() {
               </div>
             </div>
           ) : null}
-          {showBack ? (
-            <div>
-              <h2>{t('cardEditor.back')}</h2>
-              <div className="markdown">
-                <MarkdownRenderer
-                  value={currentCard.back || t('status.none')}
-                  imageLoading="eager"
-                  imageFetchPriority="high"
-                />
-              </div>
-            </div>
-          ) : (
-            <button type="button" className="btn btn-primary" onClick={handleReveal}>
-              {t('review.revealBack')}
-            </button>
-          )}
           {/* Preload next card (front + back) during current card. */}
           {nextCard ? (
             <div aria-hidden="true" style={preloadStyle}>
@@ -402,45 +471,6 @@ function ReviewSession() {
               </div>
             </div>
           ) : null}
-          {showBack ? (
-            <div className="button-row">
-              <button
-                type="button"
-                style={{ order: 1, flex: 1 }}
-                className="btn btn-primary"
-                onClick={() => handleAnswer('good')}
-              >
-                {t('review.good')}
-              </button>
-              <button
-                type="button"
-                style={{ order: 2, flex: 1 }}
-                className="btn btn-secondary"
-                onClick={() => handleAnswer('bad')}
-              >
-                {t('review.bad')}
-              </button>
-            </div>
-          ) : null}
-          {showBack ? (
-            <div className="section">
-              <Link
-                to={`/card/${currentCard.cardId}/edit`}
-                className="btn btn-secondary"
-              >
-                {t('review.editCard')}
-              </Link>
-            </div>
-          ) : null}
-          <div className="section">
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={() => setIsDeleteOpen(true)}
-            >
-              {t('review.deleteCard')}
-            </button>
-          </div>
           <ConfirmDialog
             open={isDeleteOpen}
             title={t('actions.delete')}
