@@ -33,6 +33,13 @@ const PACIFIC_ISLANDS_GLOBAL: AtlasRegion = {
   frame: [130, -30, 240, 24]
 }
 
+const SOUTHERN_INDIAN_OCEAN: AtlasRegion = {
+  id: 'southern_indian_ocean',
+  refLon: 70,
+  // Wider context for remote southern islands (e.g. French Southern Territories).
+  frame: [15, -72, 140, -10]
+}
+
 const PACIFIC_ISLAND_ISO2 = new Set([
   'AS',
   'CK',
@@ -59,8 +66,11 @@ const PACIFIC_ISLAND_ISO2 = new Set([
   'WS'
 ])
 
+const SOUTHERN_ISLAND_ISO2 = new Set(['TF', 'HM'])
+
 const ATLAS_REGIONS: AtlasRegion[] = [
   PACIFIC_ISLANDS_GLOBAL,
+  SOUTHERN_INDIAN_OCEAN,
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
   { id: 'caribbean', refLon: -69, frame: [-83, 10, -58, 25] },
   // Slightly tighter framing for North America.
@@ -151,6 +161,7 @@ function findTarget(countries: CountryFeature[], targetIso2: string): CountryFea
 
 function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   if (PACIFIC_ISLAND_ISO2.has(target.iso2)) return PACIFIC_ISLANDS_GLOBAL
+  if (SOUTHERN_ISLAND_ISO2.has(target.iso2)) return SOUTHERN_INDIAN_OCEAN
 
   const [lon, lat] = target.centroid
   for (const region of ATLAS_REGIONS) {
@@ -460,6 +471,11 @@ export function renderCountrySvg(
   const minExtentDeg = opts?.minExtentDeg ?? 2
   const theme = opts?.theme ?? 'transparent'
   const marginPx = opts?.marginPx ?? MARGIN
+
+  // Remote southern territories need an explicit wider window, otherwise local zoom is too tight.
+  if (targetIso2 === 'TF' || targetIso2 === 'HM') {
+    return renderZoom(mergedCountries, targetIso2, Math.max(paddingPct, 1.1), Math.max(minExtentDeg, 70), theme, marginPx)
+  }
 
   if (mode === 'zoom') return renderZoom(mergedCountries, targetIso2, paddingPct, minExtentDeg, theme, marginPx)
   return renderAtlas(mergedCountries, targetIso2, theme, marginPx)
