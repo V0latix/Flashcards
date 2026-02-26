@@ -18,3 +18,22 @@
 - [x] Rendre la modale auth plus robuste (Escape, click backdrop, focus trap) dans `src/auth/AuthButton.tsx`.
 - [x] Internationaliser les chaines en dur restantes (`Tags`, `Image introuvable`, legende chart, etc.) dans `src/routes/Library.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/StatsPage.tsx`.
 - [x] Enrichir la page packs (description, tags, nombre de cartes, import direct) dans `src/routes/Packs.tsx`.
+
+## P3 (audit technique: doublons / inutile)
+
+- [x] Supprimer les checks DB/Supabase au boot en production (garder uniquement en DEV) dans `src/App.tsx`.
+- [ ] Supprimer ou reutiliser le code mort `listCardsByDeck` et `listCardsFiltered` dans `src/db/queries.ts`.
+- [ ] Factoriser les utilitaires export JSON/media (`ExportPayload`, `blobToBase64`, `downloadJson`) entre `src/routes/ImportExport.tsx` et `src/routes/Library.tsx`.
+- [ ] Factoriser les utilitaires date (`parseIsoDate`, `toDateKey`, `addDays`, `normalizeToDateKey`) partages entre `src/routes/Home.tsx`, `src/leitner/engine.ts` et `src/stats/calc.ts`.
+- [ ] Extraire un composant/hook commun de filtre d'arbre de tags (actuellement duplique entre `src/routes/Library.tsx` et `src/routes/Packs.tsx`).
+- [ ] Remplacer `listPublicCardCountsByPackSlug` par une agregation SQL/RPC cote Supabase (eviter de paginer toutes les lignes `public_cards`) dans `src/supabase/api.ts`.
+- [ ] Nettoyer les logs debug UI encore presents (`src/App.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/ImportExport.tsx`) avec garde `import.meta.env.DEV`.
+- [ ] Passer l'action "import sample" en mode DEV-only dans `src/routes/ImportExport.tsx`.
+- [ ] Finir l'i18n des chaines restantes (`Tags:` dans `src/routes/PackDetail.tsx`, texte de confirmation destructif dans `src/routes/Settings.tsx`).
+
+## P4 (maintenabilite / tests)
+
+- [ ] Ajouter des tests routes manquantes: `src/routes/ImportExport.tsx`, `src/routes/PackDetail.tsx`, `src/routes/StatsPage.tsx`.
+- [ ] Ajouter des tests auth/sync pour les erreurs reseau (AuthProvider, StreakBadge, cycle de sync).
+- [ ] Decouper `src/routes/Library.tsx` et `src/routes/ReviewSession.tsx` (hooks + sous-composants) pour reduire la complexite.
+- [ ] Mutualiser les helpers pipelines (`env.ts`, `supabaseAuth.ts`) entre `src/countries-pipeline/` et `src/supabase-pipeline/`.

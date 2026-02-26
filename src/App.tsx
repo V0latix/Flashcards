@@ -24,6 +24,10 @@ function SyncGate() {
 
 function App() {
   useEffect(() => {
+    if (!import.meta.env.DEV) {
+      return
+    }
+
     const runDbCheck = async () => {
       try {
         await db.open()
@@ -51,9 +55,7 @@ function App() {
 
     void runSupabaseCheck()
 
-    if (import.meta.env.DEV) {
-      void healthCheckSupabase()
-    }
+    void healthCheckSupabase()
   }, [])
 
   return (
