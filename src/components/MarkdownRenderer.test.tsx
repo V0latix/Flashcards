@@ -44,4 +44,12 @@ describe('MarkdownRenderer', () => {
     expect(document.querySelector('.katex')).toBeTruthy()
     expect(document.querySelector('.katex-error')).toBeNull()
   })
+
+  it('sanitizes unsafe javascript links', () => {
+    render(<MarkdownRenderer value="[bad](javascript:alert('xss'))" />)
+    const link = screen.getByText('bad').closest('a')
+    expect(link).toBeTruthy()
+    expect(link).not.toHaveAttribute('href', expect.stringContaining('javascript:'))
+    expect(link).toHaveAttribute('href', '')
+  })
 })

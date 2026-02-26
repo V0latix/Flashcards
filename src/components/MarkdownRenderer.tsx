@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { defaultUrlTransform } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { resolveImageSrc } from '../utils/media'
@@ -34,6 +35,13 @@ const normalizeControlEscapes = (value: string) => {
     out += replacement ?? char
   }
   return out
+}
+
+const urlTransform = (url: string, key: string, node: { tagName?: string }) => {
+  if (key === 'src' && node.tagName === 'img' && url.startsWith('storage:')) {
+    return url
+  }
+  return defaultUrlTransform(url)
 }
 
 const MarkdownImage = (
@@ -100,7 +108,7 @@ const MarkdownRenderer = ({
 
   return (
     <ReactMarkdown
-      urlTransform={(uri) => uri}
+      urlTransform={urlTransform}
       remarkPlugins={[remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={components}
