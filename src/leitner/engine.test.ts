@@ -42,7 +42,7 @@ afterEach(() => {
 })
 
 describe('autoFillBox1', () => {
-  it('sets box1 due date based on intervalDays[1]', async () => {
+  it('sets box1 due date to today for introduced cards', async () => {
     const today = '2024-01-10'
 
     await addCardWithState({
@@ -56,7 +56,7 @@ describe('autoFillBox1', () => {
     await autoFillBox1(1, today)
 
     const box1State = await db.reviewStates.where({ box: 1 }).first()
-    expect(box1State?.due_date).toBe('2024-01-11')
+    expect(box1State?.due_date).toBe('2024-01-10')
   })
 
   it('does not promote suspended cards from box0', async () => {
@@ -183,13 +183,50 @@ describe('autoFillBox1', () => {
     expect(firstState?.box).toBe(0)
   })
 
+  it('does not count suspended box1 cards toward target', async () => {
+    const today = '2024-01-10'
+
+    for (let i = 0; i < 9; i += 1) {
+      await addCardWithState({
+        front: `Box1 active ${i}`,
+        back: `Box1 active ${i}`,
+        createdAt: `2024-01-0${i + 1}`,
+        box: 1,
+        dueDate: today
+      })
+    }
+
+    await addCardWithState({
+      front: 'Box1 suspended',
+      back: 'Box1 suspended',
+      createdAt: '2024-01-20',
+      box: 1,
+      dueDate: today,
+      suspended: true
+    })
+
+    const promotedId = await addCardWithState({
+      front: 'Box0 promoted',
+      back: 'Box0 promoted',
+      createdAt: '2024-01-21',
+      box: 0,
+      dueDate: null
+    })
+
+    await autoFillBox1(1, today)
+
+    const promotedState = await db.reviewStates.get(promotedId)
+    expect(promotedState?.box).toBe(1)
+    expect(promotedState?.due_date).toBe(today)
+  })
+
   it('returns empty session when no cards exist', async () => {
     const session = await buildDailySession(1, '2024-03-01')
     expect(session.box1).toHaveLength(0)
     expect(session.due).toHaveLength(0)
   })
 
-  it('falls back to box0 when no due cards are available', async () => {
+  it('promotes box0 cards into due session when no due cards are available', async () => {
     await addCardWithState({
       front: 'New 1',
       back: 'New 1',
@@ -377,7 +414,7 @@ describe('buildDailySession', () => {
     const session = await buildDailySession(1, today)
 
     expect(session.box1).toHaveLength(0)
-    expect(session.due).toHaveLength(5)
+    expect(session.due).toHaveLength(13)
 
     const dueIds = session.due.map((entry) => entry.card.id)
     expect(dueIds).toEqual(expect.arrayContaining([dueCardId, pastDueId, learnedDueId]))

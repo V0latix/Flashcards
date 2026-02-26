@@ -89,13 +89,14 @@ export async function autoFillBox1(
     typeof todayOrDeckId === 'string'
       ? normalizeToday(todayOrDeckId)
       : normalizeToday(maybeToday ?? '')
-  const { box1Target, intervalDays } = getLeitnerSettings()
-  const box1Interval = intervalDays[1] ?? 1
+  const { box1Target } = getLeitnerSettings()
 
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates.where({ box: 1 }).toArray()
+    const box1Cards = await loadCardsByIds(box1States.map((state) => state.card_id))
+    const activeBox1Count = box1Cards.filter((card) => !card.suspended).length
 
-    const missing = box1Target - box1States.length
+    const missing = box1Target - activeBox1Count
     if (missing <= 0) {
       return
     }
@@ -107,25 +108,33 @@ export async function autoFillBox1(
     }
 
     const box0CardIds = box0States.map((state) => state.card_id)
+    const box0StatesByCardId = new Map(box0States.map((state) => [state.card_id, state]))
     const cards = await loadCardsByIds(box0CardIds)
-    const cardIds = cards
+    const candidateCardIds = cards
       .filter((card) => !card.suspended)
       .map((card) => card.id)
       .filter((id): id is number => typeof id === 'number')
 
-    const selectedCardIds = shuffle(cardIds).slice(0, missing)
+    const selectedCardIds = shuffle(candidateCardIds).slice(0, missing)
 
     if (selectedCardIds.length === 0) {
       return
     }
 
-    const dueDate = addDays(today, box1Interval)
+    const nowIso = new Date().toISOString()
     await db.reviewStates.bulkPut(
-      selectedCardIds.map((cardId) => ({
-        card_id: cardId,
-        box: 1,
-        due_date: dueDate
-      }))
+      selectedCardIds.map((cardId) => {
+        const current = box0StatesByCardId.get(cardId)
+        return {
+          ...current,
+          card_id: cardId,
+          box: 1,
+          due_date: today,
+          is_learned: false,
+          learned_at: null,
+          updated_at: nowIso
+        }
+      })
     )
   })
 }
@@ -144,8 +153,10 @@ export async function buildDailySession(
       ? normalizeToday(todayOrDeckId)
       : normalizeToday(maybeToday ?? '')
 
+  await autoFillBox1(today)
+
   const reviewStates = await db.reviewStates.toArray()
-  const { learnedReviewIntervalDays, box1Target } = getLeitnerSettings()
+  const { learnedReviewIntervalDays } = getLeitnerSettings()
 
   const dueStates = reviewStates.filter((state) => {
     if (state.is_learned) {
@@ -205,13 +216,6 @@ export async function buildDailySession(
   }
 
   const due = await loadSessionCards(orderedDueStates)
-
-  if (due.length === 0) {
-    const box0States = reviewStates.filter((state) => state.box === 0)
-    const shuffled = shuffle(box0States).slice(0, box1Target)
-    const newCards = await loadSessionCards(shuffled)
-    return { box1: [], due: newCards }
-  }
 
   const box1: SessionCard[] = []
 

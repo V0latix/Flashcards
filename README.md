@@ -56,9 +56,9 @@ Le projet est organise en monorepo avec:
 
 ### 2) Construction de la session du jour
 - Le moteur charge les `ReviewState` locaux.
+- Il complete la Boite 1 chaque jour jusqua `box1Target` en promouvant des cartes `box=0` (si disponibles), avec `due_date=today`.
 - Il selectionne les cartes dues (`box>=1` et `due_date <= today`).
 - Il ajoute aussi les cartes `learned` dues en maintenance (`learned_at + learnedReviewIntervalDays <= today`).
-- Si aucune carte nest due, il prend un echantillon aleatoire de cartes `box=0` (jusqua `box1Target`) pour demarrer la session.
 
 ### 3) Deroulement dune carte en session
 - La question est affichee, puis la reponse apres action utilisateur.
