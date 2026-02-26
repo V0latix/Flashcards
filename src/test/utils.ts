@@ -9,6 +9,7 @@ export const resetDb = async () => {
 export const seedCardWithState = async (input: {
   front: string
   back: string
+  hint?: string | null
   tags?: string[]
   createdAt: string
   box: number
@@ -19,6 +20,7 @@ export const seedCardWithState = async (input: {
   const cardId = await db.cards.add({
     front_md: input.front,
     back_md: input.back,
+    hint_md: input.hint ?? null,
     tags: input.tags ?? [],
     created_at: input.createdAt,
     updated_at: input.createdAt

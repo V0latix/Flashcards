@@ -102,6 +102,33 @@ describe('ReviewSession', () => {
     await screen.findByText(/Session terminée/i)
   })
 
+  it('toggles hint with button and keyboard shortcut', async () => {
+    await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      hint: 'Indice A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+
+    renderReviewSession()
+
+    await screen.findByRole('heading', { name: /Recto/i })
+    expect(screen.queryByText('Indice A1')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Afficher l'indice/i }))
+    await screen.findByText('Indice A1')
+
+    fireEvent.keyDown(window, { key: 'h' })
+    await waitFor(() => {
+      expect(screen.queryByText('Indice A1')).not.toBeInTheDocument()
+    })
+
+    fireEvent.keyDown(window, { key: 'h' })
+    await screen.findByText('Indice A1')
+  })
+
   it('good answer advances the box', async () => {
     const cardId = await seedCardWithState({
       front: 'Q1',

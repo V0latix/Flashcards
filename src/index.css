@@ -853,6 +853,23 @@ ul {
   margin-bottom: 0;
 }
 
+.review-hint {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-hint h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.review-hint .markdown {
+  max-height: 140px;
+}
+
 .review-session-actions {
   display: flex;
   flex-direction: column;

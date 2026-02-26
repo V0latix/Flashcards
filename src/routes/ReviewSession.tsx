@@ -11,24 +11,26 @@ import { useI18n } from '../i18n/useI18n'
 import { useAuth } from '../auth/useAuth'
 import { supabase } from '../supabase/client'
 
+type SessionCard = {
+  cardId: number
+  front: string
+  back: string
+  hint: string | null
+  tags: string[]
+  wasReversed: boolean
+}
+
 function ReviewSession() {
   const { t } = useI18n()
   const { user } = useAuth()
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const completedSaveKey = useRef<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [cards, setCards] = useState<
-    Array<{
-      cardId: number
-      front: string
-      back: string
-      tags: string[]
-      wasReversed: boolean
-    }>
-  >([])
+  const [cards, setCards] = useState<SessionCard[]>([])
   const [answers, setAnswers] = useState<Record<number, 'good' | 'bad'>>({})
   const [index, setIndex] = useState(0)
   const [showBack, setShowBack] = useState(false)
+  const [showHint, setShowHint] = useState(false)
   const [goodCount, setGoodCount] = useState(0)
   const [badCount, setBadCount] = useState(0)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -69,6 +71,7 @@ function ReviewSession() {
     setAnswers({})
     setIndex(0)
     setShowBack(false)
+    setShowHint(false)
     setGoodCount(0)
     setBadCount(0)
     setIsDeleteOpen(false)
@@ -76,13 +79,7 @@ function ReviewSession() {
 
     const loadSession = async () => {
       const { reverseProbability } = getLeitnerSettings()
-      let nextCards: Array<{
-        cardId: number
-        front: string
-        back: string
-        tags: string[]
-        wasReversed: boolean
-      }> = []
+      let nextCards: SessionCard[] = []
 
       if (isTraining) {
         const ids = consumeTrainingQueue()
@@ -103,6 +100,7 @@ function ReviewSession() {
               cardId: card.id ?? 0,
               front: isReversed ? card.back_md : card.front_md,
               back: isReversed ? card.front_md : card.back_md,
+              hint: card.hint_md ?? null,
               tags: card.tags ?? [],
               wasReversed: isReversed
             }
@@ -131,6 +129,7 @@ function ReviewSession() {
           cardId: entry.card.id ?? 0,
           front: isReversed ? entry.card.back_md : entry.card.front_md,
           back: isReversed ? entry.card.front_md : entry.card.back_md,
+          hint: entry.card.hint_md ?? null,
           tags: entry.card.tags ?? [],
           wasReversed: isReversed
         }
@@ -183,6 +182,7 @@ function ReviewSession() {
         [currentCard.cardId]: result
       }))
       setShowBack(false)
+      setShowHint(false)
       setIndex((prev) => prev + 1)
       if (result === 'good') {
         setGoodCount((prev) => prev + 1)
@@ -206,6 +206,7 @@ function ReviewSession() {
       return next
     })
     setShowBack(false)
+    setShowHint(false)
     setIsDeleting(false)
     setIsDeleteOpen(false)
   }
@@ -215,6 +216,7 @@ function ReviewSession() {
   const badCards = cards.filter((card) => answers[card.cardId] === 'bad')
   const reviewedCount = Math.min(index, cards.length)
   const remainingCount = Math.max(cards.length - index, 0)
+  const hasHint = Boolean(currentCard?.hint?.trim())
   const progressPercent =
     cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0
 
@@ -274,6 +276,12 @@ function ReviewSession() {
         return
       }
 
+      if (hasHint && event.key.toLowerCase() === 'h') {
+        event.preventDefault()
+        setShowHint((prev) => !prev)
+        return
+      }
+
       if (!showBack) {
         return
       }
@@ -294,7 +302,7 @@ function ReviewSession() {
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [currentCard, handleAnswer, handleReveal, isDeleteOpen, isDone, isLoading, showBack])
+  }, [currentCard, handleAnswer, handleReveal, hasHint, isDeleteOpen, isDone, isLoading, showBack])
 
   useEffect(() => {
     if (!currentCard) {
@@ -439,6 +447,18 @@ function ReviewSession() {
                     imageFetchPriority="high"
                   />
                 </div>
+                {hasHint && showHint ? (
+                  <div className="review-hint">
+                    <h3>{t('labels.hint')}</h3>
+                    <div className="markdown">
+                      <MarkdownRenderer
+                        value={currentCard.hint ?? t('status.none')}
+                        imageLoading="eager"
+                        imageFetchPriority="high"
+                      />
+                    </div>
+                  </div>
+                ) : null}
               </article>
               {showBack ? (
                 <article className="review-face">
@@ -478,6 +498,16 @@ function ReviewSession() {
                   </button>
                 </div>
               )}
+              {hasHint ? (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowHint((prev) => !prev)}
+                  aria-keyshortcuts="H"
+                >
+                  {showHint ? t('labels.hideHint') : t('labels.showHint')}
+                </button>
+              ) : null}
               {showBack ? (
                 <Link
                   to={`/card/${currentCard.cardId}/edit`}
