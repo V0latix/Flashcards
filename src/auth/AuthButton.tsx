@@ -121,6 +121,7 @@ function AuthButton({ className }: AuthButtonProps) {
     const { error } = await signInWithProvider('github')
     if (error) {
       setStatus({ type: 'error', message: error })
+      setOpen(true)
     }
     setSubmitting(false)
   }
