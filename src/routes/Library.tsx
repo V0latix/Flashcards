@@ -30,6 +30,8 @@ type ExportPayload = {
   reviewLogs?: ReviewLog[]
 }
 
+const SUSPENDED_BOX = -1
+
 function Library() {
   const { t, language } = useI18n()
   const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
@@ -162,6 +164,10 @@ function Library() {
     })
     return counts
   }, [cards])
+  const suspendedCount = useMemo(
+    () => cards.filter(({ card }) => card.suspended).length,
+    [cards]
+  )
 
   const filteredCards = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -180,14 +186,22 @@ function Library() {
       }
 
       if (selectedBoxes.length > 0) {
-        const cardBox = reviewState?.box ?? 0
-        if (!selectedBoxes.includes(cardBox)) {
-          return false
+        const selectedActiveBoxes = selectedBoxes.filter((box) => box !== SUSPENDED_BOX)
+        const includeSuspended = selectedBoxes.includes(SUSPENDED_BOX)
+        if (card.suspended) {
+          if (!includeSuspended) {
+            return false
+          }
+        } else {
+          const cardBox = reviewState?.box ?? 0
+          if (selectedActiveBoxes.length === 0 || !selectedActiveBoxes.includes(cardBox)) {
+            return false
+          }
         }
       }
 
       if (normalizedQuery) {
-        const haystack = `${card.front_md} ${card.back_md}`.toLowerCase()
+        const haystack = `${card.front_md} ${card.back_md} ${card.tags.join(' ')}`.toLowerCase()
         if (!haystack.includes(normalizedQuery)) {
           return false
         }
@@ -455,6 +469,15 @@ function Library() {
                       {box} ({boxCounts[box] ?? 0})
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    className={`btn btn-secondary btn-toggle${
+                      selectedBoxes.includes(SUSPENDED_BOX) ? ' is-active' : ''
+                    }`}
+                    onClick={() => toggleBoxFilter(SUSPENDED_BOX)}
+                  >
+                    {t('labels.suspended')} ({suspendedCount})
+                  </button>
                   <button
                     type="button"
                     className="btn btn-secondary"

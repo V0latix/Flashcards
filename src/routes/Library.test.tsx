@@ -161,6 +161,27 @@ describe('Library delete by tag', () => {
     expect(queuedFronts).toEqual(['Q2'])
   })
 
+  it('search also matches tags', async () => {
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Library />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Bibliothèque/i)
+    fireEvent.change(await screen.findByLabelText(/Recherche/i), {
+      target: { value: 'Histoire' }
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Q3')).toBeInTheDocument()
+      expect(screen.queryByText('Q1')).not.toBeInTheDocument()
+      expect(screen.queryByText('Q2')).not.toBeInTheDocument()
+    })
+  })
+
   it('suspends a card and excludes it from training queue', async () => {
     render(
       <I18nProvider>
@@ -189,6 +210,44 @@ describe('Library delete by tag', () => {
     const queuedFronts = queuedCards.map((card) => card?.front_md)
     expect(queuedFronts).toEqual(expect.arrayContaining(['Q2', 'Q3']))
     expect(queuedFronts).not.toContain('Q1')
+  })
+
+  it('filters cards by suspended status', async () => {
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Library />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Bibliothèque/i)
+    const q1Card = (await screen.findByText('Q1')).closest('li')
+    expect(q1Card).not.toBeNull()
+
+    fireEvent.click(within(q1Card as HTMLElement).getByRole('button', { name: /Suspendre la carte/i }))
+
+    await waitFor(() => {
+      expect(
+        within(q1Card as HTMLElement).getByRole('button', { name: /Réactiver la carte/i })
+      ).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /^Suspendue \(\d+\)$/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Q1')).toBeInTheDocument()
+      expect(screen.queryByText('Q2')).not.toBeInTheDocument()
+      expect(screen.queryByText('Q3')).not.toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /^Toutes$/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Q1')).toBeInTheDocument()
+      expect(screen.getByText('Q2')).toBeInTheDocument()
+      expect(screen.getByText('Q3')).toBeInTheDocument()
+    })
   })
 
   it('suspends and resumes all cards from current filter', async () => {
