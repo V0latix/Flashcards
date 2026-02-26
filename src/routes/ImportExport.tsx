@@ -8,6 +8,7 @@ import { blobToBase64, downloadJson, type ExportMedia, type ExportPayload } from
 
 function ImportExport() {
   const { t } = useI18n()
+  const isDev = import.meta.env.DEV
   const [status, setStatus] = useState<string>('')
   const [summary, setSummary] = useState<{
     parsed_cards: number
@@ -350,9 +351,11 @@ function ImportExport() {
       <section>
         <label htmlFor="import-json">{t('importExport.importPool')}</label>
         <input id="import-json" type="file" accept="application/json" onChange={handleImport} />
-        <button type="button" onClick={handleDebugImport}>
-          {t('importExport.importSample')}
-        </button>
+        {isDev ? (
+          <button type="button" onClick={handleDebugImport}>
+            {t('importExport.importSample')}
+          </button>
+        ) : null}
       </section>
       {status ? <p>{status}</p> : null}
       {summary ? (
