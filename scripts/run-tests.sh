@@ -19,6 +19,11 @@ const { defineConfig } = require('vitest/config')
 
 export default defineConfig({
   root: '${ROOT_DIR}',
+  resolve: {
+    alias: {
+      '@react-native-async-storage/async-storage': resolve('${ROOT_DIR}', 'src/test/mocks/asyncStorage.ts')
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',

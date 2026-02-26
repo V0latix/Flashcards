@@ -72,7 +72,7 @@ describe('sync engine', () => {
     expect(stored?.cloud_id).toBeTruthy()
   })
 
-  it('removes local cards missing remotely if unchanged since last sync', async () => {
+  it('re-upserts local cards missing remotely if unchanged since last sync', async () => {
     const updatedAt = '2025-12-31T00:00:00.000Z'
     const cardId = await db.cards.add({
       front_md: 'Q',
@@ -101,10 +101,11 @@ describe('sync engine', () => {
     await syncOnce('user-1', true)
 
     const count = await db.cards.count()
-    expect(count).toBe(0)
+    expect(count).toBe(1)
 
     const cardsPayload = vi.mocked(upsertRemoteCards).mock.calls[0]?.[0] ?? []
-    expect(cardsPayload).toHaveLength(0)
+    expect(cardsPayload).toHaveLength(1)
+    expect(cardsPayload[0].id).toBe('cloud-1')
   })
 
   it('prefers remote card when remote updated_at is newer', async () => {

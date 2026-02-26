@@ -278,7 +278,7 @@ describe('applyReviewResult', () => {
 })
 
 describe('buildDailySession', () => {
-  it('returns box1 plus due cards from boxes 2-5', async () => {
+  it('returns due cards from box1 to box5 (including learned maintenance)', async () => {
     const today = '2024-03-01'
 
     for (let i = 0; i < 2; i += 1) {
@@ -337,8 +337,8 @@ describe('buildDailySession', () => {
 
     const session = await buildDailySession(1, today)
 
-    expect(session.box1).toHaveLength(10)
-    expect(session.due).toHaveLength(3)
+    expect(session.box1).toHaveLength(0)
+    expect(session.due).toHaveLength(5)
 
     const dueIds = session.due.map((entry) => entry.card.id)
     expect(dueIds).toEqual(expect.arrayContaining([dueCardId, pastDueId, learnedDueId]))
