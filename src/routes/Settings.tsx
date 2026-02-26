@@ -9,6 +9,7 @@ import { useI18n } from '../i18n/useI18n'
 
 function Settings() {
   const { t, language, setLanguage } = useI18n()
+  const deleteConfirmToken = t('settings.confirmDeleteToken')
   const defaultBox1Target = 10
   const defaultIntervals = {
     1: 1,
@@ -38,6 +39,7 @@ function Settings() {
   const [dangerText, setDangerText] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const navigate = useNavigate()
+  const isDeleteConfirmed = dangerText === deleteConfirmToken
 
   const handleSave = (event: React.FormEvent) => {
     event.preventDefault()
@@ -217,7 +219,7 @@ function Settings() {
         message={t('settings.deleteAllMessage')}
         confirmLabel={t('actions.delete')}
         onConfirm={async () => {
-          if (isDeleting || dangerText !== 'SUPPRIMER') {
+          if (isDeleting || !isDeleteConfirmed) {
             return
           }
           setIsDeleting(true)
@@ -233,10 +235,12 @@ function Settings() {
           setDangerText('')
         }}
         isDanger
-        confirmDisabled={isDeleting || dangerText !== 'SUPPRIMER'}
+        confirmDisabled={isDeleting || !isDeleteConfirmed}
       >
         <div className="section">
-          <label htmlFor="dangerInput">{t('settings.confirmDelete')}</label>
+          <label htmlFor="dangerInput">
+            {t('settings.confirmDelete', { token: deleteConfirmToken })}
+          </label>
           <input
             id="dangerInput"
             type="text"

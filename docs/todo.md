@@ -29,7 +29,7 @@
 - [x] Remplacer `listPublicCardCountsByPackSlug` par une agregation SQL/RPC cote Supabase (eviter de paginer toutes les lignes `public_cards`) dans `src/supabase/api.ts`.
 - [x] Nettoyer les logs debug UI encore presents (`src/App.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/ImportExport.tsx`) avec garde `import.meta.env.DEV`.
 - [x] Passer l'action "import sample" en mode DEV-only dans `src/routes/ImportExport.tsx`.
-- [ ] Finir l'i18n des chaines restantes (`Tags:` dans `src/routes/PackDetail.tsx`, texte de confirmation destructif dans `src/routes/Settings.tsx`).
+- [x] Finir l'i18n des chaines restantes (`Tags:` dans `src/routes/PackDetail.tsx`, texte de confirmation destructif dans `src/routes/Settings.tsx`).
 
 ## P4 (maintenabilite / tests)
 

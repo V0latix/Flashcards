@@ -135,7 +135,8 @@ export const translations = {
       deleteAllTitle: 'Suppression totale',
       deleteAllMessage:
         'Toutes les cartes, sessions, statistiques et progressions seront supprimées.',
-      confirmDelete: 'Tapez "SUPPRIMER" pour confirmer',
+      confirmDeleteToken: 'SUPPRIMER',
+      confirmDelete: 'Tapez "{{token}}" pour confirmer',
       defaultRestored: 'Valeurs par défaut restaurées.',
       saved: 'Paramètres enregistrés.',
       positiveNumbers: 'Les valeurs doivent être des nombres positifs.',
@@ -388,7 +389,8 @@ export const translations = {
       deleteAllTitle: 'Full deletion',
       deleteAllMessage:
         'All cards, sessions, stats, and progress will be deleted.',
-      confirmDelete: 'Type "DELETE" to confirm',
+      confirmDeleteToken: 'DELETE',
+      confirmDelete: 'Type "{{token}}" to confirm',
       defaultRestored: 'Default values restored.',
       saved: 'Settings saved.',
       positiveNumbers: 'Values must be positive numbers.',

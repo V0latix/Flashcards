@@ -108,7 +108,9 @@ function PackDetail() {
                   <p>
                     {t('cardEditor.back')}: {card.back_md}
                   </p>
-                  <p>Tags: {card.tags?.join(', ') || t('status.none')}</p>
+                  <p>
+                    {t('labels.tags')}: {card.tags?.join(', ') || t('status.none')}
+                  </p>
                 </li>
               ))}
             </ul>
