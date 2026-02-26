@@ -800,7 +800,7 @@ ul {
 }
 
 .review-card-stack-revealed {
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1.6fr) minmax(0, 0.8fr);
 }
 
 .review-face {
@@ -838,7 +838,7 @@ ul {
 }
 
 .review-card-stack-revealed .review-face .markdown img {
-  max-height: min(18vh, 180px);
+  max-height: min(26vh, 220px);
 }
 
 .review-face .markdown p:last-child {
