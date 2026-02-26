@@ -712,7 +712,7 @@ ul {
 }
 
 .review-page.container {
-  max-width: 1240px;
+  max-width: 1360px;
 }
 
 .review-session {
@@ -808,7 +808,7 @@ ul {
   border-radius: 14px;
   background: var(--surface-muted);
   padding: 12px;
-  min-height: 200px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -823,7 +823,22 @@ ul {
   flex: 1;
   min-height: 0;
   overflow: auto;
+  overflow-anchor: none;
   padding-right: 4px;
+}
+
+.review-face .markdown p {
+  margin: 0;
+}
+
+.review-face .markdown img {
+  margin: 0;
+  width: auto;
+  max-height: min(46vh, 340px);
+}
+
+.review-card-stack-revealed .review-face .markdown img {
+  max-height: min(18vh, 180px);
 }
 
 .review-face .markdown p:last-child {
@@ -1259,19 +1274,18 @@ ul {
   }
 
   .review-session {
-    height: min(760px, calc(100dvh - 176px));
+    height: min(840px, calc(100dvh - 152px));
   }
 
   .review-session-shell {
     flex: 1;
     min-height: 0;
-    grid-template-columns: minmax(0, 1fr) 240px;
+    grid-template-columns: minmax(0, 1fr) 220px;
     align-items: stretch;
   }
 
   .review-card-stack {
     min-height: 0;
-    height: 100%;
   }
 
   .review-card-stack:not(.review-card-stack-revealed) {
@@ -1280,7 +1294,6 @@ ul {
 
   .review-face {
     min-height: 0;
-    height: 100%;
   }
 }
 

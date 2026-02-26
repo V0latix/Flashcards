@@ -33,7 +33,21 @@ function ReviewSession() {
   const [badCount, setBadCount] = useState(0)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const frontMarkdownRef = useRef<HTMLDivElement | null>(null)
+  const backMarkdownRef = useRef<HTMLDivElement | null>(null)
   const [searchParams] = useSearchParams()
+
+  const resetScrollTop = (element: HTMLDivElement | null) => {
+    if (!element) {
+      return
+    }
+    if (typeof element.scrollTo === 'function') {
+      element.scrollTo({ top: 0, left: 0 })
+      return
+    }
+    element.scrollTop = 0
+    element.scrollLeft = 0
+  }
 
   const tagFilter = searchParams.get('tag')?.trim() || null
   const isTraining = searchParams.get('mode') === 'training'
@@ -282,6 +296,16 @@ function ReviewSession() {
     }
   }, [currentCard, handleAnswer, handleReveal, isDeleteOpen, isDone, isLoading, showBack])
 
+  useEffect(() => {
+    if (!currentCard) {
+      return
+    }
+    resetScrollTop(frontMarkdownRef.current)
+    if (showBack) {
+      resetScrollTop(backMarkdownRef.current)
+    }
+  }, [currentCard, showBack])
+
   return (
     <main className="container page review-page">
       {isLoading ? (
@@ -408,7 +432,7 @@ function ReviewSession() {
             <div className={showBack ? 'review-card-stack review-card-stack-revealed' : 'review-card-stack'}>
               <article className="review-face">
                 <h2>{t('cardEditor.front')}</h2>
-                <div className="markdown">
+                <div className="markdown" ref={frontMarkdownRef}>
                   <MarkdownRenderer
                     value={currentCard.front || t('status.none')}
                     imageLoading="eager"
@@ -419,7 +443,7 @@ function ReviewSession() {
               {showBack ? (
                 <article className="review-face">
                   <h2>{t('cardEditor.back')}</h2>
-                  <div className="markdown">
+                  <div className="markdown" ref={backMarkdownRef}>
                     <MarkdownRenderer
                       value={currentCard.back || t('status.none')}
                       imageLoading="eager"
