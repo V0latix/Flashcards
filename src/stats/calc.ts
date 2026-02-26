@@ -1,17 +1,6 @@
 import type { Card, ReviewLog, ReviewState } from '../db/types'
 import type { BoxDistribution, DailyReviewAgg, TagAgg } from './types'
-
-const parseDateKey = (value: string): Date => {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(Date.UTC(year, month - 1, day))
-}
-
-const toDateKey = (value: string | Date): string => {
-  if (typeof value === 'string' && value.length >= 10) {
-    return value.slice(0, 10)
-  }
-  return new Date(value).toISOString().slice(0, 10)
-}
+import { addDays, parseDateKey, toDateKey } from '../utils/date'
 
 const getPeriodKeys = (days: number, todayKey: string): string[] => {
   const keys: string[] = []
@@ -22,12 +11,6 @@ const getPeriodKeys = (days: number, todayKey: string): string[] => {
     keys.push(toDateKey(date))
   }
   return keys
-}
-
-const addDays = (value: string, days: number): string => {
-  const date = parseDateKey(value)
-  date.setUTCDate(date.getUTCDate() + days)
-  return toDateKey(date)
 }
 
 const buildPrefixes = (tags: string[]): string[] => {

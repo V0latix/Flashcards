@@ -24,7 +24,7 @@
 - [x] Supprimer les checks DB/Supabase au boot en production (garder uniquement en DEV) dans `src/App.tsx`.
 - [x] Supprimer ou reutiliser le code mort `listCardsByDeck` et `listCardsFiltered` dans `src/db/queries.ts`.
 - [x] Factoriser les utilitaires export JSON/media (`ExportPayload`, `blobToBase64`, `downloadJson`) entre `src/routes/ImportExport.tsx` et `src/routes/Library.tsx`.
-- [ ] Factoriser les utilitaires date (`parseIsoDate`, `toDateKey`, `addDays`, `normalizeToDateKey`) partages entre `src/routes/Home.tsx`, `src/leitner/engine.ts` et `src/stats/calc.ts`.
+- [x] Factoriser les utilitaires date (`parseIsoDate`, `toDateKey`, `addDays`, `normalizeToDateKey`) partages entre `src/routes/Home.tsx`, `src/leitner/engine.ts` et `src/stats/calc.ts`.
 - [ ] Extraire un composant/hook commun de filtre d'arbre de tags (actuellement duplique entre `src/routes/Library.tsx` et `src/routes/Packs.tsx`).
 - [ ] Remplacer `listPublicCardCountsByPackSlug` par une agregation SQL/RPC cote Supabase (eviter de paginer toutes les lignes `public_cards`) dans `src/supabase/api.ts`.
 - [ ] Nettoyer les logs debug UI encore presents (`src/App.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/ImportExport.tsx`) avec garde `import.meta.env.DEV`.

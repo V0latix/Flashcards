@@ -4,46 +4,13 @@ import { getDeviceId, createUuid } from '../sync/ids'
 import { markLocalChange } from '../sync/queue'
 import { LEITNER_BOX_COUNT } from './config'
 import { getLeitnerSettings } from './settings'
+import { addDays, normalizeToDateKey, normalizeTodayKey } from '../utils/date'
 
 type SessionCard = { card: Card; reviewState: ReviewState }
 
 type DailySession = {
   box1: SessionCard[]
   due: SessionCard[]
-}
-
-const toIsoDate = (date: Date): string => date.toISOString().slice(0, 10)
-
-const parseIsoDate = (value: string): Date => {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(Date.UTC(year, month - 1, day))
-}
-
-const addDays = (value: string, days: number): string => {
-  const date = parseIsoDate(value)
-  date.setUTCDate(date.getUTCDate() + days)
-  return toIsoDate(date)
-}
-
-const normalizeToday = (today: string): string => {
-  if (today.length === 10) {
-    return today
-  }
-  return toIsoDate(new Date(today))
-}
-
-const normalizeToDateKey = (value: string | null | undefined): string | null => {
-  if (!value) {
-    return null
-  }
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return value
-  }
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return null
-  }
-  return toIsoDate(parsed)
 }
 
 const loadCardsByIds = async (cardIds: number[]): Promise<Card[]> => {
@@ -87,8 +54,8 @@ export async function autoFillBox1(
 ): Promise<void> {
   const today =
     typeof todayOrDeckId === 'string'
-      ? normalizeToday(todayOrDeckId)
-      : normalizeToday(maybeToday ?? '')
+      ? normalizeTodayKey(todayOrDeckId)
+      : normalizeTodayKey(maybeToday ?? '')
   const { box1Target } = getLeitnerSettings()
 
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
@@ -150,8 +117,8 @@ export async function buildDailySession(
 ): Promise<DailySession> {
   const today =
     typeof todayOrDeckId === 'string'
-      ? normalizeToday(todayOrDeckId)
-      : normalizeToday(maybeToday ?? '')
+      ? normalizeTodayKey(todayOrDeckId)
+      : normalizeTodayKey(maybeToday ?? '')
 
   await autoFillBox1(today)
 
@@ -228,7 +195,7 @@ export const applyReviewResult = async (
   todayInput: string,
   wasReversed = false
 ): Promise<void> => {
-  const today = normalizeToday(todayInput)
+  const today = normalizeTodayKey(todayInput)
   const { intervalDays } = getLeitnerSettings()
 
   await db.transaction('rw', db.reviewStates, db.reviewLogs, async () => {

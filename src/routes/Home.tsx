@@ -8,38 +8,12 @@ import db from '../db'
 import type { ReviewState } from '../db/types'
 import { getLeitnerSettings } from '../leitner/settings'
 import { useI18n } from '../i18n/useI18n'
+import { addDays, normalizeToDateKey, parseDateKey } from '../utils/date'
 
 type HomeBoxSummary = {
   dueCounts: Record<number, number>
   nextDue: Record<number, string | null>
   tomorrowDueCount: number
-}
-
-const parseIsoDate = (value: string) => {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Date(Date.UTC(year, month - 1, day))
-}
-
-const toDateKey = (value: Date) => value.toISOString().slice(0, 10)
-
-const normalizeToDateKey = (value: string | null | undefined) => {
-  if (!value) {
-    return null
-  }
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return value
-  }
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return null
-  }
-  return toDateKey(parsed)
-}
-
-const addDays = (value: string, days: number) => {
-  const date = parseIsoDate(value)
-  date.setUTCDate(date.getUTCDate() + days)
-  return toDateKey(date)
 }
 
 const computeDueKey = (state: ReviewState, learnedIntervalDays: number) => {
@@ -75,7 +49,7 @@ function Home() {
     if (!parsed) {
       return value
     }
-    const date = parseIsoDate(parsed)
+    const date = parseDateKey(parsed)
     const locale = language === 'fr' ? 'fr-FR' : 'en-US'
     return date.toLocaleDateString(locale, {
       timeZone: 'UTC',
