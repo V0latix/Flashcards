@@ -8,27 +8,13 @@ import {
   setCardsSuspended,
   updateCard
 } from '../db/queries'
-import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
+import type { Card, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { saveTrainingQueue } from '../utils/training'
 import { useI18n } from '../i18n/useI18n'
+import { blobToBase64, downloadJson, type ExportMedia, type ExportPayload } from '../utils/export'
 import db from '../db'
-
-type ExportMedia = {
-  card_id: number
-  side: MediaSide
-  mime: string
-  base64: string
-}
-
-type ExportPayload = {
-  schema_version: number
-  cards: Card[]
-  reviewStates: ReviewState[]
-  media: ExportMedia[]
-  reviewLogs?: ReviewLog[]
-}
 
 const SUSPENDED_BOX = -1
 
@@ -236,36 +222,6 @@ function Library() {
     [filteredCards]
   )
 
-  const blobToBase64 = (blob: Blob): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onerror = () => reject(new Error('Failed to read blob'))
-      reader.onload = () => {
-        const result = reader.result
-        if (typeof result === 'string') {
-          const base64 = result.split(',')[1] ?? ''
-          resolve(base64)
-          return
-        }
-        reject(new Error('Unexpected reader result'))
-      }
-      reader.readAsDataURL(blob)
-    })
-
-  const downloadJson = (payload: ExportPayload) => {
-    const safeTagName = selectedTag ? selectedTag.replaceAll('/', '-') : 'all'
-    const fileName = `cards-export-${safeTagName}.json`
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json'
-    })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = fileName
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
   const handleExportSelection = async () => {
     if (selectedCardIds.length === 0) {
       return
@@ -299,7 +255,8 @@ function Library() {
         reviewLogs: reviewLogs.filter((log) => deckCardIds.has(log.card_id))
       }
 
-      downloadJson(payload)
+      const safeTagName = selectedTag ? selectedTag.replaceAll('/', '-') : 'all'
+      downloadJson(payload, `cards-export-${safeTagName}.json`)
       setExportStatus(t('importExport.exportDone'))
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)

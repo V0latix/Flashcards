@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import db from '../db'
-import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
+import type { ReviewLog, ReviewState } from '../db/types'
 import { createUuid, getDeviceId } from '../sync/ids'
 import { markLocalChange } from '../sync/queue'
 import { useI18n } from '../i18n/useI18n'
+import { blobToBase64, downloadJson, type ExportMedia, type ExportPayload } from '../utils/export'
 
 function ImportExport() {
   const { t } = useI18n()
@@ -17,13 +18,6 @@ function ImportExport() {
     errors: string[]
   } | null>(null)
 
-  type ExportMedia = {
-    card_id: number
-    side: MediaSide
-    mime: string
-    base64: string
-  }
-
   type ImportCard = {
     id?: string | number
     front_md?: string
@@ -32,30 +26,6 @@ function ImportExport() {
     back?: string
     tags?: string[]
   }
-
-  type ExportPayload = {
-    schema_version: number
-    cards: Card[]
-    reviewStates: ReviewState[]
-    media: ExportMedia[]
-    reviewLogs?: ReviewLog[]
-  }
-
-  const blobToBase64 = (blob: Blob): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onerror = () => reject(new Error('Failed to read blob'))
-      reader.onload = () => {
-        const result = reader.result
-        if (typeof result === 'string') {
-          const base64 = result.split(',')[1] ?? ''
-          resolve(base64)
-          return
-        }
-        reject(new Error('Unexpected reader result'))
-      }
-      reader.readAsDataURL(blob)
-    })
 
   const base64ToBlob = (base64: string, mime: string): Blob => {
     const binary = atob(base64)
@@ -71,18 +41,6 @@ function ImportExport() {
       return crypto.randomUUID()
     }
     return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`
-  }
-
-  const downloadJson = (payload: ExportPayload) => {
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json'
-    })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'cards-export.json'
-    link.click()
-    URL.revokeObjectURL(url)
   }
 
   const handleExport = async () => {
