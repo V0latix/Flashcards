@@ -275,20 +275,10 @@ function Library() {
   }
 
   const handleTraining = () => {
-    const sourceCards = selectedTag
-      ? cards.filter(({ card }) =>
-          card.tags.some(
-            (tag) => tag === selectedTag || tag.startsWith(`${selectedTag}/`)
-          )
-        )
-      : cards
-    const ids = sourceCards
-      .map(({ card }) => card.id)
-      .filter((id): id is number => typeof id === 'number')
-    if (ids.length === 0) {
+    if (selectedCardIds.length === 0) {
       return
     }
-    saveTrainingQueue(ids)
+    saveTrainingQueue(selectedCardIds)
     navigate('/review?mode=training')
   }
 
@@ -403,7 +393,7 @@ function Library() {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleTraining}
-                disabled={cards.length === 0}
+                disabled={selectedCardIds.length === 0}
               >
                 {t('actions.training')}
               </button>

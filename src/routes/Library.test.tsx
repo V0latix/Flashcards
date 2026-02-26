@@ -5,6 +5,7 @@ import db from '../db'
 import { I18nProvider } from '../i18n/I18nProvider'
 import Library from './Library'
 import { resetDb, seedCardWithState } from '../test/utils'
+import { consumeTrainingQueue } from '../utils/training'
 
 const blobToText = (blob: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -35,6 +36,7 @@ describe('Library delete by tag', () => {
   })
 
   beforeEach(async () => {
+    sessionStorage.clear()
     await resetDb()
     await seedCardWithState({
       front: 'Q1',
@@ -134,5 +136,29 @@ describe('Library delete by tag', () => {
     expect(payload.reviewStates).toHaveLength(2)
     expect(anchorClickSpy).toHaveBeenCalledTimes(1)
     expect(revokeObjectUrlSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('training mode uses current active filters', async () => {
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Library />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Bibliothèque/i)
+    fireEvent.click(await screen.findByRole('button', { name: /Geographie/i }))
+    fireEvent.change(screen.getByLabelText(/Recherche/i), {
+      target: { value: 'Q2' }
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /entraînement/i }))
+
+    const ids = consumeTrainingQueue()
+    expect(ids).toHaveLength(1)
+
+    const queuedCard = await db.cards.get(ids[0])
+    expect(queuedCard?.front_md).toBe('Q2')
   })
 })
