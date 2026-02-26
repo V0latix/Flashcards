@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { listPacks, listPublicCardCountsByPackSlug } from '../supabase/api'
 import { importPackToLocal } from '../supabase/import'
 import type { Pack } from '../supabase/types'
-import { buildTagTree, type TagNode } from '../utils/tagTree'
+import TagTreeFilter from '../components/TagTreeFilter'
 import { useI18n } from '../i18n/useI18n'
 
 function Packs() {
@@ -13,7 +13,6 @@ function Packs() {
   const [error, setError] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [query, setQuery] = useState('')
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [cardCountsBySlug, setCardCountsBySlug] = useState<Record<string, number>>({})
   const [importingSlug, setImportingSlug] = useState<string | null>(null)
   const [importStatusBySlug, setImportStatusBySlug] = useState<Record<string, string>>({})
@@ -36,11 +35,6 @@ function Packs() {
 
     void loadPacks()
   }, [])
-
-  const tagTree = useMemo(
-    () => buildTagTree(packs.map((pack) => pack.tags ?? [])),
-    [packs]
-  )
 
   const tagFilteredPacks = useMemo(() => {
     if (!selectedTag) {
@@ -76,50 +70,6 @@ function Packs() {
     })
   }, [query, tagFilteredPacks])
 
-  const renderTagNodes = (nodes: TagNode[], depth = 0) => {
-    if (nodes.length === 0) {
-      return null
-    }
-    return (
-      <ul className="tree" style={{ paddingLeft: depth * 16 }}>
-        {nodes.map((node) => {
-          const isCollapsed = collapsed[node.path] ?? true
-          const hasChildren = node.children.length > 0
-          return (
-            <li key={node.path}>
-              <div className="tree-row">
-                {hasChildren ? (
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() =>
-                      setCollapsed((prev) => ({
-                        ...prev,
-                        [node.path]: !isCollapsed
-                      }))
-                    }
-                  >
-                    {isCollapsed ? '▸' : '▾'}
-                  </button>
-                ) : (
-                  <span className="tree-spacer" />
-                )}
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setSelectedTag(node.path)}
-                >
-                  {node.name} ({node.count})
-                </button>
-              </div>
-              {!isCollapsed ? renderTagNodes(node.children, depth + 1) : null}
-            </li>
-          )
-        })}
-      </ul>
-    )
-  }
-
   return (
     <main className="container page">
       <div className="page-header">
@@ -132,19 +82,13 @@ function Packs() {
       {!isLoading && !error && packs.length > 0 ? (
         <section className="card section split">
           <div className="sidebar">
-            <h2>{t('labels.tags')}</h2>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setSelectedTag(null)}
-            >
-              {t('packs.all')}
-            </button>
-            {tagTree.children.length === 0 ? (
-              <p>{t('library.noTags')}</p>
-            ) : (
-              renderTagNodes(tagTree.children)
-            )}
+            <TagTreeFilter
+              title={t('labels.tags')}
+              allLabel={t('packs.all')}
+              noTagsLabel={t('library.noTags')}
+              tagsCollection={packs.map((pack) => pack.tags ?? [])}
+              onSelectTag={setSelectedTag}
+            />
           </div>
           <div className="panel">
             <h2>{selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('packs.all')}</h2>

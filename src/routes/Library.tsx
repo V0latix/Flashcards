@@ -9,8 +9,8 @@ import {
   updateCard
 } from '../db/queries'
 import type { Card, ReviewState } from '../db/types'
-import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
+import TagTreeFilter from '../components/TagTreeFilter'
 import { saveTrainingQueue } from '../utils/training'
 import { useI18n } from '../i18n/useI18n'
 import { blobToBase64, downloadJson, type ExportMedia, type ExportPayload } from '../utils/export'
@@ -25,7 +25,6 @@ function Library() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [selectedBoxes, setSelectedBoxes] = useState<number[]>([])
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [openHints, setOpenHints] = useState<Record<number, boolean>>({})
   const [visibleCount, setVisibleCount] = useState(100)
   const [tagDeleteOpen, setTagDeleteOpen] = useState(false)
@@ -132,11 +131,6 @@ function Library() {
     setIsCardDeleting(false)
     setCardToDelete(null)
   }
-
-  const tagTree = useMemo(
-    () => buildTagTree(cards.map(({ card }) => card.tags)),
-    [cards]
-  )
 
   const totalCardsCount = cards.length
   const boxOptions = [0, 1, 2, 3, 4, 5]
@@ -288,50 +282,6 @@ function Library() {
     await loadCards()
   }
 
-  const renderTagNodes = (nodes: TagNode[], depth = 0) => {
-    if (nodes.length === 0) {
-      return null
-    }
-    return (
-      <ul className="tree" style={{ paddingLeft: depth * 16 }}>
-        {nodes.map((node) => {
-          const isCollapsed = collapsed[node.path] ?? true
-          const hasChildren = node.children.length > 0
-          return (
-            <li key={node.path}>
-              <div className="tree-row">
-                {hasChildren ? (
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() =>
-                      setCollapsed((prev) => ({
-                        ...prev,
-                        [node.path]: !isCollapsed
-                      }))
-                    }
-                  >
-                    {isCollapsed ? '▸' : '▾'}
-                  </button>
-                ) : (
-                  <span className="tree-spacer" />
-                )}
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => handleSelectTag(node.path)}
-              >
-                {node.name} ({node.count})
-              </button>
-              </div>
-              {!isCollapsed ? renderTagNodes(node.children, depth + 1) : null}
-            </li>
-          )
-        })}
-      </ul>
-    )
-  }
-
   const breadcrumbParts = selectedTag ? selectedTag.split('/') : []
   const breadcrumbPaths = breadcrumbParts.map((_, index) =>
     breadcrumbParts.slice(0, index + 1).join('/')
@@ -371,16 +321,13 @@ function Library() {
       ) : (
         <section className="card section split">
           <div className="sidebar">
-            <h2>{t('labels.tags')}</h2>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => handleSelectTag(null)}
-            >
-              {t('library.allCards')}
-            </button>
-            {tagTree.children.length === 0 ? <p>{t('library.noTags')}</p> : null}
-            {renderTagNodes(tagTree.children)}
+            <TagTreeFilter
+              title={t('labels.tags')}
+              allLabel={t('library.allCards')}
+              noTagsLabel={t('library.noTags')}
+              tagsCollection={cards.map(({ card }) => card.tags)}
+              onSelectTag={handleSelectTag}
+            />
           </div>
           <div className="panel">
             <div className="panel-header">
