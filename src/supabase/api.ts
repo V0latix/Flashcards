@@ -2,6 +2,7 @@ import { supabase } from './client'
 import type { Pack, PublicCard } from './types'
 
 const PAGE_SIZE = 1000
+const PUBLIC_CARD_COUNTS_RPC = 'public_card_counts_by_pack'
 
 export async function listPacks(): Promise<Pack[]> {
   const { data, error } = await supabase
@@ -16,7 +17,27 @@ export async function listPacks(): Promise<Pack[]> {
   return (data ?? []) as Pack[]
 }
 
-export async function listPublicCardCountsByPackSlug(): Promise<Record<string, number>> {
+type PublicCardCountRow = {
+  pack_slug: string | null
+  cards_count: number | string | null
+}
+
+const parseCountRows = (rows: PublicCardCountRow[]): Record<string, number> => {
+  const counts: Record<string, number> = {}
+  rows.forEach((row) => {
+    if (typeof row.pack_slug !== 'string' || row.pack_slug.trim() === '') {
+      return
+    }
+    const parsed =
+      typeof row.cards_count === 'number'
+        ? row.cards_count
+        : Number(row.cards_count ?? 0)
+    counts[row.pack_slug] = Number.isFinite(parsed) ? parsed : 0
+  })
+  return counts
+}
+
+const listPublicCardCountsByPackSlugLegacy = async (): Promise<Record<string, number>> => {
   const counts: Record<string, number> = {}
   let from = 0
 
@@ -43,6 +64,29 @@ export async function listPublicCardCountsByPackSlug(): Promise<Record<string, n
   }
 
   return counts
+}
+
+const isMissingRpcError = (error: { code?: string; message?: string }) => {
+  const message = (error.message ?? '').toLowerCase()
+  return (
+    error.code === 'PGRST202' ||
+    message.includes('could not find the function') ||
+    message.includes(PUBLIC_CARD_COUNTS_RPC)
+  )
+}
+
+export async function listPublicCardCountsByPackSlug(): Promise<Record<string, number>> {
+  const { data, error } = await supabase.rpc(PUBLIC_CARD_COUNTS_RPC)
+
+  if (!error) {
+    return parseCountRows((data ?? []) as PublicCardCountRow[])
+  }
+
+  if (isMissingRpcError(error)) {
+    return listPublicCardCountsByPackSlugLegacy()
+  }
+
+  throw new Error(`Supabase listPublicCardCountsByPackSlug failed: ${error.message}`)
 }
 
 export async function listPublicCardsByPackSlug(slug: string): Promise<PublicCard[]> {
