@@ -2,19 +2,8 @@ import db from './index'
 import type { Card, ReviewLog, ReviewState } from './types'
 import { markLocalChange, queueCardDelete } from '../sync/queue'
 
-export type CardFilter = {
-  text?: string
-  box?: number | null
-  tags?: string[]
-}
-
 export async function listCards(): Promise<Card[]> {
   return db.cards.toArray()
-}
-
-export async function listCardsByDeck(_deckId: number): Promise<Card[]> {
-  void _deckId
-  return listCards()
 }
 
 export async function listCardsWithReviewState(
@@ -34,43 +23,6 @@ export async function listCardsWithReviewState(
     card,
     reviewState: reviewStateByCardId.get(card.id ?? -1)
   }))
-}
-
-export async function listCardsFiltered(
-  filter: CardFilter
-): Promise<Array<{ card: Card; reviewState: ReviewState | undefined }>> {
-  const { text, box, tags } = filter
-  const normalizedText = text?.trim().toLowerCase() ?? ''
-  const normalizedTags = (tags ?? []).map((tag) => tag.trim().toLowerCase()).filter(Boolean)
-
-  const entries = await listCardsWithReviewState(0)
-
-  return entries.filter(({ card, reviewState }) => {
-    if (typeof box === 'number') {
-      if (!reviewState || reviewState.box !== box) {
-        return false
-      }
-    }
-
-    if (normalizedText) {
-      const haystack = `${card.front_md} ${card.back_md}`.toLowerCase()
-      if (!haystack.includes(normalizedText)) {
-        return false
-      }
-    }
-
-    if (normalizedTags.length > 0) {
-      const cardTags = card.tags.map((tag) => tag.toLowerCase())
-      const hasAnyTag = normalizedTags.some((tag) =>
-        cardTags.some((cardTag) => cardTag.includes(tag))
-      )
-      if (!hasAnyTag) {
-        return false
-      }
-    }
-
-    return true
-  })
 }
 
 export async function getCardById(id: number): Promise<Card | undefined> {

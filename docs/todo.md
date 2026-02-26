@@ -22,7 +22,7 @@
 ## P3 (audit technique: doublons / inutile)
 
 - [x] Supprimer les checks DB/Supabase au boot en production (garder uniquement en DEV) dans `src/App.tsx`.
-- [ ] Supprimer ou reutiliser le code mort `listCardsByDeck` et `listCardsFiltered` dans `src/db/queries.ts`.
+- [x] Supprimer ou reutiliser le code mort `listCardsByDeck` et `listCardsFiltered` dans `src/db/queries.ts`.
 - [ ] Factoriser les utilitaires export JSON/media (`ExportPayload`, `blobToBase64`, `downloadJson`) entre `src/routes/ImportExport.tsx` et `src/routes/Library.tsx`.
 - [ ] Factoriser les utilitaires date (`parseIsoDate`, `toDateKey`, `addDays`, `normalizeToDateKey`) partages entre `src/routes/Home.tsx`, `src/leitner/engine.ts` et `src/stats/calc.ts`.
 - [ ] Extraire un composant/hook commun de filtre d'arbre de tags (actuellement duplique entre `src/routes/Library.tsx` et `src/routes/Packs.tsx`).
