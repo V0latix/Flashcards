@@ -8,12 +8,14 @@ const addCardWithState = async (input: {
   createdAt: string
   box: number
   dueDate: string | null
+  suspended?: boolean
   isLearned?: boolean
   learnedAt?: string | null
 }) => {
   const cardId = await db.cards.add({
     front_md: input.front,
     back_md: input.back,
+    suspended: input.suspended ?? false,
     tags: [],
     created_at: input.createdAt,
     updated_at: input.createdAt
@@ -55,6 +57,43 @@ describe('autoFillBox1', () => {
 
     const box1State = await db.reviewStates.where({ box: 1 }).first()
     expect(box1State?.due_date).toBe('2024-01-11')
+  })
+
+  it('does not promote suspended cards from box0', async () => {
+    const today = '2024-01-10'
+
+    for (let i = 0; i < 9; i += 1) {
+      await addCardWithState({
+        front: `Box1 ${i}`,
+        back: `Box1 ${i}`,
+        createdAt: `2024-01-0${i + 1}`,
+        box: 1,
+        dueDate: today
+      })
+    }
+
+    const activeId = await addCardWithState({
+      front: 'Box0 active',
+      back: 'Box0 active',
+      createdAt: '2024-01-20',
+      box: 0,
+      dueDate: null
+    })
+    const suspendedId = await addCardWithState({
+      front: 'Box0 suspended',
+      back: 'Box0 suspended',
+      createdAt: '2024-01-21',
+      box: 0,
+      dueDate: null,
+      suspended: true
+    })
+
+    await autoFillBox1(1, today)
+
+    const activeState = await db.reviewStates.get(activeId)
+    const suspendedState = await db.reviewStates.get(suspendedId)
+    expect(activeState?.box).toBe(1)
+    expect(suspendedState?.box).toBe(0)
   })
 
   it('only fills what is available when box0 is insufficient', async () => {
@@ -342,5 +381,31 @@ describe('buildDailySession', () => {
 
     const dueIds = session.due.map((entry) => entry.card.id)
     expect(dueIds).toEqual(expect.arrayContaining([dueCardId, pastDueId, learnedDueId]))
+  })
+
+  it('excludes suspended cards from due session', async () => {
+    const today = '2024-03-01'
+
+    await addCardWithState({
+      front: 'Due active',
+      back: 'Due active',
+      createdAt: '2024-02-20',
+      box: 2,
+      dueDate: today
+    })
+    await addCardWithState({
+      front: 'Due suspended',
+      back: 'Due suspended',
+      createdAt: '2024-02-21',
+      box: 2,
+      dueDate: today,
+      suspended: true
+    })
+
+    const session = await buildDailySession(1, today)
+    const dueFronts = session.due.map((entry) => entry.card.front_md)
+
+    expect(dueFronts).toContain('Due active')
+    expect(dueFronts).not.toContain('Due suspended')
   })
 })

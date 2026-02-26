@@ -9,7 +9,7 @@
 
 - [x] Faire en sorte que le mode training respecte les filtres actifs (utiliser `filteredCards` ou `selectedCardIds`) dans `src/routes/Library.tsx`.
 - [x] Ajouter l'affichage de `hint_md` en session de review (bouton "Indice" + raccourci clavier) dans `src/routes/ReviewSession.tsx`.
-- [ ] Implementer la suspension de cartes (`suspended`) avec actions UI et exclusion dans le moteur de session (`src/db/types.ts`, `src/leitner/engine.ts`, `src/routes/Library.tsx`).
+- [x] Implementer la suspension de cartes (`suspended`) avec actions UI et exclusion dans le moteur de session (`src/db/types.ts`, `src/leitner/engine.ts`, `src/routes/Library.tsx`).
 - [ ] Finaliser la logique "box1 target" (brancher `autoFillBox1` ou simplifier les restes de code) dans `src/leitner/engine.ts`.
 
 ## P2 (qualite UX/accessibilite)

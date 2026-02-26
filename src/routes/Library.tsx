@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import MarkdownRenderer from '../components/MarkdownRenderer'
-import { deleteCard, deleteCardsByTag, listCardsWithReviewState } from '../db/queries'
+import {
+  deleteCard,
+  deleteCardsByTag,
+  listCardsWithReviewState,
+  setCardsSuspended,
+  updateCard
+} from '../db/queries'
 import type { Card, MediaSide, ReviewLog, ReviewState } from '../db/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -202,6 +208,19 @@ function Library() {
         .filter((id): id is number => typeof id === 'number'),
     [filteredCards]
   )
+  const filteredSuspendedCount = useMemo(
+    () => filteredCards.filter(({ card }) => card.suspended).length,
+    [filteredCards]
+  )
+  const filteredActiveCount = filteredCards.length - filteredSuspendedCount
+  const trainingCardIds = useMemo(
+    () =>
+      filteredCards
+        .filter(({ card }) => !card.suspended)
+        .map(({ card }) => card.id)
+        .filter((id): id is number => typeof id === 'number'),
+    [filteredCards]
+  )
 
   const blobToBase64 = (blob: Blob): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -275,11 +294,27 @@ function Library() {
   }
 
   const handleTraining = () => {
+    if (trainingCardIds.length === 0) {
+      return
+    }
+    saveTrainingQueue(trainingCardIds)
+    navigate('/review?mode=training')
+  }
+
+  const handleToggleSuspended = async (card: Card) => {
+    if (!card.id) {
+      return
+    }
+    await updateCard(card.id, { suspended: !card.suspended })
+    await loadCards()
+  }
+
+  const handleSetSuspendedForFiltered = async (suspended: boolean) => {
     if (selectedCardIds.length === 0) {
       return
     }
-    saveTrainingQueue(selectedCardIds)
-    navigate('/review?mode=training')
+    await setCardsSuspended(selectedCardIds, suspended)
+    await loadCards()
   }
 
   const renderTagNodes = (nodes: TagNode[], depth = 0) => {
@@ -393,7 +428,7 @@ function Library() {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleTraining}
-                disabled={selectedCardIds.length === 0}
+                disabled={trainingCardIds.length === 0}
               >
                 {t('actions.training')}
               </button>
@@ -438,6 +473,26 @@ function Library() {
                 </button>
               </div>
             ) : null}
+            {selectedCardIds.length > 0 ? (
+              <div className="section button-row">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => void handleSetSuspendedForFiltered(true)}
+                  disabled={filteredActiveCount === 0}
+                >
+                  {t('actions.suspendSelection')}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => void handleSetSuspendedForFiltered(false)}
+                  disabled={filteredSuspendedCount === 0}
+                >
+                  {t('actions.resumeSelection')}
+                </button>
+              </div>
+            ) : null}
             {breadcrumbParts.length > 0 ? (
               <div className="breadcrumb">
                 {breadcrumbParts.map((part, index) => (
@@ -477,6 +532,9 @@ function Library() {
                     <div className="chip">
                       {t('labels.box')} {reviewState?.box ?? 0}
                     </div>
+                    {card.suspended ? (
+                      <div className="chip">{t('labels.suspended')}</div>
+                    ) : null}
                     <p>
                       {t('labels.nextReview')}: {formatDueDate(reviewState?.due_date)}
                     </p>
@@ -501,6 +559,13 @@ function Library() {
                         ) : null}
                       </div>
                     ) : null}
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => void handleToggleSuspended(card)}
+                    >
+                      {card.suspended ? t('actions.resumeCard') : t('actions.suspendCard')}
+                    </button>
                     <button
                       type="button"
                       className="btn btn-secondary"

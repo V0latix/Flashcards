@@ -111,6 +111,7 @@ const mapRemoteCardToLocal = (card: RemoteCard): Card => ({
   front_md: card.front_md,
   back_md: card.back_md,
   hint_md: null,
+  suspended: false,
   tags: card.tags ?? [],
   created_at: card.created_at,
   updated_at: card.updated_at,

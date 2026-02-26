@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { StrictMode } from 'react'
 import { MemoryRouter, useNavigate } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthProvider } from '../auth/AuthProvider'
@@ -31,6 +32,19 @@ const renderReviewSession = (entry = '/review') =>
     </I18nProvider>
   )
 
+const renderReviewSessionStrict = (entry = '/review') =>
+  render(
+    <StrictMode>
+      <I18nProvider>
+        <AuthProvider>
+          <MemoryRouter initialEntries={[entry]}>
+            <ReviewSession />
+          </MemoryRouter>
+        </AuthProvider>
+      </I18nProvider>
+    </StrictMode>
+  )
+
 const renderReviewSessionWithTagNavigation = (entry = '/review?tag=Tag/A') => {
   const Wrapper = () => {
     const navigate = useNavigate()
@@ -57,6 +71,7 @@ const renderReviewSessionWithTagNavigation = (entry = '/review?tag=Tag/A') => {
 
 describe('ReviewSession', () => {
   beforeEach(async () => {
+    sessionStorage.clear()
     await resetDb()
     setSettings()
     vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
@@ -96,7 +111,7 @@ describe('ReviewSession', () => {
 
     await screen.findByRole('heading', { name: /Recto/i })
     fireEvent.keyDown(window, { key: ' ', code: 'Space' })
-    await screen.findByText('A1')
+    await screen.findByRole('button', { name: 'BON' })
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
 
     await screen.findByText(/Session terminée/i)
@@ -222,6 +237,43 @@ describe('ReviewSession', () => {
       const state = await db.reviewStates.get(cardId)
       expect(state?.box).toBe(1)
     })
+  })
+
+  it('loads training queue in strict mode', async () => {
+    const cardId = await seedCardWithState({
+      front: 'Q strict',
+      back: 'A strict',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+    saveTrainingQueue([cardId])
+
+    renderReviewSessionStrict('/review?mode=training')
+
+    await screen.findByText(/Mode entraînement/i)
+    await screen.findByText('Q strict')
+  })
+
+  it('loads training queue from replay cache after first consume', async () => {
+    const cardId = await seedCardWithState({
+      front: 'Q replay',
+      back: 'A replay',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+    saveTrainingQueue([cardId])
+    sessionStorage.setItem(
+      'flashcards_training_queue_replay',
+      JSON.stringify({ ids: [cardId], consumedAt: Date.now() })
+    )
+    sessionStorage.removeItem('flashcards_training_queue')
+
+    renderReviewSession('/review?mode=training')
+
+    await screen.findByText(/Mode entraînement/i)
+    await screen.findByText('Q replay')
   })
 
   it('shows the current card tags during session', async () => {

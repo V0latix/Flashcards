@@ -56,7 +56,11 @@ const loadCardsByIds = async (cardIds: number[]): Promise<Card[]> => {
 
 const loadSessionCards = async (states: ReviewState[]): Promise<SessionCard[]> => {
   const cards = await loadCardsByIds(states.map((state) => state.card_id))
-  const cardById = new Map(cards.map((card) => [card.id, card]))
+  const cardById = new Map(
+    cards
+      .filter((card) => !card.suspended)
+      .map((card) => [card.id, card])
+  )
 
   return states
     .map((state) => {
@@ -104,7 +108,10 @@ export async function autoFillBox1(
 
     const box0CardIds = box0States.map((state) => state.card_id)
     const cards = await loadCardsByIds(box0CardIds)
-    const cardIds = cards.map((card) => card.id).filter((id): id is number => typeof id === 'number')
+    const cardIds = cards
+      .filter((card) => !card.suspended)
+      .map((card) => card.id)
+      .filter((id): id is number => typeof id === 'number')
 
     const selectedCardIds = shuffle(cardIds).slice(0, missing)
 

@@ -138,7 +138,60 @@ describe('Library delete by tag', () => {
     expect(revokeObjectUrlSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('training mode uses current active filters', async () => {
+  it('training mode respects active search filters', async () => {
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Library />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Bibliothèque/i)
+    fireEvent.change(await screen.findByLabelText(/Recherche/i), {
+      target: { value: 'Q2' }
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /entraînement/i }))
+
+    const ids = consumeTrainingQueue()
+    expect(ids).toHaveLength(1)
+    const queuedCards = await Promise.all(ids.map((id) => db.cards.get(id)))
+    const queuedFronts = queuedCards.map((card) => card?.front_md)
+    expect(queuedFronts).toEqual(['Q2'])
+  })
+
+  it('suspends a card and excludes it from training queue', async () => {
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Library />
+        </MemoryRouter>
+      </I18nProvider>
+    )
+
+    await screen.findByText(/Bibliothèque/i)
+    const q1Card = (await screen.findByText('Q1')).closest('li')
+    expect(q1Card).not.toBeNull()
+
+    fireEvent.click(within(q1Card as HTMLElement).getByRole('button', { name: /Suspendre la carte/i }))
+
+    await waitFor(() => {
+      expect(
+        within(q1Card as HTMLElement).getByRole('button', { name: /Réactiver la carte/i })
+      ).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /Session d'entraînement/i }))
+
+    const ids = consumeTrainingQueue()
+    const queuedCards = await Promise.all(ids.map((id) => db.cards.get(id)))
+    const queuedFronts = queuedCards.map((card) => card?.front_md)
+    expect(queuedFronts).toEqual(expect.arrayContaining(['Q2', 'Q3']))
+    expect(queuedFronts).not.toContain('Q1')
+  })
+
+  it('suspends and resumes all cards from current filter', async () => {
     render(
       <I18nProvider>
         <MemoryRouter>
@@ -149,16 +202,29 @@ describe('Library delete by tag', () => {
 
     await screen.findByText(/Bibliothèque/i)
     fireEvent.click(await screen.findByRole('button', { name: /Geographie/i }))
-    fireEvent.change(screen.getByLabelText(/Recherche/i), {
-      target: { value: 'Q2' }
+
+    fireEvent.click(screen.getByRole('button', { name: /Suspendre la sélection/i }))
+
+    await waitFor(async () => {
+      const cards = await db.cards.toArray()
+      const geographieCards = cards.filter((card) =>
+        card.tags.some((tag) => tag.startsWith('Geographie'))
+      )
+      const histoireCards = cards.filter((card) =>
+        card.tags.some((tag) => tag.startsWith('Histoire'))
+      )
+      expect(geographieCards.every((card) => card.suspended)).toBe(true)
+      expect(histoireCards.some((card) => card.suspended)).toBe(false)
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /entraînement/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Réactiver la sélection/i }))
 
-    const ids = consumeTrainingQueue()
-    expect(ids).toHaveLength(1)
-
-    const queuedCard = await db.cards.get(ids[0])
-    expect(queuedCard?.front_md).toBe('Q2')
+    await waitFor(async () => {
+      const cards = await db.cards.toArray()
+      const geographieCards = cards.filter((card) =>
+        card.tags.some((tag) => tag.startsWith('Geographie'))
+      )
+      expect(geographieCards.some((card) => card.suspended)).toBe(false)
+    })
   })
 })

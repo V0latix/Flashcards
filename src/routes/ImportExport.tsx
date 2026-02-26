@@ -230,6 +230,7 @@ function ImportExport() {
               front_md: card.front_md,
               back_md: card.back_md,
               tags: card.tags,
+              suspended: false,
               created_at: now,
               updated_at: now,
               source_type: 'manual',

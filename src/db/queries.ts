@@ -95,6 +95,7 @@ export async function createCard(input: {
       back_md: input.back_md,
       hint_md: input.hint_md ?? null,
       tags,
+      suspended: false,
       created_at: now,
       updated_at: now,
       source_type: input.source_type ?? null,
@@ -127,6 +128,7 @@ export async function updateCard(
     back_md?: string
     tags?: string[]
     hint_md?: string | null
+    suspended?: boolean
     source_type?: string | null
     source_id?: string | null
     source_ref?: string | null
@@ -147,6 +149,9 @@ export async function updateCard(
   if (updates.hint_md !== undefined) {
     payload.hint_md = updates.hint_md
   }
+  if (updates.suspended !== undefined) {
+    payload.suspended = updates.suspended
+  }
   if (updates.source_type !== undefined) {
     payload.source_type = updates.source_type
   }
@@ -164,6 +169,34 @@ export async function updateCard(
     markLocalChange()
   }
   return updated
+}
+
+export async function setCardsSuspended(
+  cardIds: number[],
+  suspended: boolean
+): Promise<number> {
+  if (cardIds.length === 0) {
+    return 0
+  }
+
+  const now = new Date().toISOString()
+  const cards = await db.cards.bulkGet(cardIds)
+  const updates = cards
+    .filter((card): card is Card => Boolean(card?.id))
+    .filter((card) => Boolean(card.suspended) !== suspended)
+    .map((card) => ({
+      ...card,
+      suspended,
+      updated_at: now
+    }))
+
+  if (updates.length === 0) {
+    return 0
+  }
+
+  await db.cards.bulkPut(updates)
+  markLocalChange()
+  return updates.length
 }
 
 export async function deleteCard(id: number): Promise<void> {

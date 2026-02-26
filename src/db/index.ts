@@ -160,6 +160,22 @@ class FlashcardsDB extends Dexie {
           }
         })
       })
+
+    this.version(9)
+      .stores({
+        cards:
+          '++id, created_at, updated_at, suspended, source, source_type, source_id, source_ref, cloud_id, synced_at, [source+source_id], [source_type+source_id]',
+        media: '++id, card_id, side',
+        reviewStates: 'card_id, box, due_date, updated_at',
+        reviewLogs: '++id, card_id, timestamp, client_event_id'
+      })
+      .upgrade(async (tx) => {
+        await tx.table('cards').toCollection().modify((card) => {
+          if (!('suspended' in card)) {
+            card.suspended = false
+          }
+        })
+      })
   }
 }
 

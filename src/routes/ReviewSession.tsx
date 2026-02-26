@@ -6,7 +6,7 @@ import { getLeitnerSettings } from '../leitner/settings'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { deleteCard } from '../db/queries'
-import { consumeTrainingQueue } from '../utils/training'
+import { consumeTrainingQueue, TRAINING_QUEUE_KEY } from '../utils/training'
 import { useI18n } from '../i18n/useI18n'
 import { useAuth } from '../auth/useAuth'
 import { supabase } from '../supabase/client'
@@ -18,6 +18,57 @@ type SessionCard = {
   hint: string | null
   tags: string[]
   wasReversed: boolean
+}
+
+const TRAINING_QUEUE_REPLAY_WINDOW_MS = 15_000
+const TRAINING_QUEUE_REPLAY_KEY = `${TRAINING_QUEUE_KEY}_replay`
+type TrainingReplayPayload = { ids?: unknown; consumedAt?: unknown }
+const normalizeTrainingIds = (ids: unknown): number[] => {
+  if (!Array.isArray(ids)) {
+    return []
+  }
+  return ids
+    .map((id) => Number(id))
+    .filter((id) => Number.isFinite(id) && id > 0)
+}
+
+const loadTrainingQueue = (): number[] => {
+  if (typeof sessionStorage === 'undefined') {
+    return []
+  }
+
+  const hasPendingQueue = Boolean(sessionStorage.getItem(TRAINING_QUEUE_KEY))
+
+  if (hasPendingQueue) {
+    const ids = consumeTrainingQueue()
+    sessionStorage.setItem(
+      TRAINING_QUEUE_REPLAY_KEY,
+      JSON.stringify({ ids, consumedAt: Date.now() })
+    )
+    return ids
+  }
+
+  const replayRaw = sessionStorage.getItem(TRAINING_QUEUE_REPLAY_KEY)
+  if (!replayRaw) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(replayRaw) as TrainingReplayPayload
+    const replayIds = normalizeTrainingIds(parsed.ids)
+    const consumedAt = Number(parsed.consumedAt)
+    if (
+      replayIds.length > 0 &&
+      Number.isFinite(consumedAt) &&
+      Date.now() - consumedAt <= TRAINING_QUEUE_REPLAY_WINDOW_MS
+    ) {
+      return replayIds
+    }
+  } catch {
+    // Ignore malformed replay payload.
+  }
+  sessionStorage.removeItem(TRAINING_QUEUE_REPLAY_KEY)
+  return []
 }
 
 function ReviewSession() {
@@ -66,23 +117,23 @@ function ReviewSession() {
   useEffect(() => {
     let isCancelled = false
 
-    setIsLoading(true)
-    setCards([])
-    setAnswers({})
-    setIndex(0)
-    setShowBack(false)
-    setShowHint(false)
-    setGoodCount(0)
-    setBadCount(0)
-    setIsDeleteOpen(false)
-    setIsDeleting(false)
-
     const loadSession = async () => {
+      setIsLoading(true)
+      setCards([])
+      setAnswers({})
+      setIndex(0)
+      setShowBack(false)
+      setShowHint(false)
+      setGoodCount(0)
+      setBadCount(0)
+      setIsDeleteOpen(false)
+      setIsDeleting(false)
+
       const { reverseProbability } = getLeitnerSettings()
       let nextCards: SessionCard[] = []
 
       if (isTraining) {
-        const ids = consumeTrainingQueue()
+        const ids = loadTrainingQueue()
         if (ids.length === 0) {
           if (isCancelled) {
             return
@@ -93,7 +144,10 @@ function ReviewSession() {
         }
         const rawCards = await db.cards.bulkGet(ids)
         const queue = rawCards
-          .filter((card): card is NonNullable<typeof card> => Boolean(card?.id))
+          .filter(
+            (card): card is NonNullable<typeof card> =>
+              Boolean(card?.id) && !card.suspended
+          )
           .map((card) => {
             const isReversed = Math.random() < reverseProbability
             return {
