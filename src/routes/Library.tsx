@@ -414,7 +414,7 @@ function Library() {
       ) : (
         <section className="card section split">
           <div className="sidebar">
-            <h2>Tags</h2>
+            <h2>{t('labels.tags')}</h2>
             <button
               type="button"
               className="btn btn-primary"
@@ -550,7 +550,7 @@ function Library() {
                 {visibleCards.map(({ card, reviewState }) => (
                   <li key={card.id} className="card list-item">
                     <Link to={`/card/${card.id}/edit`} className="markdown">
-                      <MarkdownRenderer value={card.front_md || '*Sans front*'} />
+                      <MarkdownRenderer value={card.front_md || `*${t('library.noFront')}*`} />
                     </Link>
                     <div className="chip">
                       {t('labels.box')} {reviewState?.box ?? 0}

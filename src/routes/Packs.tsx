@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { listPacks } from '../supabase/api'
+import { listPacks, listPublicCardCountsByPackSlug } from '../supabase/api'
+import { importPackToLocal } from '../supabase/import'
 import type { Pack } from '../supabase/types'
 import { buildTagTree, type TagNode } from '../utils/tagTree'
 import { useI18n } from '../i18n/useI18n'
@@ -13,12 +14,19 @@ function Packs() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const [cardCountsBySlug, setCardCountsBySlug] = useState<Record<string, number>>({})
+  const [importingSlug, setImportingSlug] = useState<string | null>(null)
+  const [importStatusBySlug, setImportStatusBySlug] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const loadPacks = async () => {
       try {
-        const data = await listPacks()
+        const [data, counts] = await Promise.all([
+          listPacks(),
+          listPublicCardCountsByPackSlug()
+        ])
         setPacks(data)
+        setCardCountsBySlug(counts)
       } catch (err) {
         setError((err as Error).message)
       } finally {
@@ -124,7 +132,7 @@ function Packs() {
       {!isLoading && !error && packs.length > 0 ? (
         <section className="card section split">
           <div className="sidebar">
-            <h2>Tags</h2>
+            <h2>{t('labels.tags')}</h2>
             <button
               type="button"
               className="btn btn-primary"
@@ -155,9 +163,51 @@ function Packs() {
                 {filteredPacks.map((pack) => (
                   <li key={pack.id} className="card list-item">
                     <h3>{pack.title}</h3>
-                    <Link className="btn btn-primary" to={`/packs/${pack.slug}`}>
-                      {t('packs.open')}
-                    </Link>
+                    <p>{pack.description?.trim() || t('packs.descriptionFallback')}</p>
+                    <p>{t('packs.cardsCount', { count: cardCountsBySlug[pack.slug] ?? 0 })}</p>
+                    <p>
+                      {t('labels.tags')}:{' '}
+                      {pack.tags?.length ? pack.tags.join(', ') : t('status.none')}
+                    </p>
+                    <div className="button-row">
+                      <Link className="btn btn-primary" to={`/packs/${pack.slug}`}>
+                        {t('packs.open')}
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        disabled={importingSlug === pack.slug}
+                        onClick={async () => {
+                          setImportingSlug(pack.slug)
+                          setImportStatusBySlug((prev) => ({
+                            ...prev,
+                            [pack.slug]: ''
+                          }))
+                          try {
+                            const result = await importPackToLocal(pack.slug)
+                            setImportStatusBySlug((prev) => ({
+                              ...prev,
+                              [pack.slug]: t('packs.importResult', {
+                                imported: result.imported,
+                                already: result.alreadyPresent
+                              })
+                            }))
+                          } catch (err) {
+                            setImportStatusBySlug((prev) => ({
+                              ...prev,
+                              [pack.slug]: t('packs.importFailed', {
+                                message: (err as Error).message
+                              })
+                            }))
+                          } finally {
+                            setImportingSlug(null)
+                          }
+                        }}
+                      >
+                        {t('packs.importDirect')}
+                      </button>
+                    </div>
+                    {importStatusBySlug[pack.slug] ? <p>{importStatusBySlug[pack.slug]}</p> : null}
                   </li>
                 ))}
               </ul>

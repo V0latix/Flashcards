@@ -4,6 +4,7 @@ import { defaultUrlTransform } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { resolveImageSrc } from '../utils/media'
+import { useI18n } from '../i18n/useI18n'
 
 type MarkdownRendererProps = {
   value: string
@@ -48,9 +49,11 @@ const MarkdownImage = (
   props: React.ImgHTMLAttributes<HTMLImageElement> & {
     imageLoading: 'lazy' | 'eager'
     imageFetchPriority: 'auto' | 'high' | 'low'
+    fallbackText: string
+    defaultAlt: string
   }
 ) => {
-  const { src, alt, imageLoading, imageFetchPriority, ...rest } = props
+  const { src, alt, imageLoading, imageFetchPriority, fallbackText, defaultAlt, ...rest } = props
   const [erroredSrc, setErroredSrc] = useState<string | null>(null)
   const originalSrc = src ?? ''
   const resolvedSrc = originalSrc ? resolveImageSrc(originalSrc) : ''
@@ -62,13 +65,13 @@ const MarkdownImage = (
   }, [originalSrc, resolvedSrc])
 
   if (!resolvedSrc || erroredSrc === resolvedSrc) {
-    return <span className="img-error">Image introuvable</span>
+    return <span className="img-error">{fallbackText}</span>
   }
 
   return (
     <img
       {...rest}
-      alt={alt || 'Image'}
+      alt={alt || defaultAlt}
       decoding="async"
       loading={imageLoading}
       src={resolvedSrc}
@@ -87,6 +90,7 @@ const MarkdownRenderer = ({
   imageLoading = 'lazy',
   imageFetchPriority = 'auto'
 }: MarkdownRendererProps) => {
+  const { t } = useI18n()
   const normalizedValue = useMemo(
     () =>
       normalizeMathDelimiters(normalizeMathEscapes(normalizeControlEscapes(value))),
@@ -100,10 +104,12 @@ const MarkdownRenderer = ({
           {...imgProps}
           imageLoading={imageLoading}
           imageFetchPriority={imageFetchPriority}
+          fallbackText={t('markdown.imageNotFound')}
+          defaultAlt={t('markdown.imageAlt')}
         />
       )
     }),
-    [imageFetchPriority, imageLoading]
+    [imageFetchPriority, imageLoading, t]
   )
 
   return (

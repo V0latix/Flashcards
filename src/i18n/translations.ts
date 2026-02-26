@@ -113,6 +113,7 @@ export const translations = {
       subtitle: 'Explore tes cartes par dossiers de tags.',
       allCards: 'Toutes les cartes',
       tag: 'Tag',
+      noFront: 'Sans recto',
       deleteByTag: 'Supprimer toutes les cartes de ce tag',
       noTags: 'Aucun tag pour le moment.',
       noCards: 'Aucune carte pour le moment.',
@@ -162,10 +163,15 @@ export const translations = {
       reviewsToday: "Révisions aujourd'hui",
       successRate7d: 'Réussite 7j',
       reviews: 'Révisions',
+      chartLegend: 'Vert: {{good}}, rose: {{bad}}.',
       rate: 'Taux',
       reviewTag: 'Réviser ce tag',
       boxDistribution: 'Distribution des boîtes',
       weakTags: 'Tags à renforcer'
+    },
+    markdown: {
+      imageAlt: 'Image',
+      imageNotFound: 'Image introuvable'
     },
     review: {
       title: 'Session',
@@ -192,6 +198,11 @@ export const translations = {
       title: 'Packs',
       subtitle: 'Explorer et télécharger des packs depuis Supabase.',
       search: 'Recherche',
+      descriptionFallback: 'Sans description.',
+      cardsCount: '{{count}} carte(s)',
+      importDirect: 'Importer',
+      importResult: '{{imported}} importées, {{already}} déjà présentes',
+      importFailed: 'Erreur import: {{message}}',
       download: 'Télécharger',
       open: 'Ouvrir',
       all: 'Tous les packs',
@@ -355,6 +366,7 @@ export const translations = {
       subtitle: 'Explore your cards by tag folders.',
       allCards: 'All cards',
       tag: 'Tag',
+      noFront: 'No front',
       deleteByTag: 'Delete all cards from this tag',
       noTags: 'No tags yet.',
       noCards: 'No cards yet.',
@@ -404,10 +416,15 @@ export const translations = {
       reviewsToday: 'Reviews today',
       successRate7d: 'Success 7d',
       reviews: 'Reviews',
+      chartLegend: 'Green: {{good}}, pink: {{bad}}.',
       rate: 'Rate',
       reviewTag: 'Review this tag',
       boxDistribution: 'Box distribution',
       weakTags: 'Weak tags'
+    },
+    markdown: {
+      imageAlt: 'Image',
+      imageNotFound: 'Image not found'
     },
     review: {
       title: 'Session',
@@ -434,6 +451,11 @@ export const translations = {
       title: 'Packs',
       subtitle: 'Browse and download packs from Supabase.',
       search: 'Search',
+      descriptionFallback: 'No description.',
+      cardsCount: '{{count}} card(s)',
+      importDirect: 'Import',
+      importResult: '{{imported}} imported, {{already}} already present',
+      importFailed: 'Import error: {{message}}',
       download: 'Download',
       open: 'Open',
       all: 'All packs',

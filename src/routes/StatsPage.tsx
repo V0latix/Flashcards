@@ -89,7 +89,12 @@ const Chart = ({
               </div>
             ))}
           </div>
-          <p>Vert: {t('review.good').toLowerCase()}, rose: {t('review.bad').toLowerCase()}.</p>
+          <p>
+            {t('stats.chartLegend', {
+              good: t('review.good').toLowerCase(),
+              bad: t('review.bad').toLowerCase()
+            })}
+          </p>
         </>
       )}
     </div>
@@ -321,7 +326,7 @@ function StatsPage() {
 
         <section className="card section split stats-tags">
           <div className="sidebar">
-            <h2>Tags</h2>
+            <h2>{t('labels.tags')}</h2>
             <button type="button" className="btn btn-primary" onClick={() => setSelectedTag(null)}>
               {t('stats.tagsAll')}
             </button>
@@ -355,7 +360,7 @@ function StatsPage() {
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Tag</th>
+                      <th>{t('library.tag')}</th>
                       <th>{t('labels.total')}</th>
                       <th>{t('stats.dueToday')}</th>
                       <th>{t('labels.box')}</th>

@@ -15,6 +15,6 @@
 ## P2 (qualite UX/accessibilite)
 
 - [x] Ameliorer le menu "Add" (Escape, click outside, focus management) et l'etat actif des routes dynamiques dans `src/components/AppShell.tsx`.
-- [ ] Rendre la modale auth plus robuste (Escape, click backdrop, focus trap) dans `src/auth/AuthButton.tsx`.
-- [ ] Internationaliser les chaines en dur restantes (`Tags`, `Image introuvable`, legende chart, etc.) dans `src/routes/Library.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/StatsPage.tsx`.
-- [ ] Enrichir la page packs (description, tags, nombre de cartes, import direct) dans `src/routes/Packs.tsx`.
+- [x] Rendre la modale auth plus robuste (Escape, click backdrop, focus trap) dans `src/auth/AuthButton.tsx`.
+- [x] Internationaliser les chaines en dur restantes (`Tags`, `Image introuvable`, legende chart, etc.) dans `src/routes/Library.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/StatsPage.tsx`.
+- [x] Enrichir la page packs (description, tags, nombre de cartes, import direct) dans `src/routes/Packs.tsx`.
