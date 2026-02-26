@@ -162,12 +162,14 @@ function ImportExport() {
       reviewStateBySourceId.set(String(state.card_id), state)
     })
 
-    const cardsBefore = await db.cards.count()
-    const reviewStatesBefore = await db.reviewStates.count()
-    console.log('Import debug (before):', {
-      cards_before: cardsBefore,
-      reviewstates_before: reviewStatesBefore
-    })
+    if (import.meta.env.DEV) {
+      const cardsBefore = await db.cards.count()
+      const reviewStatesBefore = await db.reviewStates.count()
+      console.log('Import debug (before):', {
+        cards_before: cardsBefore,
+        reviewstates_before: reviewStatesBefore
+      })
+    }
 
     let insertedCards = 0
     let insertedReviewStates = 0
@@ -282,12 +284,14 @@ function ImportExport() {
       errors.push((error as Error).message)
     }
 
-    const cardsAfter = await db.cards.count()
-    const reviewStatesAfter = await db.reviewStates.count()
-    console.log('Import debug (after):', {
-      cards_after: cardsAfter,
-      reviewstates_after: reviewStatesAfter
-    })
+    if (import.meta.env.DEV) {
+      const cardsAfter = await db.cards.count()
+      const reviewStatesAfter = await db.reviewStates.count()
+      console.log('Import debug (after):', {
+        cards_after: cardsAfter,
+        reviewstates_after: reviewStatesAfter
+      })
+    }
 
     const nextSummary = {
       parsed_cards: rawCards.length,

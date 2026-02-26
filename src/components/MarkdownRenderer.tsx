@@ -78,7 +78,9 @@ const MarkdownImage = (
       // React types may lag this attribute; keep it runtime-safe.
       {...({ fetchPriority: imageFetchPriority } as unknown as Record<string, string>)}
       onError={() => {
-        console.error('[IMG ERROR]', { originalSrc, resolvedSrc })
+        if (import.meta.env.DEV) {
+          console.error('[IMG ERROR]', { originalSrc, resolvedSrc })
+        }
         setErroredSrc(resolvedSrc)
       }}
     />
