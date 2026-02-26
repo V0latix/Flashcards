@@ -739,6 +739,7 @@ ul {
 }
 
 .review-session {
+  --review-scale: 1;
   margin-top: 0;
   display: flex;
   flex-direction: column;
@@ -765,6 +766,25 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.review-progress-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.review-size-label {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.review-size-slider {
+  width: 150px;
+  accent-color: var(--primary);
 }
 
 .review-progress-head {
@@ -864,12 +884,12 @@ ul {
 .review-face .markdown img {
   margin: 0 auto;
   width: auto;
-  height: min(46vh, 360px);
+  height: min(calc(46vh * var(--review-scale)), calc(360px * var(--review-scale)));
   max-height: none;
 }
 
 .review-card-stack-revealed .review-face .markdown img {
-  height: min(36vh, 280px);
+  height: min(calc(36vh * var(--review-scale)), calc(280px * var(--review-scale)));
 }
 
 .review-face .markdown p:last-child {
@@ -1322,7 +1342,7 @@ ul {
   }
 
   .review-session {
-    height: min(900px, calc(100dvh - 132px));
+    height: min(calc(980px * var(--review-scale)), calc(100dvh - 110px));
   }
 
   .review-session-shell {
@@ -1351,6 +1371,15 @@ ul {
 }
 
 @media (max-width: 640px) {
+  .review-progress-controls {
+    justify-content: flex-start;
+  }
+
+  .review-size-slider {
+    width: 100%;
+    max-width: 180px;
+  }
+
   .button-row {
     flex-direction: column;
   }

@@ -86,6 +86,7 @@ function ReviewSession() {
   const [badCount, setBadCount] = useState(0)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [cardWindowScale, setCardWindowScale] = useState(100)
   const frontMarkdownRef = useRef<HTMLDivElement | null>(null)
   const backMarkdownRef = useRef<HTMLDivElement | null>(null)
   const [searchParams] = useSearchParams()
@@ -273,6 +274,7 @@ function ReviewSession() {
   const hasHint = Boolean(currentCard?.hint?.trim())
   const progressPercent =
     cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0
+  const reviewSessionStyle = { '--review-scale': cardWindowScale / 100 } as React.CSSProperties
 
   useEffect(() => {
     if (isTraining || !isDone || !user || cards.length === 0) {
@@ -455,7 +457,7 @@ function ReviewSession() {
           </Link>
         </section>
       ) : currentCard ? (
-        <section className="card section review-session">
+        <section className="card section review-session" style={reviewSessionStyle}>
           <div className="review-session-meta">
             {isTraining ? (
               <p className="review-session-mode">{t('review.trainingMode')}</p>
@@ -474,6 +476,21 @@ function ReviewSession() {
               <p className="review-progress-count">
                 {t('review.remaining', { count: remainingCount })}
               </p>
+            </div>
+            <div className="review-progress-controls">
+              <label className="review-size-label" htmlFor="review-size-slider">
+                {t('review.cardSize')}
+              </label>
+              <input
+                id="review-size-slider"
+                className="review-size-slider"
+                type="range"
+                min={90}
+                max={130}
+                step={5}
+                value={cardWindowScale}
+                onChange={(event) => setCardWindowScale(Number(event.target.value))}
+              />
             </div>
             <div
               className="review-progress-track"

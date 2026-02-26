@@ -227,6 +227,36 @@ function targetMarkerSvg(
   ].join('')
 }
 
+function explicitArchipelagoMarkersSvg(
+  iso2: string,
+  project: (lonLat: [number, number]) => [number, number] | null
+): string {
+  if (iso2 !== 'KI') return ''
+
+  // Kiribati spans three distant island groups; mark each to make the target explicit.
+  const groups: [number, number][] = [
+    [173.0, 1.5], // Gilbert Islands
+    [-171.5, -4.5], // Phoenix Islands
+    [-157.5, 1.5] // Line Islands
+  ]
+
+  const circles: string[] = []
+  for (const p of groups) {
+    const lonNearPacificRef = unwrapLon(p[0], 170)
+    const xy = project([lonNearPacificRef, p[1]])
+    if (!xy) continue
+    const [cx, cy] = xy
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue
+    if (cx < -200 || cy < -200 || cx > SIZE + 200 || cy > SIZE + 200) continue
+    circles.push(`<circle cx="${cx}" cy="${cy}" r="34" fill="#FF4D4D" opacity="0.22"/>`)
+    circles.push(`<circle cx="${cx}" cy="${cy}" r="34" fill="none" stroke="#7A0A0A" stroke-width="5.8" opacity="0.88"/>`)
+    circles.push(`<circle cx="${cx}" cy="${cy}" r="34" fill="none" stroke="#FF6B6B" stroke-width="3.4" opacity="1"/>`)
+    circles.push(`<circle cx="${cx}" cy="${cy}" r="2.8" fill="#B30000" opacity="0.98"/>`)
+  }
+
+  return circles.join('')
+}
+
 function renderAtlas(
   countries: CountryFeature[],
   targetIso2: string,
@@ -311,6 +341,8 @@ function renderAtlas(
     Number.isFinite(centerByPath[0]) && Number.isFinite(centerByPath[1]) ? centerByPath : fallbackCenter
   const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
   if (marker) parts.push(marker)
+  const explicitMarkers = explicitArchipelagoMarkersSvg(target.iso2, (lonLat) => projection(lonLat))
+  if (explicitMarkers) parts.push(explicitMarkers)
 
   parts.push(`</svg>`)
 
@@ -433,6 +465,8 @@ function renderZoom(
     Number.isFinite(centerByPath[0]) && Number.isFinite(centerByPath[1]) ? centerByPath : fallbackCenter
   const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
   if (marker) parts.push(marker)
+  const explicitMarkers = explicitArchipelagoMarkersSvg(target.iso2, (lonLat) => projection(lonLat))
+  if (explicitMarkers) parts.push(explicitMarkers)
 
   parts.push(`</svg>`)
 
