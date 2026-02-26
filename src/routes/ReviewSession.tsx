@@ -48,12 +48,34 @@ function ReviewSession() {
   }
 
   useEffect(() => {
+    let isCancelled = false
+
+    setIsLoading(true)
+    setCards([])
+    setAnswers({})
+    setIndex(0)
+    setShowBack(false)
+    setGoodCount(0)
+    setBadCount(0)
+    setIsDeleteOpen(false)
+    setIsDeleting(false)
+
     const loadSession = async () => {
       const { reverseProbability } = getLeitnerSettings()
+      let nextCards: Array<{
+        cardId: number
+        front: string
+        back: string
+        tags: string[]
+        wasReversed: boolean
+      }> = []
 
       if (isTraining) {
         const ids = consumeTrainingQueue()
         if (ids.length === 0) {
+          if (isCancelled) {
+            return
+          }
           setCards([])
           setIsLoading(false)
           return
@@ -71,7 +93,11 @@ function ReviewSession() {
               wasReversed: isReversed
             }
           })
-        setCards(shuffle(queue))
+        nextCards = shuffle(queue)
+        if (isCancelled) {
+          return
+        }
+        setCards(nextCards)
         setIsLoading(false)
         return
       }
@@ -96,12 +122,18 @@ function ReviewSession() {
         }
       })
       const filtered = queue.filter((item) => item.cardId !== 0)
-      setCards(shuffle(filtered))
-      setAnswers({})
+      nextCards = shuffle(filtered)
+      if (isCancelled) {
+        return
+      }
+      setCards(nextCards)
       setIsLoading(false)
     }
 
     void loadSession()
+    return () => {
+      isCancelled = true
+    }
   }, [isTraining, tagFilter, today])
 
   const currentCard = cards[index]

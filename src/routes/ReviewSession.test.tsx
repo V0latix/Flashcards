@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useNavigate } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthProvider } from '../auth/AuthProvider'
 import db from '../db'
@@ -30,6 +30,30 @@ const renderReviewSession = (entry = '/review') =>
       </AuthProvider>
     </I18nProvider>
   )
+
+const renderReviewSessionWithTagNavigation = (entry = '/review?tag=Tag/A') => {
+  const Wrapper = () => {
+    const navigate = useNavigate()
+    return (
+      <>
+        <button type="button" onClick={() => navigate('/review?tag=Tag/B')}>
+          Changer tag
+        </button>
+        <ReviewSession />
+      </>
+    )
+  }
+
+  return render(
+    <I18nProvider>
+      <AuthProvider>
+        <MemoryRouter initialEntries={[entry]}>
+          <Wrapper />
+        </MemoryRouter>
+      </AuthProvider>
+    </I18nProvider>
+  )
+}
 
 describe('ReviewSession', () => {
   beforeEach(async () => {
@@ -188,5 +212,38 @@ describe('ReviewSession', () => {
     await screen.findByRole('heading', { name: /Recto/i })
     expect(screen.getByText(/Geographie\/Europe/)).toBeInTheDocument()
     expect(screen.getByText(/Capitales/)).toBeInTheDocument()
+  })
+
+  it('resets session progress when tag filter changes', async () => {
+    await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01',
+      tags: ['Tag/A']
+    })
+    await seedCardWithState({
+      front: 'Q2',
+      back: 'A2',
+      createdAt: '2024-01-02',
+      box: 1,
+      dueDate: '2024-01-01',
+      tags: ['Tag/B']
+    })
+
+    renderReviewSessionWithTagNavigation()
+
+    await screen.findByText('Q1')
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
+    await screen.findByText(/Session terminée/i)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Changer tag' }))
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Session terminée/i)).not.toBeInTheDocument()
+    })
+    await screen.findByText('Q2')
   })
 })
