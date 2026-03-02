@@ -133,19 +133,36 @@ function Home() {
           </span>
         </div>
         <div className="home-summary-grid">
-          {[1, 2, 3, 4, 5].map((box) => (
-            <div key={box} className="home-summary-item">
-              <div className="chip">
-                {t('labels.box')} {box}
+          {[1, 2, 3, 4, 5].map((box) => {
+            const dueCount = boxSummary.dueCounts[box] ?? 0
+            const isDisabled = dueCount === 0
+            return (
+              <div key={box} className="home-summary-item">
+                <div className="chip">
+                  {t('labels.box')} {box}
+                </div>
+                <p className="home-summary-count">
+                  {dueCount} {t('labels.due')}
+                </p>
+                <p className="home-summary-next">
+                  {t('labels.nextReview')}: {formatDate(boxSummary.nextDue[box])}
+                </p>
+                <Link
+                  to={`/review?box=${box}`}
+                  className={`home-box-link${isDisabled ? ' home-box-link-disabled' : ''}`}
+                  aria-label={t('home.startBoxSession', { box })}
+                  aria-disabled={isDisabled}
+                  onClick={(event) => {
+                    if (isDisabled) {
+                      event.preventDefault()
+                    }
+                  }}
+                >
+                  {t('home.startBoxSessionCta')}
+                </Link>
               </div>
-              <p className="home-summary-count">
-                {boxSummary.dueCounts[box] ?? 0} {t('labels.due')}
-              </p>
-              <p className="home-summary-next">
-                {t('labels.nextReview')}: {formatDate(boxSummary.nextDue[box])}
-              </p>
-            </div>
-          ))}
+            )
+          })}
           <div className="home-summary-item home-summary-item-tomorrow">
             <div className="chip">{t('labels.tomorrow')}</div>
             <p className="home-summary-count">{boxSummary.tomorrowDueCount}</p>

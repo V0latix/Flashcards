@@ -19,5 +19,6 @@ describe('Home', () => {
       </I18nProvider>
     )
     expect(screen.getByLabelText('Commencer une session')).toBeInTheDocument()
+    expect(screen.getByLabelText('Démarrer la boîte 1')).toBeInTheDocument()
   })
 })

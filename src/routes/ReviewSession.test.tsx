@@ -325,4 +325,32 @@ describe('ReviewSession', () => {
     })
     await screen.findByText('Q2')
   })
+
+  it('filters session by selected box', async () => {
+    await seedCardWithState({
+      front: 'Q box 1',
+      back: 'A box 1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+    await seedCardWithState({
+      front: 'Q box 2',
+      back: 'A box 2',
+      createdAt: '2024-01-02',
+      box: 2,
+      dueDate: '2024-01-01'
+    })
+
+    renderReviewSession('/review?box=2')
+
+    await screen.findByText('Q box 2')
+    expect(screen.queryByText('Q box 1')).not.toBeInTheDocument()
+    expect(screen.getByText('Boîte: 2')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
+
+    await screen.findByText(/Session terminée/i)
+  })
 })

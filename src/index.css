@@ -1057,6 +1057,30 @@ ul {
   color: var(--muted);
 }
 
+.home-box-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-muted);
+  text-decoration: none;
+}
+
+.home-box-link:hover {
+  background: rgba(79, 140, 255, 0.12);
+  border-color: rgba(79, 140, 255, 0.3);
+}
+
+.home-box-link-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .home-summary-item-tomorrow .home-summary-count {
   font-size: 1.15rem;
 }

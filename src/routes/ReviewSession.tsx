@@ -104,7 +104,19 @@ function ReviewSession() {
   }
 
   const tagFilter = searchParams.get('tag')?.trim() || null
+  const selectedBox = useMemo(() => {
+    const rawBox = searchParams.get('box')
+    if (!rawBox) {
+      return null
+    }
+    const parsed = Number.parseInt(rawBox, 10)
+    if (!Number.isInteger(parsed) || parsed < 1 || parsed > 5) {
+      return null
+    }
+    return parsed
+  }, [searchParams])
   const isTraining = searchParams.get('mode') === 'training'
+  const isFilteredSession = tagFilter !== null || selectedBox !== null
 
   const shuffle = <T,>(input: T[]): T[] => {
     const result = [...input]
@@ -171,13 +183,17 @@ function ReviewSession() {
 
       const session = await buildDailySession(today)
       const baseQueue = [...session.box1, ...session.due]
-      const filteredQueue = tagFilter
+      const filteredByTag = tagFilter
         ? baseQueue.filter((entry) =>
             entry.card.tags.some(
               (tag) => tag === tagFilter || tag.startsWith(`${tagFilter}/`)
             )
           )
         : baseQueue
+      const filteredQueue =
+        selectedBox !== null
+          ? filteredByTag.filter((entry) => entry.reviewState.box === selectedBox)
+          : filteredByTag
       const queue = filteredQueue.map((entry) => {
         const isReversed = Math.random() < reverseProbability
         return {
@@ -202,7 +218,7 @@ function ReviewSession() {
     return () => {
       isCancelled = true
     }
-  }, [isTraining, tagFilter, today])
+  }, [isTraining, selectedBox, tagFilter, today])
 
   const currentCard = cards[index]
   const nextCard = cards[index + 1]
@@ -277,7 +293,7 @@ function ReviewSession() {
   const reviewSessionStyle = { '--review-scale': cardWindowScale / 100 } as React.CSSProperties
 
   useEffect(() => {
-    if (isTraining || !isDone || !user || cards.length === 0) {
+    if (isTraining || isFilteredSession || !isDone || !user || cards.length === 0) {
       return
     }
 
@@ -309,7 +325,7 @@ function ReviewSession() {
     }
 
     void saveDoneStatus()
-  }, [cards.length, isDone, isTraining, today, user])
+  }, [cards.length, isDone, isFilteredSession, isTraining, today, user])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -468,6 +484,7 @@ function ReviewSession() {
               </div>
             ) : null}
             {tagFilter ? <p>{t('library.tag')}: {tagFilter}</p> : null}
+            {selectedBox !== null ? <p>{t('labels.box')}: {selectedBox}</p> : null}
           </div>
 
           <div className="review-progress" aria-label={t('review.progress')}>

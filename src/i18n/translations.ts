@@ -100,7 +100,9 @@ export const translations = {
     },
     home: {
       startSession: 'Commencer une session',
-      startSessionDesc: 'Lance la session du jour.',
+      startSessionDesc: 'Lance la session complète du jour.',
+      startBoxSession: 'Démarrer la boîte {{box}}',
+      startBoxSessionCta: 'Réviser cette boîte',
       addDesc: 'Carte, import JSON ou packs.',
       importJson: 'Importer JSON',
       library: 'Bibliothèque',
@@ -355,7 +357,9 @@ export const translations = {
     },
     home: {
       startSession: 'Start a session',
-      startSessionDesc: "Kick off today's session.",
+      startSessionDesc: "Kick off today's full session.",
+      startBoxSession: 'Start box {{box}}',
+      startBoxSessionCta: 'Review this box',
       addDesc: 'Card, JSON import, or packs.',
       importJson: 'Import JSON',
       library: 'Library',
