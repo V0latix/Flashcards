@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import db from '../db'
-import type { ReviewLog, ReviewState } from '../db/types'
+import type { MediaSide, ReviewLog, ReviewState } from '../db/types'
 import { createUuid, getDeviceId } from '../sync/ids'
 import { markLocalChange } from '../sync/queue'
 import { useI18n } from '../i18n/useI18n'

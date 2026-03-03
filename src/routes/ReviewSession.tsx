@@ -159,7 +159,7 @@ function ReviewSession() {
         const queue = rawCards
           .filter(
             (card): card is NonNullable<typeof card> =>
-              Boolean(card?.id) && !card.suspended
+              card !== undefined && card !== null && Boolean(card.id) && !card.suspended
           )
           .map((card) => {
             const isReversed = Math.random() < reverseProbability
