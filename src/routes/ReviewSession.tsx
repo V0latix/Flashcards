@@ -5,7 +5,7 @@ import { applyReviewResult, buildDailySession } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
-import { deleteCard } from '../db/queries'
+import { deleteCard, updateCard } from '../db/queries'
 import { consumeTrainingQueue, TRAINING_QUEUE_KEY } from '../utils/training'
 import { useI18n } from '../i18n/useI18n'
 import { useAuth } from '../auth/useAuth'
@@ -86,7 +86,7 @@ function ReviewSession() {
   const [badCount, setBadCount] = useState(0)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [cardWindowScale, setCardWindowScale] = useState(100)
+  const [isSuspending, setIsSuspending] = useState(false)
   const frontMarkdownRef = useRef<HTMLDivElement | null>(null)
   const backMarkdownRef = useRef<HTMLDivElement | null>(null)
   const [searchParams] = useSearchParams()
@@ -141,6 +141,7 @@ function ReviewSession() {
       setBadCount(0)
       setIsDeleteOpen(false)
       setIsDeleting(false)
+      setIsSuspending(false)
 
       const { reverseProbability } = getLeitnerSettings()
       let nextCards: SessionCard[] = []
@@ -282,6 +283,38 @@ function ReviewSession() {
     setIsDeleteOpen(false)
   }
 
+  const handleSuspend = async () => {
+    if (!currentCard || isSuspending) {
+      return
+    }
+
+    setIsSuspending(true)
+    const targetId = currentCard.cardId
+
+    try {
+      await updateCard(targetId, { suspended: true })
+      setCards((prev) => {
+        const next = prev.filter((card) => card.cardId !== targetId)
+        setIndex((prevIndex) => Math.min(prevIndex, Math.max(0, next.length - 1)))
+        return next
+      })
+      setAnswers((prev) => {
+        if (!(targetId in prev)) {
+          return prev
+        }
+        const next = { ...prev }
+        delete next[targetId]
+        return next
+      })
+      setShowBack(false)
+      setShowHint(false)
+    } catch (error) {
+      console.error('suspend card failed', error)
+    } finally {
+      setIsSuspending(false)
+    }
+  }
+
   const isDone = !isLoading && index >= cards.length
   const goodCards = cards.filter((card) => answers[card.cardId] === 'good')
   const badCards = cards.filter((card) => answers[card.cardId] === 'bad')
@@ -290,7 +323,6 @@ function ReviewSession() {
   const hasHint = Boolean(currentCard?.hint?.trim())
   const progressPercent =
     cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0
-  const reviewSessionStyle = { '--review-scale': cardWindowScale / 100 } as React.CSSProperties
 
   useEffect(() => {
     if (isTraining || isFilteredSession || !isDone || !user || cards.length === 0) {
@@ -473,7 +505,7 @@ function ReviewSession() {
           </Link>
         </section>
       ) : currentCard ? (
-        <section className="card section review-session" style={reviewSessionStyle}>
+        <section className="card section review-session">
           <div className="review-session-meta">
             {isTraining ? (
               <p className="review-session-mode">{t('review.trainingMode')}</p>
@@ -493,21 +525,6 @@ function ReviewSession() {
               <p className="review-progress-count">
                 {t('review.remaining', { count: remainingCount })}
               </p>
-            </div>
-            <div className="review-progress-controls">
-              <label className="review-size-label" htmlFor="review-size-slider">
-                {t('review.cardSize')}
-              </label>
-              <input
-                id="review-size-slider"
-                className="review-size-slider"
-                type="range"
-                min={90}
-                max={130}
-                step={5}
-                value={cardWindowScale}
-                onChange={(event) => setCardWindowScale(Number(event.target.value))}
-              />
             </div>
             <div
               className="review-progress-track"
@@ -604,6 +621,14 @@ function ReviewSession() {
                   {t('review.editCard')}
                 </Link>
               ) : null}
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => void handleSuspend()}
+                disabled={isSuspending || isDeleting}
+              >
+                {t('actions.suspendCard')}
+              </button>
               <button
                 type="button"
                 className="btn btn-danger"

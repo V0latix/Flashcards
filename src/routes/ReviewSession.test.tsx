@@ -98,6 +98,21 @@ describe('ReviewSession', () => {
     expect(faux.style.order).toBe('2')
   })
 
+  it('does not show card size slider during session', async () => {
+    await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+
+    renderReviewSession()
+
+    await screen.findByRole('heading', { name: /Recto/i })
+    expect(screen.queryByRole('slider')).not.toBeInTheDocument()
+  })
+
   it('supports keyboard shortcuts during review', async () => {
     await seedCardWithState({
       front: 'Q1',
@@ -214,6 +229,38 @@ describe('ReviewSession', () => {
     })
 
     await screen.findByText(/1 carte\(s\) restante\(s\)/i)
+    randomSpy.mockRestore()
+  })
+
+  it('suspends a card during session and continues', async () => {
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.999)
+    const firstId = await seedCardWithState({
+      front: 'Q1',
+      back: 'A1',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+    await seedCardWithState({
+      front: 'Q2',
+      back: 'A2',
+      createdAt: '2024-01-02',
+      box: 1,
+      dueDate: '2024-01-01'
+    })
+
+    renderReviewSession()
+
+    await screen.findByRole('heading', { name: /Recto/i })
+    fireEvent.click(screen.getByRole('button', { name: /Suspendre la carte/i }))
+
+    await waitFor(async () => {
+      const card = await db.cards.get(firstId)
+      expect(card?.suspended).toBe(true)
+    })
+
+    await screen.findByText(/1 carte\(s\) restante\(s\)/i)
+    expect(screen.getByText('Q2')).toBeInTheDocument()
     randomSpy.mockRestore()
   })
 

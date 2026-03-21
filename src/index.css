@@ -768,25 +768,6 @@ ul {
   gap: 8px;
 }
 
-.review-progress-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.review-size-label {
-  margin: 0;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.review-size-slider {
-  width: 150px;
-  accent-color: var(--primary);
-}
-
 .review-progress-head {
   display: flex;
   align-items: baseline;
@@ -1399,15 +1380,6 @@ ul {
 }
 
 @media (max-width: 640px) {
-  .review-progress-controls {
-    justify-content: flex-start;
-  }
-
-  .review-size-slider {
-    width: 100%;
-    max-width: 180px;
-  }
-
   .button-row {
     flex-direction: column;
   }
