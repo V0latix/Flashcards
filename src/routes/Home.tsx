@@ -61,7 +61,12 @@ function Home() {
 
   useEffect(() => {
     const loadSummary = async () => {
-      const states = await db.reviewStates.toArray()
+      const [states, cards] = await Promise.all([db.reviewStates.toArray(), db.cards.toArray()])
+      const suspendedCardIds = new Set(
+        cards
+          .filter((card) => card.suspended && typeof card.id === 'number')
+          .map((card) => card.id as number)
+      )
       const { learnedReviewIntervalDays } = getLeitnerSettings()
 
       const dueCounts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
@@ -76,6 +81,9 @@ function Home() {
       let tomorrowDueCount = 0
 
       states.forEach((state) => {
+        if (suspendedCardIds.has(state.card_id)) {
+          return
+        }
         const dueKey = computeDueKey(state, learnedReviewIntervalDays)
         if (!dueKey) {
           return

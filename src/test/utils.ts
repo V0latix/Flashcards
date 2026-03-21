@@ -11,6 +11,7 @@ export const seedCardWithState = async (input: {
   back: string
   hint?: string | null
   tags?: string[]
+  suspended?: boolean
   createdAt: string
   box: number
   dueDate: string | null
@@ -21,6 +22,7 @@ export const seedCardWithState = async (input: {
     front_md: input.front,
     back_md: input.back,
     hint_md: input.hint ?? null,
+    suspended: input.suspended ?? false,
     tags: input.tags ?? [],
     created_at: input.createdAt,
     updated_at: input.createdAt
