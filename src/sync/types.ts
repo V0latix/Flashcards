@@ -15,6 +15,7 @@ export type RemoteCard = {
   source_type: 'public_pack' | 'manual'
   source_ref: string | null
   source_public_id: string | null
+  suspended?: boolean
   front_md: string
   back_md: string
   tags: string[]

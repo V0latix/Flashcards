@@ -9,6 +9,8 @@ import type {
 
 const PAGE_SIZE = 1000
 const UPSERT_CHUNK_SIZE = 500
+const isMissingSuspendedColumnError = (message: string) =>
+  /suspended/i.test(message) && /(schema cache|column)/i.test(message)
 
 async function fetchAllByUser<T>(
   table: 'user_cards' | 'user_progress' | 'user_review_log',
@@ -75,9 +77,24 @@ export const upsertRemoteCards = async (cards: RemoteCard[]) => {
     const { error } = await supabase.from('user_cards').upsert(chunk, {
       onConflict: 'id'
     })
-    if (error) {
+    if (!error) {
+      continue
+    }
+    if (!isMissingSuspendedColumnError(error.message)) {
       throw new Error(error.message)
     }
+
+    // Backward-compatible retry while migration is being applied remotely.
+    const fallbackChunk = chunk.map(({ suspended: _suspended, ...card }) => card)
+    const { error: fallbackError } = await supabase.from('user_cards').upsert(fallbackChunk, {
+      onConflict: 'id'
+    })
+    if (fallbackError) {
+      throw new Error(fallbackError.message)
+    }
+    console.warn(
+      '[sync] user_cards.suspended is missing remotely; retry succeeded without suspended column'
+    )
   }
 }
 

@@ -62,6 +62,7 @@ describe('sync engine', () => {
     expect(cardsPayload).toHaveLength(1)
     expect(cardsPayload[0].user_id).toBe('user-1')
     expect(cardsPayload[0].source_type).toBe('manual')
+    expect(cardsPayload[0].suspended).toBe(false)
 
     expect(upsertRemoteProgress).toHaveBeenCalledTimes(1)
     const progressPayload = vi.mocked(upsertRemoteProgress).mock.calls[0][0]
@@ -140,6 +141,7 @@ describe('sync engine', () => {
           source_type: 'manual',
           source_ref: null,
           source_public_id: null,
+          suspended: true,
           front_md: 'Remote Q',
           back_md: 'Remote A',
           tags: [],
@@ -157,5 +159,6 @@ describe('sync engine', () => {
     const updated = await db.cards.get(cardId)
     expect(updated?.front_md).toBe('Remote Q')
     expect(updated?.back_md).toBe('Remote A')
+    expect(updated?.suspended).toBe(true)
   })
 })

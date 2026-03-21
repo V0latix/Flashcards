@@ -19,9 +19,9 @@ create table if not exists public.user_cards (
   source_type text not null check (source_type in ('public_pack', 'manual')),
   source_ref text,
   source_public_id text,
+  suspended boolean not null default false,
   front_md text not null,
   back_md text not null,
-  hint_md text,
   tags text[] not null default '{}',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
