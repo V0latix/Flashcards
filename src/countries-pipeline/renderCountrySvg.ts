@@ -70,7 +70,6 @@ const SOUTHERN_ISLAND_ISO2 = new Set(['TF', 'HM'])
 
 const ATLAS_REGIONS: AtlasRegion[] = [
   PACIFIC_ISLANDS_GLOBAL,
-  SOUTHERN_INDIAN_OCEAN,
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
   { id: 'caribbean', refLon: -69, frame: [-83, 10, -58, 25] },
   // Slightly tighter framing for North America.
@@ -80,7 +79,11 @@ const ATLAS_REGIONS: AtlasRegion[] = [
   { id: 'europe_west', refLon: 9, frame: [-22, 36, 24, 70] },
   // Slightly wider to the west so countries like Bulgaria fit entirely.
   { id: 'europe_east', refLon: 40, frame: [20, 34, 70, 72] },
+  // Africa must come before SOUTHERN_INDIAN_OCEAN: the Indian Ocean frame's lat range
+  // [-72, -10] overlaps southern Africa, which would otherwise capture Angola, Botswana,
+  // Madagascar, Mozambique, Namibia, South Africa, etc. in the wrong atlas view.
   { id: 'africa', refLon: 20, frame: [-25, -40, 60, 40] },
+  SOUTHERN_INDIAN_OCEAN,
   { id: 'west_asia', refLon: 75, frame: [30, 0, 125, 55] },
   { id: 'east_asia', refLon: 120, frame: [90, -5, 160, 60] },
   { id: 'oceania', refLon: 160, frame: [105, -55, 200, 20] }
@@ -189,6 +192,33 @@ function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   return best
 }
 
+// Map pin (teardrop) with the tip pointing at (cx, cy), body extending upward.
+// The arc formula: from left tangent point to right tangent point via the top of the
+// head circle, using a large clockwise arc (sweep=1 in SVG y-down coordinates).
+function mapPin(cx: number, cy: number, totalHeight: number): string {
+  const R = totalHeight * 0.38 // head circle radius
+  const hc = totalHeight * 0.60 // distance from tip to head center
+  const alpha = Math.asin(Math.min(R / hc, 0.9999))
+  const tx = R * Math.cos(alpha) // tangent point x offset
+  const tyAbs = hc - R * Math.sin(alpha) // tangent point distance above tip
+  const headCY = cy - hc
+  const innerR = R * 0.42
+  const f = (n: number) => n.toFixed(2)
+  const lx = f(cx - tx)
+  const rx = f(cx + tx)
+  const ty = f(cy - tyAbs)
+  return [
+    // Drop shadow
+    `<ellipse cx="${f(cx + 1.5)}" cy="${f(cy + 4)}" rx="${f(totalHeight * 0.22)}" ry="${f(totalHeight * 0.09)}" fill="black" opacity="0.18"/>`,
+    // Pin body: tip → left tangent → large CW arc to right tangent → close
+    `<path d="M ${f(cx)},${f(cy)} L ${lx},${ty} A ${f(R)},${f(R)} 0 1 1 ${rx},${ty} Z" fill="#EF4444"/>`,
+    // Pin border
+    `<path d="M ${f(cx)},${f(cy)} L ${lx},${ty} A ${f(R)},${f(R)} 0 1 1 ${rx},${ty} Z" fill="none" stroke="#991B1B" stroke-width="2.2" stroke-linejoin="round"/>`,
+    // Inner white hole
+    `<circle cx="${f(cx)}" cy="${f(headCY)}" r="${f(innerR)}" fill="white" opacity="0.88"/>`
+  ].join('')
+}
+
 function targetMarkerSvg(
   targetBounds: [[number, number], [number, number]],
   targetCenter?: [number, number] | null,
@@ -214,17 +244,8 @@ function targetMarkerSvg(
 
   const cx = targetCenter?.[0] ?? (x0 + x1) / 2
   const cy = targetCenter?.[1] ?? (y0 + y1) / 2
-  const tinyBoost = projectedArea <= 300 ? 18 : projectedArea <= 1200 ? 12 : 8
-  const base = Math.max(maxDim * 0.7, 10)
-  const r = Math.max(22, Math.min(54, base + tinyBoost))
-  const outerR = r + 5
-  return [
-    // Visible zone for tiny islands/micro-states: soft filled disc + strong contour.
-    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="#FF4D4D" opacity="0.24"/>`,
-    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="#7A0A0A" stroke-width="6.5" opacity="0.86"/>`,
-    `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="#FF6B6B" stroke-width="3.8" opacity="1"/>`,
-    `<circle cx="${cx}" cy="${cy}" r="2.8" fill="#B30000" opacity="0.98"/>`
-  ].join('')
+  const H = projectedArea <= 300 ? 72 : projectedArea <= 1200 ? 65 : 58
+  return mapPin(cx, cy, H)
 }
 
 function explicitArchipelagoMarkersSvg(
@@ -240,7 +261,7 @@ function explicitArchipelagoMarkersSvg(
     [-157.5, 1.5] // Line Islands
   ]
 
-  const circles: string[] = []
+  const pins: string[] = []
   for (const p of groups) {
     const lonNearPacificRef = unwrapLon(p[0], 170)
     const xy = project([lonNearPacificRef, p[1]])
@@ -248,13 +269,10 @@ function explicitArchipelagoMarkersSvg(
     const [cx, cy] = xy
     if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue
     if (cx < -200 || cy < -200 || cx > SIZE + 200 || cy > SIZE + 200) continue
-    circles.push(`<circle cx="${cx}" cy="${cy}" r="34" fill="#FF4D4D" opacity="0.22"/>`)
-    circles.push(`<circle cx="${cx}" cy="${cy}" r="34" fill="none" stroke="#7A0A0A" stroke-width="5.8" opacity="0.88"/>`)
-    circles.push(`<circle cx="${cx}" cy="${cy}" r="34" fill="none" stroke="#FF6B6B" stroke-width="3.4" opacity="1"/>`)
-    circles.push(`<circle cx="${cx}" cy="${cy}" r="2.8" fill="#B30000" opacity="0.98"/>`)
+    pins.push(mapPin(cx, cy, 60))
   }
 
-  return circles.join('')
+  return pins.join('')
 }
 
 function renderAtlas(
@@ -283,6 +301,17 @@ function renderAtlas(
     ])
 
   const path = geoPath(projection)
+
+  // Early fallback: if the country is essentially invisible at atlas scale (< 8 projected px²),
+  // render a local zoom that shows the immediate geographic context instead of the whole continent.
+  // This covers micro-states (Monaco, Vatican, San Marino…) and tiny island nations.
+  const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
+  if (targetProjectedArea < 8) {
+    const isRemoteIsland = PACIFIC_ISLAND_ISO2.has(target.iso2) || SOUTHERN_ISLAND_ISO2.has(target.iso2)
+    const minExtDeg = isRemoteIsland ? 18 : 12
+    return renderZoom(countries, target.iso2, 0.3, minExtDeg, theme, marginPx)
+  }
+
   const targetDCheck = path(target.feature as unknown as GeoJSON.GeoJSON)
   if (!targetDCheck) {
     // Fallback for remote territories that may not fit any fixed atlas frame.
@@ -334,7 +363,6 @@ function renderAtlas(
   )
 
   const targetBounds = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
-  const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
   const centerByPath = path.centroid(target.feature as unknown as GeoJSON.GeoJSON)
   const fallbackCenter = projection(target.centroid as [number, number])
   const targetCenter =
