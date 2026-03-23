@@ -220,6 +220,46 @@ describe('autoFillBox1', () => {
     expect(promotedState?.due_date).toBe(today)
   })
 
+  it('tops up box1 with new cards when existing box1 cards are not due yet', async () => {
+    const today = '2024-01-10'
+
+    await addCardWithState({
+      front: 'Due today',
+      back: 'Due today',
+      createdAt: '2024-01-01',
+      box: 1,
+      dueDate: today
+    })
+
+    for (let i = 0; i < 9; i += 1) {
+      await addCardWithState({
+        front: `Future ${i}`,
+        back: `Future ${i}`,
+        createdAt: `2024-01-1${i}`,
+        box: 1,
+        dueDate: '2024-01-11'
+      })
+    }
+
+    for (let i = 0; i < 9; i += 1) {
+      await addCardWithState({
+        front: `New ${i}`,
+        back: `New ${i}`,
+        createdAt: `2024-01-2${i}`,
+        box: 0,
+        dueDate: null
+      })
+    }
+
+    const session = await buildDailySession(1, today)
+    const dueTodayStates = (await db.reviewStates.where({ box: 1 }).toArray()).filter(
+      (state) => state.due_date === today
+    )
+
+    expect(dueTodayStates).toHaveLength(10)
+    expect(session.due).toHaveLength(10)
+  })
+
   it('returns empty session when no cards exist', async () => {
     const session = await buildDailySession(1, '2024-03-01')
     expect(session.box1).toHaveLength(0)

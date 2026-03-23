@@ -88,6 +88,31 @@ describe('leitner', () => {
     })
   })
 
+  it('fills up to the box1 target based on cards due today', () => {
+    const cards = [
+      buildCard(1, 'Due', 'due'),
+      buildCard(2, 'Future', 'future'),
+      buildCard(3, 'New', 'new')
+    ]
+
+    const states: ReviewState[] = [
+      baseState(1, 1, '2024-04-01'),
+      baseState(2, 1, '2024-04-02'),
+      baseState(3, 0, null)
+    ]
+
+    const settings = {
+      ...getDefaultLeitnerSettings(),
+      box1Target: 2
+    }
+
+    const result = buildDailySession(cards, states, '2024-04-01', settings, makeRng([0.1, 0.2]))
+
+    expect(result.box1.map((entry) => entry.cardId)).toEqual(expect.arrayContaining([1, 3]))
+    expect(result.box1).toHaveLength(2)
+    expect(result.sessionCards).toHaveLength(2)
+  })
+
   it('applies learned transitions and logs reverse flag', () => {
     const settings = getDefaultLeitnerSettings()
     const state = baseState(10, 5, '2024-01-01')

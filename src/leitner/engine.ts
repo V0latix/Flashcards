@@ -61,9 +61,24 @@ export async function autoFillBox1(
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates.where({ box: 1 }).toArray()
     const box1Cards = await loadCardsByIds(box1States.map((state) => state.card_id))
-    const activeBox1Count = box1Cards.filter((card) => !card.suspended).length
+    const activeBox1CardIds = new Set(
+      box1Cards
+        .filter((card) => !card.suspended)
+        .map((card) => card.id)
+        .filter((id): id is number => typeof id === 'number')
+    )
+    const activeDueBox1Count = box1States.filter((state) => {
+      if (state.is_learned || !activeBox1CardIds.has(state.card_id)) {
+        return false
+      }
+      const dueKey = normalizeToDateKey(state.due_date)
+      if (!dueKey) {
+        return false
+      }
+      return dueKey <= today
+    }).length
 
-    const missing = box1Target - activeBox1Count
+    const missing = box1Target - activeDueBox1Count
     if (missing <= 0) {
       return
     }

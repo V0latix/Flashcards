@@ -56,6 +56,13 @@ const normalizeToday = (today: string): string => {
   return toIsoDate(new Date(today))
 }
 
+const isDueOnOrBefore = (dueDate: string | null, today: string): boolean => {
+  if (!dueDate) {
+    return false
+  }
+  return dueDate <= today
+}
+
 const shuffleWithRng = <T,>(items: T[], rng: Rng): T[] => {
   const result = [...items]
   for (let i = result.length - 1; i > 0; i -= 1) {
@@ -101,8 +108,10 @@ export const autoFillBox1 = (
   rng: Rng
 ): ReviewState[] => {
   const today = normalizeToday(todayInput)
-  const box1States = reviewStates.filter((state) => state.box === 1)
-  const missing = box1Target - box1States.length
+  const dueBox1States = reviewStates.filter(
+    (state) => state.box === 1 && !state.is_learned && isDueOnOrBefore(state.due_date, today)
+  )
+  const missing = box1Target - dueBox1States.length
   if (missing <= 0) {
     return reviewStates
   }
@@ -137,7 +146,9 @@ export const buildDailySession = (
   const today = normalizeToday(todayInput)
   const nextStates = autoFillBox1(reviewStates, today, settings.box1Target, rng)
 
-  const box1States = nextStates.filter((state) => state.box === 1)
+  const box1States = nextStates.filter(
+    (state) => state.box === 1 && !state.is_learned && isDueOnOrBefore(state.due_date, today)
+  )
   const dueStates = nextStates.filter((state) => {
     if (state.is_learned) {
       return false
@@ -145,10 +156,7 @@ export const buildDailySession = (
     if (state.box <= 1) {
       return false
     }
-    if (!state.due_date) {
-      return false
-    }
-    return state.due_date <= today
+    return isDueOnOrBefore(state.due_date, today)
   })
 
   const learnedDueStates = nextStates.filter((state) => {
