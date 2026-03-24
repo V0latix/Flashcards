@@ -8,7 +8,7 @@ const MARGIN = 25
 
 const COLORS = {
   otherFill: '#C7C7C7',
-  targetFill: '#FFFFFF',
+  targetFill: '#F97316',
   stroke: '#8A8A8A',
   water: '#4EADE6'
 } as const
@@ -192,6 +192,41 @@ function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   return best
 }
 
+// Dashed ellipse drawn around the full bounding box of a scattered archipelago.
+// Triggered when actual land fills only a small fraction of the bbox — visually communicates
+// "this country is spread over a large area" even when individual islands are tiny dots.
+function archipelagoExtentSvg(
+  targetBounds: [[number, number], [number, number]],
+  targetProjectedArea: number
+): string {
+  const [[x0, y0], [x1, y1]] = targetBounds
+  const w = Math.max(0, x1 - x0)
+  const h = Math.max(0, y1 - y0)
+  const boundsArea = w * h
+  if (boundsArea === 0) return ''
+
+  const fillRatio = targetProjectedArea / boundsArea
+
+  // Only draw for genuinely scattered archipelagos: large spatial spread, tiny land fraction.
+  if (boundsArea < 8000 || fillRatio >= 0.10) return ''
+
+  const cx = ((x0 + x1) / 2).toFixed(1)
+  const cy = ((y0 + y1) / 2).toFixed(1)
+  const pad = Math.min(Math.max(w, h) * 0.10, 55)
+  const rx = (w / 2 + pad).toFixed(1)
+  const ry = (h / 2 + pad).toFixed(1)
+  const span = Math.max(w, h)
+  const dash = Math.max(12, span * 0.07).toFixed(0)
+  const gap = Math.max(7, span * 0.04).toFixed(0)
+
+  return [
+    // Subtle tint so the region reads as "belonging together"
+    `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#F97316" opacity="0.07"/>`,
+    // Dashed border to communicate extent without overpowering the islands
+    `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#F97316" stroke-width="2.5" stroke-dasharray="${dash} ${gap}" opacity="0.55"/>`
+  ].join('')
+}
+
 // Map pin (teardrop) with the tip pointing at (cx, cy), body extending upward.
 // The arc formula: from left tangent point to right tangent point via the top of the
 // head circle, using a large clockwise arc (sweep=1 in SVG y-down coordinates).
@@ -244,7 +279,8 @@ function targetMarkerSvg(
 
   const cx = targetCenter?.[0] ?? (x0 + x1) / 2
   const cy = targetCenter?.[1] ?? (y0 + y1) / 2
-  const H = projectedArea <= 300 ? 72 : projectedArea <= 1200 ? 65 : 58
+  // Larger pins for very small islands so the marker is clearly readable.
+  const H = projectedArea <= 300 ? 80 : projectedArea <= 1200 ? 70 : 58
   return mapPin(cx, cy, H)
 }
 
@@ -305,10 +341,12 @@ function renderAtlas(
   // Early fallback: if the country is essentially invisible at atlas scale (< 8 projected px²),
   // render a local zoom that shows the immediate geographic context instead of the whole continent.
   // This covers micro-states (Monaco, Vatican, San Marino…) and tiny island nations.
+  // Exception: Caribbean islands always stay in the Caribbean atlas frame for consistency.
   const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
-  if (targetProjectedArea < 8) {
+  if (targetProjectedArea < 8 && region.id !== 'caribbean') {
     const isRemoteIsland = PACIFIC_ISLAND_ISO2.has(target.iso2) || SOUTHERN_ISLAND_ISO2.has(target.iso2)
-    const minExtDeg = isRemoteIsland ? 18 : 12
+    // Wider context for remote ocean islands so surrounding geography is visible.
+    const minExtDeg = isRemoteIsland ? 28 : 12
     return renderZoom(countries, target.iso2, 0.3, minExtDeg, theme, marginPx)
   }
 
@@ -327,6 +365,10 @@ function renderAtlas(
   }
   const others = visible.filter((c) => c.iso2 !== targetIso2).sort((a, b) => a.iso2.localeCompare(b.iso2))
 
+  // Compute target bounds early so we can draw the archipelago extent ellipse before fills.
+  const targetBoundsEarly = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
+  const extentEllipse = archipelagoExtentSvg(targetBoundsEarly, targetProjectedArea)
+
   const parts: string[] = []
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" shape-rendering="geometricPrecision">`
@@ -335,6 +377,8 @@ function renderAtlas(
   if (theme === 'blue') {
     parts.push(`<rect x="0" y="0" width="${SIZE}" height="${SIZE}" fill="${COLORS.water}"/>`)
   }
+
+  if (extentEllipse) parts.push(extentEllipse)
 
   parts.push(`<g fill="${COLORS.otherFill}" stroke="none">`)
   for (const c of others) {
@@ -445,6 +489,11 @@ function renderZoom(
 
   const path = geoPath(projection)
 
+  // Compute target bounds early for the archipelago extent ellipse.
+  const targetBoundsEarlyZ = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
+  const targetProjectedAreaZ = path.area(target.feature as unknown as GeoJSON.GeoJSON)
+  const extentEllipseZ = archipelagoExtentSvg(targetBoundsEarlyZ, targetProjectedAreaZ)
+
   const parts: string[] = []
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" shape-rendering="geometricPrecision">`
@@ -453,6 +502,8 @@ function renderZoom(
   if (theme === 'blue') {
     parts.push(`<rect x="0" y="0" width="${SIZE}" height="${SIZE}" fill="${COLORS.water}"/>`)
   }
+
+  if (extentEllipseZ) parts.push(extentEllipseZ)
 
   // Fill layer (no stroke): keeps colors clean.
   parts.push(`<g fill="${COLORS.otherFill}" stroke="none">`)
@@ -485,8 +536,8 @@ function renderZoom(
     `<path d="${targetD}" fill="none" stroke="${COLORS.stroke}" stroke-width="${STROKE.target}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`
   )
 
-  const targetBounds = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
-  const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
+  const targetBounds = targetBoundsEarlyZ
+  const targetProjectedArea = targetProjectedAreaZ
   const centerByPath = path.centroid(target.feature as unknown as GeoJSON.GeoJSON)
   const fallbackCenter = projection(target.centroid as [number, number])
   const targetCenter =

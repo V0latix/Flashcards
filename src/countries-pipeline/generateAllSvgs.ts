@@ -54,9 +54,9 @@ export async function generateAllSvgs(): Promise<{ generated: number; skipped: n
       theme: 'blue'
     })
 
-    // Sanity check: target country must exist as a white-filled path.
-    if (!svg.includes('class="target"') || !svg.includes('fill="#FFFFFF"')) {
-      throw new Error(`SVG check failed for ${c.iso2}: missing target white path`)
+    // Sanity check: target country must exist as a filled path.
+    if (!svg.includes('class="target"')) {
+      throw new Error(`SVG check failed for ${c.iso2}: missing target path`)
     }
 
     const outPath = join(OUT_SVG_DIR, `${c.iso2}.svg`)
