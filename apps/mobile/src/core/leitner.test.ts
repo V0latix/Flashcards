@@ -34,7 +34,7 @@ const baseState = (cardId: number, box: number, dueDate: string | null): ReviewS
 })
 
 describe('leitner', () => {
-  it('fills box1 from box0 without replacement', () => {
+  it('marks new box0 cards due today without changing their box', () => {
     const states: ReviewState[] = [
       baseState(1, 1, '2024-01-01'),
       baseState(2, 0, null),
@@ -43,11 +43,11 @@ describe('leitner', () => {
     ]
 
     const updated = autoFillBox1(states, '2024-01-02', 2, makeRng([0.9, 0.1, 0.8]))
-    const box1States = updated.filter((state) => state.box === 1)
-    expect(box1States).toHaveLength(2)
-    const newBox1 = box1States.find((state) => state.card_id !== 1)
-    expect(newBox1?.due_date).toBe('2024-01-02')
-    const ids = box1States.map((state) => state.card_id)
+    const dueBox0States = updated.filter(
+      (state) => state.box === 0 && state.due_date === '2024-01-02'
+    )
+    expect(dueBox0States).toHaveLength(1)
+    const ids = dueBox0States.map((state) => state.card_id)
     expect(new Set(ids).size).toBe(ids.length)
   })
 
@@ -108,9 +108,10 @@ describe('leitner', () => {
 
     const result = buildDailySession(cards, states, '2024-04-01', settings, makeRng([0.1, 0.2]))
 
-    expect(result.box1.map((entry) => entry.cardId)).toEqual(expect.arrayContaining([1, 3]))
-    expect(result.box1).toHaveLength(2)
+    expect(result.box1.map((entry) => entry.cardId)).toEqual([1])
+    expect(result.box1).toHaveLength(1)
     expect(result.sessionCards).toHaveLength(2)
+    expect(result.due.map((entry) => entry.cardId)).toContain(3)
   })
 
   it('applies learned transitions and logs reverse flag', () => {
@@ -144,5 +145,25 @@ describe('leitner', () => {
     expect(bad.nextState.is_learned).toBe(false)
     expect(bad.nextState.learned_at).toBeNull()
     expect(bad.nextState.due_date).toBe('2024-01-11')
+  })
+
+  it('moves introduced box0 cards directly to box 2 on good answer', () => {
+    const settings = getDefaultLeitnerSettings()
+    const state = baseState(10, 0, '2024-01-02')
+
+    const result = applyReviewResult(state, 'good', '2024-01-02', settings)
+
+    expect(result.nextState.box).toBe(2)
+    expect(result.nextState.due_date).toBe('2024-01-05')
+  })
+
+  it('moves introduced box0 cards to box 1 on bad answer', () => {
+    const settings = getDefaultLeitnerSettings()
+    const state = baseState(10, 0, '2024-01-02')
+
+    const result = applyReviewResult(state, 'bad', '2024-01-02', settings)
+
+    expect(result.nextState.box).toBe(1)
+    expect(result.nextState.due_date).toBe('2024-01-03')
   })
 })

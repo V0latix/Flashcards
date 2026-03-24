@@ -42,7 +42,7 @@ afterEach(() => {
 })
 
 describe('autoFillBox1', () => {
-  it('sets box1 due date to today for introduced cards', async () => {
+  it('marks introduced box0 cards as due today', async () => {
     const today = '2024-01-10'
 
     await addCardWithState({
@@ -55,8 +55,8 @@ describe('autoFillBox1', () => {
 
     await autoFillBox1(1, today)
 
-    const box1State = await db.reviewStates.where({ box: 1 }).first()
-    expect(box1State?.due_date).toBe('2024-01-10')
+    const introducedState = await db.reviewStates.where({ box: 0 }).first()
+    expect(introducedState?.due_date).toBe('2024-01-10')
   })
 
   it('does not promote suspended cards from box0', async () => {
@@ -92,7 +92,8 @@ describe('autoFillBox1', () => {
 
     const activeState = await db.reviewStates.get(activeId)
     const suspendedState = await db.reviewStates.get(suspendedId)
-    expect(activeState?.box).toBe(1)
+    expect(activeState?.box).toBe(0)
+    expect(activeState?.due_date).toBe(today)
     expect(suspendedState?.box).toBe(0)
   })
 
@@ -121,11 +122,15 @@ describe('autoFillBox1', () => {
 
     await autoFillBox1(1, today)
 
-    const box1States = await db.reviewStates.where({ box: 1 }).toArray()
-    const box0States = await db.reviewStates.where({ box: 0 }).toArray()
+    const dueBox1States = (await db.reviewStates.where({ box: 1 }).toArray()).filter(
+      (state) => state.due_date === today
+    )
+    const dueBox0States = (await db.reviewStates.where({ box: 0 }).toArray()).filter(
+      (state) => state.due_date === today
+    )
 
-    expect(box1States).toHaveLength(9)
-    expect(box0States).toHaveLength(0)
+    expect(dueBox1States).toHaveLength(7)
+    expect(dueBox0States).toHaveLength(2)
   })
 
   it('selects a random sample from box0 without replacement', async () => {
@@ -175,7 +180,7 @@ describe('autoFillBox1', () => {
     const thirdState = await db.reviewStates.get(thirdId)
 
     const promoted = [firstState, secondState, thirdState]
-      .filter((state) => state?.box === 1)
+      .filter((state) => state?.box === 0 && state?.due_date === today)
       .map((state) => state?.card_id)
 
     expect(promoted).toHaveLength(2)
@@ -216,7 +221,7 @@ describe('autoFillBox1', () => {
     await autoFillBox1(1, today)
 
     const promotedState = await db.reviewStates.get(promotedId)
-    expect(promotedState?.box).toBe(1)
+    expect(promotedState?.box).toBe(0)
     expect(promotedState?.due_date).toBe(today)
   })
 
@@ -252,11 +257,11 @@ describe('autoFillBox1', () => {
     }
 
     const session = await buildDailySession(1, today)
-    const dueTodayStates = (await db.reviewStates.where({ box: 1 }).toArray()).filter(
+    const dueTodayStates = (await db.reviewStates.where({ box: 0 }).toArray()).filter(
       (state) => state.due_date === today
     )
 
-    expect(dueTodayStates).toHaveLength(10)
+    expect(dueTodayStates).toHaveLength(9)
     expect(session.due).toHaveLength(10)
   })
 
@@ -330,6 +335,38 @@ describe('applyReviewResult', () => {
     expect(logs[0].result).toBe('bad')
     expect(logs[0].previous_box).toBe(4)
     expect(logs[0].new_box).toBe(1)
+  })
+
+  it('moves new cards from box 0 directly to box 2 on good answer', async () => {
+    const cardId = await addCardWithState({
+      front: 'Front',
+      back: 'Back',
+      createdAt: '2024-01-01',
+      box: 0,
+      dueDate: '2024-01-10'
+    })
+
+    await applyReviewResult(cardId, 'good', '2024-01-10')
+
+    const state = await db.reviewStates.get(cardId)
+    expect(state?.box).toBe(2)
+    expect(state?.due_date).toBe('2024-01-13')
+  })
+
+  it('moves new cards from box 0 to box 1 on bad answer', async () => {
+    const cardId = await addCardWithState({
+      front: 'Front',
+      back: 'Back',
+      createdAt: '2024-01-01',
+      box: 0,
+      dueDate: '2024-01-10'
+    })
+
+    await applyReviewResult(cardId, 'bad', '2024-01-10')
+
+    const state = await db.reviewStates.get(cardId)
+    expect(state?.box).toBe(1)
+    expect(state?.due_date).toBe('2024-01-11')
   })
 
   it('marks box 5 good cards as learned', async () => {

@@ -111,12 +111,17 @@ export const autoFillBox1 = (
   const dueBox1States = reviewStates.filter(
     (state) => state.box === 1 && !state.is_learned && isDueOnOrBefore(state.due_date, today)
   )
-  const missing = box1Target - dueBox1States.length
+  const introducedBox0States = reviewStates.filter(
+    (state) => state.box === 0 && !state.is_learned && isDueOnOrBefore(state.due_date, today)
+  )
+  const missing = box1Target - dueBox1States.length - introducedBox0States.length
   if (missing <= 0) {
     return reviewStates
   }
 
-  const box0States = reviewStates.filter((state) => state.box === 0)
+  const box0States = reviewStates.filter(
+    (state) => state.box === 0 && !isDueOnOrBefore(state.due_date, today)
+  )
   if (box0States.length === 0) {
     return reviewStates
   }
@@ -130,7 +135,7 @@ export const autoFillBox1 = (
     }
     return {
       ...state,
-      box: 1,
+      box: 0,
       due_date: today
     }
   })
@@ -145,6 +150,9 @@ export const buildDailySession = (
 ): DailySession => {
   const today = normalizeToday(todayInput)
   const nextStates = autoFillBox1(reviewStates, today, settings.box1Target, rng)
+  const introducedStates = nextStates.filter(
+    (state) => state.box === 0 && !state.is_learned && isDueOnOrBefore(state.due_date, today)
+  )
 
   const box1States = nextStates.filter(
     (state) => state.box === 1 && !state.is_learned && isDueOnOrBefore(state.due_date, today)
@@ -179,7 +187,7 @@ export const buildDailySession = (
   })
 
   const box1 = buildSessionCards(box1States, cards, settings, rng)
-  const due = buildSessionCards([...dueStateByCard.values()], cards, settings, rng)
+  const due = buildSessionCards([...dueStateByCard.values(), ...introducedStates], cards, settings, rng)
   const sessionCards = shuffleWithRng([...box1, ...due], rng)
 
   return {
@@ -214,6 +222,10 @@ export const applyReviewResult = (
       nextDueDate = null
       nextIsLearned = true
       nextLearnedAt = nowIso
+    } else if (previousBox === 0) {
+      nextBox = Math.min(2, LEITNER_BOX_COUNT)
+      const interval = settings.intervalDays[nextBox] ?? 1
+      nextDueDate = addDays(today, interval)
     } else {
       nextBox = Math.min(previousBox + 1, LEITNER_BOX_COUNT)
       if (previousBox === LEITNER_BOX_COUNT) {

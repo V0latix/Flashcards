@@ -46,6 +46,14 @@ const shuffle = <T,>(items: T[]): T[] => {
   return result
 }
 
+const isDueOnOrBefore = (dueDate: string | null | undefined, today: string): boolean => {
+  const dueKey = normalizeToDateKey(dueDate)
+  if (!dueKey) {
+    return false
+  }
+  return dueKey <= today
+}
+
 export async function autoFillBox1(today: string): Promise<void>
 export async function autoFillBox1(_deckId: number, today: string): Promise<void>
 export async function autoFillBox1(
@@ -60,7 +68,9 @@ export async function autoFillBox1(
 
   await db.transaction('rw', db.cards, db.reviewStates, async () => {
     const box1States = await db.reviewStates.where({ box: 1 }).toArray()
+    const box0States = await db.reviewStates.where({ box: 0 }).toArray()
     const box1Cards = await loadCardsByIds(box1States.map((state) => state.card_id))
+    const box0Cards = await loadCardsByIds(box0States.map((state) => state.card_id))
     const activeBox1CardIds = new Set(
       box1Cards
         .filter((card) => !card.suspended)
@@ -71,19 +81,25 @@ export async function autoFillBox1(
       if (state.is_learned || !activeBox1CardIds.has(state.card_id)) {
         return false
       }
-      const dueKey = normalizeToDateKey(state.due_date)
-      if (!dueKey) {
+      return isDueOnOrBefore(state.due_date, today)
+    }).length
+    const activeBox0CardIds = new Set(
+      box0Cards
+        .filter((card) => !card.suspended)
+        .map((card) => card.id)
+        .filter((id): id is number => typeof id === 'number')
+    )
+    const activeIntroducedBox0Count = box0States.filter((state) => {
+      if (state.is_learned || !activeBox0CardIds.has(state.card_id)) {
         return false
       }
-      return dueKey <= today
+      return isDueOnOrBefore(state.due_date, today)
     }).length
 
-    const missing = box1Target - activeDueBox1Count
+    const missing = box1Target - activeDueBox1Count - activeIntroducedBox0Count
     if (missing <= 0) {
       return
     }
-
-    const box0States = await db.reviewStates.where({ box: 0 }).toArray()
 
     if (box0States.length === 0) {
       return
@@ -91,11 +107,14 @@ export async function autoFillBox1(
 
     const box0CardIds = box0States.map((state) => state.card_id)
     const box0StatesByCardId = new Map(box0States.map((state) => [state.card_id, state]))
-    const cards = await loadCardsByIds(box0CardIds)
-    const candidateCardIds = cards
+    const candidateCardIds = box0Cards
       .filter((card) => !card.suspended)
       .map((card) => card.id)
       .filter((id): id is number => typeof id === 'number')
+      .filter((id) => {
+        const state = box0StatesByCardId.get(id)
+        return !isDueOnOrBefore(state?.due_date, today)
+      })
 
     const selectedCardIds = shuffle(candidateCardIds).slice(0, missing)
 
@@ -110,7 +129,7 @@ export async function autoFillBox1(
         return {
           ...current,
           card_id: cardId,
-          box: 1,
+          box: 0,
           due_date: today,
           is_learned: false,
           learned_at: null,
@@ -139,6 +158,12 @@ export async function buildDailySession(
 
   const reviewStates = await db.reviewStates.toArray()
   const { learnedReviewIntervalDays } = getLeitnerSettings()
+  const introducedStates = reviewStates.filter((state) => {
+    if (state.is_learned || state.box !== 0) {
+      return false
+    }
+    return isDueOnOrBefore(state.due_date, today)
+  })
 
   const dueStates = reviewStates.filter((state) => {
     if (state.is_learned) {
@@ -147,11 +172,7 @@ export async function buildDailySession(
     if (state.box < 1) {
       return false
     }
-    const dueKey = normalizeToDateKey(state.due_date)
-    if (!dueKey) {
-      return false
-    }
-    return dueKey <= today
+    return isDueOnOrBefore(state.due_date, today)
   })
 
   const learnedDueStates = reviewStates.filter((state) => {
@@ -196,6 +217,7 @@ export async function buildDailySession(
       orderedDueStates.push(...list)
     }
   }
+  orderedDueStates.push(...introducedStates)
 
   const due = await loadSessionCards(orderedDueStates)
 
@@ -233,6 +255,10 @@ export const applyReviewResult = async (
         nextDueDate = null
         nextIsLearned = true
         nextLearnedAt = nowIso
+      } else if (previousBox === 0) {
+        nextBox = Math.min(2, LEITNER_BOX_COUNT)
+        const interval = intervalDays[nextBox] ?? 1
+        nextDueDate = addDays(today, interval)
       } else {
         nextBox = Math.min(previousBox + 1, LEITNER_BOX_COUNT)
         if (previousBox === LEITNER_BOX_COUNT) {
