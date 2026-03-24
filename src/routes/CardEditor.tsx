@@ -21,7 +21,7 @@ function CardEditor() {
       return []
     }
     return tagsInput
-      .split(',')
+      .split('\n')
       .map((tag) => tag.trim())
       .filter(Boolean)
   }, [tagsInput])
@@ -37,7 +37,7 @@ function CardEditor() {
         setFront(card.front_md)
         setBack(card.back_md)
         setHint(card.hint_md ?? '')
-        setTagsInput(card.tags.join(', '))
+        setTagsInput(card.tags.join('\n'))
       }
       setIsLoading(false)
     }
@@ -106,11 +106,11 @@ function CardEditor() {
           </div>
           <div>
             <label htmlFor="tags">{t('cardEditor.tags')}</label>
-            <input
+            <textarea
               id="tags"
-              type="text"
+              rows={4}
               value={tagsInput}
-              className="input"
+              className="textarea"
               onChange={(event) => setTagsInput(event.target.value)}
             />
           </div>

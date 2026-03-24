@@ -251,7 +251,7 @@ export const translations = {
       front: 'Recto',
       back: 'Verso',
       hint: 'Indice (optionnel)',
-      tags: 'Tags (séparés par des /)',
+      tags: 'Tags (un tag par ligne, / pour la hiérarchie)',
       preview: 'Aperçu',
       save: 'Enregistrer',
       delete: 'Supprimer'
@@ -508,7 +508,7 @@ export const translations = {
       front: 'Front',
       back: 'Back',
       hint: 'Hint (optional)',
-      tags: 'Tags (separated by /)',
+      tags: 'Tags (one tag per line, / for hierarchy)',
       preview: 'Preview',
       save: 'Save',
       delete: 'Delete'
