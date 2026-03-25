@@ -68,6 +68,9 @@ const PACIFIC_ISLAND_ISO2 = new Set([
 
 const SOUTHERN_ISLAND_ISO2 = new Set(['TF', 'HM'])
 
+// Small island nations shown within the Africa atlas: stay in frame with forceZone ellipse.
+const AFRICA_ISLAND_ISO2 = new Set(['SC'])
+
 const ATLAS_REGIONS: AtlasRegion[] = [
   PACIFIC_ISLANDS_GLOBAL,
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
@@ -166,6 +169,9 @@ function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   if (PACIFIC_ISLAND_ISO2.has(target.iso2)) return PACIFIC_ISLANDS_GLOBAL
   if (SOUTHERN_ISLAND_ISO2.has(target.iso2)) return SOUTHERN_INDIAN_OCEAN
 
+  // Kazakhstan's centroid falls in europe_east but the country extends to ~87°E — assign to west_asia.
+  if (target.iso2 === 'KZ') return ATLAS_REGIONS.find((r) => r.id === 'west_asia')!
+
   const [lon, lat] = target.centroid
   for (const region of ATLAS_REGIONS) {
     const lonU = unwrapLon(lon, region.refLon)
@@ -192,12 +198,14 @@ function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   return best
 }
 
-// Dashed ellipse drawn around the full bounding box of a scattered archipelago.
-// Triggered when actual land fills only a small fraction of the bbox — visually communicates
-// "this country is spread over a large area" even when individual islands are tiny dots.
+// Dashed ellipse drawn around the full bounding box of an archipelago.
+// For scattered archipelagos (large spread, tiny land): always triggered.
+// For Pacific island nations: triggered even for tighter groupings (forceZone=true) so that
+// each country has a visible territory zone in the wide Pacific atlas view.
 function archipelagoExtentSvg(
   targetBounds: [[number, number], [number, number]],
-  targetProjectedArea: number
+  targetProjectedArea: number,
+  forceZone?: boolean
 ): string {
   const [[x0, y0], [x1, y1]] = targetBounds
   const w = Math.max(0, x1 - x0)
@@ -207,8 +215,10 @@ function archipelagoExtentSvg(
 
   const fillRatio = targetProjectedArea / boundsArea
 
-  // Only draw for genuinely scattered archipelagos: large spatial spread, tiny land fraction.
-  if (boundsArea < 8000 || fillRatio >= 0.10) return ''
+  // Standard threshold: large spatial spread with tiny land fraction.
+  // forceZone lowers the boundsArea threshold so even modest archipelagos get a zone ellipse.
+  const minBoundsArea = forceZone ? 300 : 8000
+  if (boundsArea < minBoundsArea || fillRatio >= 0.10) return ''
 
   const cx = ((x0 + x1) / 2).toFixed(1)
   const cy = ((y0 + y1) / 2).toFixed(1)
@@ -341,13 +351,22 @@ function renderAtlas(
   // Early fallback: if the country is essentially invisible at atlas scale (< 8 projected px²),
   // render a local zoom that shows the immediate geographic context instead of the whole continent.
   // This covers micro-states (Monaco, Vatican, San Marino…) and tiny island nations.
-  // Exception: Caribbean islands always stay in the Caribbean atlas frame for consistency.
+  // Exceptions:
+  //   - Caribbean islands always stay in the Caribbean atlas frame for consistency.
+  //   - Southern territories (TF, HM) stay in SOUTHERN_INDIAN_OCEAN with archipelago ellipse + markers.
+  //   - Pacific island nations stay in PACIFIC_ISLANDS_GLOBAL; forceZone ensures a visible ellipse.
   const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
-  if (targetProjectedArea < 8 && region.id !== 'caribbean') {
-    const isRemoteIsland = PACIFIC_ISLAND_ISO2.has(target.iso2) || SOUTHERN_ISLAND_ISO2.has(target.iso2)
+  const isPacificIsland = PACIFIC_ISLAND_ISO2.has(target.iso2)
+  const isAfricaIsland = AFRICA_ISLAND_ISO2.has(target.iso2)
+  if (
+    targetProjectedArea < 8 &&
+    region.id !== 'caribbean' &&
+    !SOUTHERN_ISLAND_ISO2.has(target.iso2) &&
+    !isPacificIsland &&
+    !isAfricaIsland
+  ) {
     // Wider context for remote ocean islands so surrounding geography is visible.
-    const minExtDeg = isRemoteIsland ? 28 : 12
-    return renderZoom(countries, target.iso2, 0.3, minExtDeg, theme, marginPx)
+    return renderZoom(countries, target.iso2, 0.3, 12, theme, marginPx)
   }
 
   const targetDCheck = path(target.feature as unknown as GeoJSON.GeoJSON)
@@ -366,8 +385,9 @@ function renderAtlas(
   const others = visible.filter((c) => c.iso2 !== targetIso2).sort((a, b) => a.iso2.localeCompare(b.iso2))
 
   // Compute target bounds early so we can draw the archipelago extent ellipse before fills.
+  // Force zone ellipse for Pacific island nations and Africa island nations.
   const targetBoundsEarly = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
-  const extentEllipse = archipelagoExtentSvg(targetBoundsEarly, targetProjectedArea)
+  const extentEllipse = archipelagoExtentSvg(targetBoundsEarly, targetProjectedArea, isPacificIsland || isAfricaIsland)
 
   const parts: string[] = []
   parts.push(
@@ -411,8 +431,11 @@ function renderAtlas(
   const fallbackCenter = projection(target.centroid as [number, number])
   const targetCenter =
     Number.isFinite(centerByPath[0]) && Number.isFinite(centerByPath[1]) ? centerByPath : fallbackCenter
-  const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
-  if (marker) parts.push(marker)
+  // Skip pin when an archipelago zone ellipse is already drawn — the ellipse communicates extent.
+  if (!extentEllipse) {
+    const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
+    if (marker) parts.push(marker)
+  }
   const explicitMarkers = explicitArchipelagoMarkersSvg(target.iso2, (lonLat) => projection(lonLat))
   if (explicitMarkers) parts.push(explicitMarkers)
 
@@ -542,8 +565,11 @@ function renderZoom(
   const fallbackCenter = projection(target.centroid as [number, number])
   const targetCenter =
     Number.isFinite(centerByPath[0]) && Number.isFinite(centerByPath[1]) ? centerByPath : fallbackCenter
-  const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
-  if (marker) parts.push(marker)
+  // Skip pin when an archipelago zone ellipse is already drawn — the ellipse communicates extent.
+  if (!extentEllipseZ) {
+    const marker = targetMarkerSvg(targetBounds, targetCenter as [number, number] | null, targetProjectedArea)
+    if (marker) parts.push(marker)
+  }
   const explicitMarkers = explicitArchipelagoMarkersSvg(target.iso2, (lonLat) => projection(lonLat))
   if (explicitMarkers) parts.push(explicitMarkers)
 
@@ -585,9 +611,9 @@ export function renderCountrySvg(
   const theme = opts?.theme ?? 'transparent'
   const marginPx = opts?.marginPx ?? MARGIN
 
-  // Remote southern territories need an explicit wider window, otherwise local zoom is too tight.
-  if (targetIso2 === 'TF' || targetIso2 === 'HM') {
-    return renderZoom(mergedCountries, targetIso2, Math.max(paddingPct, 1.1), Math.max(minExtentDeg, 70), theme, marginPx)
+  // New Zealand: the wide oceania atlas frame makes NZ appear too small — use a dedicated zoom.
+  if (targetIso2 === 'NZ') {
+    return renderZoom(mergedCountries, targetIso2, Math.max(paddingPct, 0.3), Math.max(minExtentDeg, 5), theme, marginPx)
   }
 
   if (mode === 'zoom') return renderZoom(mergedCountries, targetIso2, paddingPct, minExtentDeg, theme, marginPx)
