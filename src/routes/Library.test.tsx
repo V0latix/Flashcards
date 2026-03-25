@@ -203,6 +203,14 @@ describe('Library delete by tag', () => {
       ).toBeInTheDocument()
     })
 
+    await waitFor(async () => {
+      const suspendedCard = (await db.cards.toArray()).find((card) => card.front_md === 'Q1')
+      const state = suspendedCard?.id ? await db.reviewStates.get(suspendedCard.id) : undefined
+      expect(state?.box).toBe(0)
+      expect(state?.due_date).toBeNull()
+      expect(state?.is_learned).toBe(false)
+    })
+
     fireEvent.click(screen.getByRole('button', { name: /Session d'entraînement/i }))
 
     const ids = consumeTrainingQueue()
@@ -272,7 +280,16 @@ describe('Library delete by tag', () => {
       const histoireCards = cards.filter((card) =>
         card.tags.some((tag) => tag.startsWith('Histoire'))
       )
+      const geographieStates = await Promise.all(
+        geographieCards
+          .map((card) => card.id)
+          .filter((id): id is number => typeof id === 'number')
+          .map((id) => db.reviewStates.get(id))
+      )
       expect(geographieCards.every((card) => card.suspended)).toBe(true)
+      expect(geographieStates.every((state) => state?.box === 0 && state?.due_date === null)).toBe(
+        true
+      )
       expect(histoireCards.some((card) => card.suspended)).toBe(false)
     })
 

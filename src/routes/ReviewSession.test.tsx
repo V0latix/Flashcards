@@ -256,7 +256,11 @@ describe('ReviewSession', () => {
 
     await waitFor(async () => {
       const card = await db.cards.get(firstId)
+      const state = await db.reviewStates.get(firstId)
       expect(card?.suspended).toBe(true)
+      expect(state?.box).toBe(0)
+      expect(state?.due_date).toBeNull()
+      expect(state?.is_learned).toBe(false)
     })
 
     await screen.findByText(/1 carte\(s\) restante\(s\)/i)

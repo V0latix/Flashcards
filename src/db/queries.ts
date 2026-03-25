@@ -2,6 +2,20 @@ import db from './index'
 import type { Card, ReviewLog, ReviewState } from './types'
 import { markLocalChange, queueCardDelete } from '../sync/queue'
 
+const buildSuspendedReviewState = (
+  cardId: number,
+  current: ReviewState | undefined,
+  updatedAt: string
+): ReviewState => ({
+  ...current,
+  card_id: cardId,
+  box: 0,
+  due_date: null,
+  is_learned: false,
+  learned_at: null,
+  updated_at: updatedAt
+})
+
 export async function listCards(): Promise<Card[]> {
   return db.cards.toArray()
 }
@@ -116,7 +130,16 @@ export async function updateCard(
   if (updates.cloud_id !== undefined) {
     payload.cloud_id = updates.cloud_id
   }
-  const updated = await db.cards.update(id, payload)
+  let updated = 0
+  await db.transaction('rw', db.cards, db.reviewStates, async () => {
+    updated = await db.cards.update(id, payload)
+    if (!updated || updates.suspended !== true) {
+      return
+    }
+
+    const currentState = await db.reviewStates.get(id)
+    await db.reviewStates.put(buildSuspendedReviewState(id, currentState, now))
+  })
   if (updated) {
     markLocalChange()
   }
@@ -146,7 +169,23 @@ export async function setCardsSuspended(
     return 0
   }
 
-  await db.cards.bulkPut(updates)
+  await db.transaction('rw', db.cards, db.reviewStates, async () => {
+    await db.cards.bulkPut(updates)
+
+    if (!suspended) {
+      return
+    }
+
+    const targetIds = updates
+      .map((card) => card.id)
+      .filter((id): id is number => typeof id === 'number')
+    const reviewStates = await db.reviewStates.bulkGet(targetIds)
+    await db.reviewStates.bulkPut(
+      targetIds.map((cardId, index) =>
+        buildSuspendedReviewState(cardId, reviewStates[index] ?? undefined, now)
+      )
+    )
+  })
   markLocalChange()
   return updates.length
 }
