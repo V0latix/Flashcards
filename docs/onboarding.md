@@ -6,14 +6,13 @@
 
 ## En 5 minutes
 
-**Ce que fait le projet** : App de révision par flashcards (méthode Leitner 5 boîtes), local-first, web + mobile, avec sync Supabase optionnelle et catalogue de packs publics.
+**Ce que fait le projet** : App de révision par flashcards (méthode Leitner 5 boîtes), local-first, web, avec sync Supabase optionnelle et catalogue de packs publics.
 
 **Lancer localement** :
 ```bash
 cp .env.local.example .env.local  # ou créer avec VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev        # → http://localhost:5173
-npm run mobile     # → Expo (apps/mobile/)
 ```
 
 **Première chose à lire** : `src/leitner/engine.ts` — c'est le cœur de l'app.
@@ -28,7 +27,6 @@ npm run mobile     # → Expo (apps/mobile/)
 4. **Markdown + KaTeX** : tout le contenu est du Markdown, les formules sont en LaTeX
 5. **Tags hiérarchiques** : `geo/europe/france` → filtrage TreeView dans la bibliothèque
 6. **Packs publics** : générés via pipelines Node.js séparés (pays, départements, sport, science…)
-7. **Mobile** : app React Native/Expo dans `apps/mobile/` — logique Leitner partageable
 
 ---
 
@@ -80,7 +78,6 @@ npm run dev              # Serveur web dev
 npm run test             # Tests Vitest (run once)
 npm run test:watch       # Tests en watch mode
 npm run check            # lint + typecheck + tests (CI complet)
-npm run mobile           # Expo dev server
 npm run pipeline:countries   # Regénérer SVG pays + upload Supabase
 npm run seed:<pack>      # Seeder un pack public (ex: seed:countries-pack)
 npx vitest run src/leitner/engine.test.ts  # Un seul fichier de test

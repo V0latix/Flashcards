@@ -5,7 +5,7 @@
 
 ```mermaid
 graph TD
-    subgraph "Client (Browser / React Native)"
+    subgraph "Client (Browser)"
         UI[React UI]
         Router[React Router 7]
         Leitner[Leitner Engine]
@@ -182,5 +182,4 @@ AppShell
 | 3 | Last-write-wins par `updated_at` | Cas d'usage personnel (1 utilisateur, multi-appareils) |
 | 4 | KaTeX via remark/rehype | Support LaTeX dans les cartes (maths, sciences) |
 | 5 | Pipelines séparés (dist-countries/) | Scripts Node.js isolés du bundle web |
-| 6 | React Native/Expo dans apps/mobile/ | Partage possible de la logique Leitner |
 | 7 | Tags hiérarchiques (geo/europe/france) | Filtrage TreeView, compatibilité avec les packs publics |

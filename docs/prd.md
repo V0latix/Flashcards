@@ -5,7 +5,7 @@
 
 Application de révision par flashcards utilisant la méthode de Leitner à 5 boîtes.
 **Local-first** : fonctionne entièrement offline, sync optionnelle via Supabase.
-Disponible en web (GitHub Pages) et mobile (React Native/Expo).
+Disponible en web (GitHub Pages).
 
 ## Utilisateurs cibles
 
@@ -39,9 +39,6 @@ Disponible en web (GitHub Pages) et mobile (React Native/Expo).
 ### Internationalisation
 - [x] Interface disponible en français et anglais
 
-### Mobile
-- [x] App React Native/Expo (apps/mobile/)
-
 ## Epics identifiés
 
 ### Epic 1 — Core Leitner
@@ -60,10 +57,6 @@ Authentification, synchronisation multi-appareils, gestion des conflits.
 Pipeline de génération SVG, seed Supabase, import dans la collection.
 → `docs/epic-04-public-packs.md`
 
-### Epic 5 — Mobile
-App React Native, parité des features avec le web.
-→ `docs/epic-05-mobile.md`
-
 ## Axes d'évolution potentiels
 
 - Partage de decks entre utilisateurs
@@ -71,4 +64,4 @@ App React Native, parité des features avec le web.
 - Mode "challenge" (timer, score)
 - Génération de cartes assistée par IA
 - Support audio (prononciation, langues)
-- Notifications de rappel (mobile)
+- Notifications de rappel (PWA)

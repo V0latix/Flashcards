@@ -15,7 +15,6 @@
 | Cloud sync | Supabase | ^2.91.1 |
 | Tests | Vitest + Testing Library | ^4.0.18 |
 | Lint | ESLint 9 + typescript-eslint | — |
-| Mobile | React Native / Expo | apps/mobile/ |
 | Markdown | react-markdown + KaTeX | — |
 | i18n | Maison (fr/en) | src/i18n/ |
 
@@ -35,10 +34,6 @@ src/
 ├── sync/           # Moteur de sync snapshot-based (engine, remoteStore, localStore)
 ├── test/           # Fixtures et mocks partagés (fake-indexeddb)
 └── utils/          # Utilitaires (date, tags, training, media)
-
-apps/
-├── mobile/         # React Native / Expo
-└── web/            # (alias du projet principal)
 
 src/countries-pipeline/   # Pipeline SVG pays (Natural Earth → Supabase)
 src/departements-pipeline/ # Pipeline SVG départements français
@@ -194,11 +189,10 @@ npm run lint         # ESLint
 npm run test         # Vitest (single run)
 npm run test:watch   # Vitest watch mode
 npm run check        # lint + typecheck + tests (CI complet)
-npm run mobile       # Expo dev server (React Native)
 ```
 
 ## Déploiement
 
 - **Web** : GitHub Actions → GitHub Pages (push sur `main`)
   - Secrets requis : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
-- **Mobile** : EAS Build → TestFlight (voir `docs/mobile-release.md`)
+
