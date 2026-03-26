@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import db from '../db'
-import { applyReviewResult, buildDailySession } from '../leitner/engine'
+import { applyReviewResult, buildDailySession, hasPendingDailyCards } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -77,6 +77,8 @@ function ReviewSession() {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const completedSaveKey = useRef<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [sessionCardCount, setSessionCardCount] = useState(0)
+  const [pendingReviewWrites, setPendingReviewWrites] = useState(0)
   const [cards, setCards] = useState<SessionCard[]>([])
   const [answers, setAnswers] = useState<Record<number, 'good' | 'bad'>>({})
   const [index, setIndex] = useState(0)
@@ -116,7 +118,6 @@ function ReviewSession() {
     return parsed
   }, [searchParams])
   const isTraining = searchParams.get('mode') === 'training'
-  const isFilteredSession = tagFilter !== null || selectedBox !== null
 
   const shuffle = <T,>(input: T[]): T[] => {
     const result = [...input]
@@ -133,6 +134,8 @@ function ReviewSession() {
     const loadSession = async () => {
       setIsLoading(true)
       setCards([])
+      setSessionCardCount(0)
+      setPendingReviewWrites(0)
       setAnswers({})
       setIndex(0)
       setShowBack(false)
@@ -178,6 +181,7 @@ function ReviewSession() {
           return
         }
         setCards(nextCards)
+        setSessionCardCount(nextCards.length)
         setIsLoading(false)
         return
       }
@@ -212,6 +216,7 @@ function ReviewSession() {
         return
       }
       setCards(nextCards)
+      setSessionCardCount(nextCards.length)
       setIsLoading(false)
     }
 
@@ -243,11 +248,14 @@ function ReviewSession() {
         return
       }
       if (!isTraining) {
-        void applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed).catch(
-          (error) => {
+        setPendingReviewWrites((prev) => prev + 1)
+        void applyReviewResult(currentCard.cardId, result, today, currentCard.wasReversed)
+          .catch((error) => {
             console.error('applyReviewResult failed', error)
-          }
-        )
+          })
+          .finally(() => {
+            setPendingReviewWrites((prev) => Math.max(0, prev - 1))
+          })
       }
       setAnswers((prev) => ({
         ...prev,
@@ -325,17 +333,24 @@ function ReviewSession() {
     cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0
 
   useEffect(() => {
-    if (isTraining || isFilteredSession || !isDone || !user || cards.length === 0) {
+    if (isTraining || !isDone || !user || sessionCardCount === 0 || pendingReviewWrites > 0) {
       return
     }
 
-    const saveKey = `${user.id}:${today}`
-    if (completedSaveKey.current === saveKey) {
-      return
-    }
-    completedSaveKey.current = saveKey
+    let cancelled = false
 
     const saveDoneStatus = async () => {
+      const hasPendingCards = await hasPendingDailyCards(today)
+      if (cancelled || hasPendingCards) {
+        return
+      }
+
+      const saveKey = `${user.id}:${today}`
+      if (completedSaveKey.current === saveKey) {
+        return
+      }
+      completedSaveKey.current = saveKey
+
       const now = new Date().toISOString()
       const { error } = await supabase.from('daily_cards_status').upsert(
         [
@@ -350,14 +365,23 @@ function ReviewSession() {
       )
       if (error) {
         completedSaveKey.current = null
+        if (cancelled) {
+          return
+        }
         console.error('daily_cards_status upsert failed', error.message)
+        return
+      }
+      if (cancelled) {
         return
       }
       window.dispatchEvent(new Event('daily-status-updated'))
     }
 
     void saveDoneStatus()
-  }, [cards.length, isDone, isFilteredSession, isTraining, today, user])
+    return () => {
+      cancelled = true
+    }
+  }, [isDone, isTraining, pendingReviewWrites, sessionCardCount, today, user])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

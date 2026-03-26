@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import db from '../db'
-import { applyReviewResult, autoFillBox1, buildDailySession } from './engine'
+import { applyReviewResult, autoFillBox1, buildDailySession, hasPendingDailyCards } from './engine'
 
 const addCardWithState = async (input: {
   front: string
@@ -427,6 +427,40 @@ describe('applyReviewResult', () => {
     expect(state?.is_learned).toBe(true)
     expect(state?.learned_at).toBeTruthy()
     expect(state?.due_date).toBeNull()
+  })
+})
+
+describe('hasPendingDailyCards', () => {
+  it('returns false when the only due card is suspended', async () => {
+    await addCardWithState({
+      front: 'Suspended due',
+      back: 'Suspended due',
+      createdAt: '2024-01-01',
+      box: 2,
+      dueDate: '2024-01-10',
+      suspended: true
+    })
+
+    await expect(hasPendingDailyCards('2024-01-10')).resolves.toBe(false)
+  })
+
+  it('returns true when another due card remains active', async () => {
+    await addCardWithState({
+      front: 'Done card',
+      back: 'Done card',
+      createdAt: '2024-01-01',
+      box: 3,
+      dueDate: '2024-01-10'
+    })
+    await addCardWithState({
+      front: 'Remaining card',
+      back: 'Remaining card',
+      createdAt: '2024-01-02',
+      box: 2,
+      dueDate: '2024-01-10'
+    })
+
+    await expect(hasPendingDailyCards('2024-01-10')).resolves.toBe(true)
   })
 })
 

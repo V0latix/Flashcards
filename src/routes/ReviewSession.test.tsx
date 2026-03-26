@@ -2,12 +2,33 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { MemoryRouter, useNavigate } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { AuthProvider } from '../auth/AuthProvider'
 import db from '../db'
 import { I18nProvider } from '../i18n/I18nProvider'
 import ReviewSession from './ReviewSession'
 import { resetDb, seedCardWithState } from '../test/utils'
 import { saveTrainingQueue } from '../utils/training'
+
+const { fromMock, upsertMock } = vi.hoisted(() => ({
+  fromMock: vi.fn(),
+  upsertMock: vi.fn()
+}))
+
+vi.mock('../auth/useAuth', () => ({
+  useAuth: () => ({
+    user: { id: 'user-1' },
+    session: null,
+    loading: false,
+    signInWithProvider: vi.fn(),
+    signInWithEmail: vi.fn(),
+    signOut: vi.fn()
+  })
+}))
+
+vi.mock('../supabase/client', () => ({
+  supabase: {
+    from: fromMock
+  }
+}))
 
 const setSettings = (box1Target = 2) => {
   localStorage.setItem(
@@ -24,11 +45,9 @@ const setSettings = (box1Target = 2) => {
 const renderReviewSession = (entry = '/review') =>
   render(
     <I18nProvider>
-      <AuthProvider>
-        <MemoryRouter initialEntries={[entry]}>
-          <ReviewSession />
-        </MemoryRouter>
-      </AuthProvider>
+      <MemoryRouter initialEntries={[entry]}>
+        <ReviewSession />
+      </MemoryRouter>
     </I18nProvider>
   )
 
@@ -36,11 +55,9 @@ const renderReviewSessionStrict = (entry = '/review') =>
   render(
     <StrictMode>
       <I18nProvider>
-        <AuthProvider>
-          <MemoryRouter initialEntries={[entry]}>
-            <ReviewSession />
-          </MemoryRouter>
-        </AuthProvider>
+        <MemoryRouter initialEntries={[entry]}>
+          <ReviewSession />
+        </MemoryRouter>
       </I18nProvider>
     </StrictMode>
   )
@@ -60,11 +77,9 @@ const renderReviewSessionWithTagNavigation = (entry = '/review?tag=Tag/A') => {
 
   return render(
     <I18nProvider>
-      <AuthProvider>
-        <MemoryRouter initialEntries={[entry]}>
-          <Wrapper />
-        </MemoryRouter>
-      </AuthProvider>
+      <MemoryRouter initialEntries={[entry]}>
+        <Wrapper />
+      </MemoryRouter>
     </I18nProvider>
   )
 }
@@ -76,6 +91,17 @@ describe('ReviewSession', () => {
     setSettings()
     vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
     vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    upsertMock.mockReset()
+    upsertMock.mockResolvedValue({ error: null })
+    fromMock.mockReset()
+    fromMock.mockImplementation((table: string) => {
+      if (table !== 'daily_cards_status') {
+        throw new Error(`Unexpected table ${table}`)
+      }
+      return {
+        upsert: upsertMock
+      }
+    })
   })
 
   it('shows a card and buttons, bon on the left', async () => {
@@ -403,5 +429,88 @@ describe('ReviewSession', () => {
     fireEvent.click(screen.getByRole('button', { name: 'BON' }))
 
     await screen.findByText(/Session terminée/i)
+  })
+
+  it('records daily completion after the last filtered due card is done', async () => {
+    const today = new Date().toISOString().slice(0, 10)
+
+    await seedCardWithState({
+      front: 'Q filtered',
+      back: 'A filtered',
+      createdAt: '2024-01-01',
+      box: 2,
+      dueDate: today
+    })
+
+    renderReviewSession('/review?box=2')
+
+    await screen.findByText('Q filtered')
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
+
+    await waitFor(() => {
+      expect(upsertMock).toHaveBeenCalledTimes(1)
+    })
+    expect(upsertMock).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({
+          user_id: 'user-1',
+          day: today,
+          done: true
+        })
+      ],
+      { onConflict: 'user_id,day' }
+    )
+  })
+
+  it('does not record daily completion while other due cards remain outside the filter', async () => {
+    const today = new Date().toISOString().slice(0, 10)
+
+    await seedCardWithState({
+      front: 'Q box 2',
+      back: 'A box 2',
+      createdAt: '2024-01-01',
+      box: 2,
+      dueDate: today
+    })
+    await seedCardWithState({
+      front: 'Q box 3',
+      back: 'A box 3',
+      createdAt: '2024-01-02',
+      box: 3,
+      dueDate: today
+    })
+
+    renderReviewSession('/review?box=2')
+
+    await screen.findByText('Q box 2')
+    fireEvent.click(screen.getByRole('button', { name: /Révéler/i }))
+    fireEvent.click(screen.getByRole('button', { name: 'BON' }))
+
+    await screen.findByText(/Session terminée/i)
+    await waitFor(() => {
+      expect(upsertMock).not.toHaveBeenCalled()
+    })
+  })
+
+  it('records daily completion when suspending the last filtered due card', async () => {
+    const today = new Date().toISOString().slice(0, 10)
+
+    await seedCardWithState({
+      front: 'Q suspend',
+      back: 'A suspend',
+      createdAt: '2024-01-01',
+      box: 2,
+      dueDate: today
+    })
+
+    renderReviewSession('/review?box=2')
+
+    await screen.findByText('Q suspend')
+    fireEvent.click(screen.getByRole('button', { name: /Suspendre la carte/i }))
+
+    await waitFor(() => {
+      expect(upsertMock).toHaveBeenCalledTimes(1)
+    })
   })
 })

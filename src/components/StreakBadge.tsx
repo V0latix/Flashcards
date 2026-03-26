@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../auth/useAuth'
+import db from '../db'
 import { useI18n } from '../i18n/useI18n'
+import { hasPendingDailyCards } from '../leitner/engine'
 import { supabase } from '../supabase/client'
 
 type StreakState = {
@@ -77,6 +79,37 @@ function StreakBadge() {
       }
 
       const today = toIsoDate(new Date())
+      const hasPendingCards = await hasPendingDailyCards(today)
+      if (!hasPendingCards) {
+        const reviewLogs = await db.reviewLogs.toArray()
+        const hasReviewToday = reviewLogs.some(
+          (log) => typeof log.timestamp === 'string' && log.timestamp.slice(0, 10) === today
+        )
+
+        if (hasReviewToday) {
+          const now = new Date().toISOString()
+          const { error: upsertError } = await supabase.from('daily_cards_status').upsert(
+            [
+              {
+                user_id: userId,
+                day: today,
+                done: true,
+                done_at: now
+              }
+            ],
+            { onConflict: 'user_id,day' }
+          )
+
+          if (cancelled) {
+            return
+          }
+
+          if (upsertError) {
+            console.error('streak recovery upsert failed', upsertError.message)
+          }
+        }
+      }
+
       const { data, error } = await supabase
         .from('daily_cards_status')
         .select('day')

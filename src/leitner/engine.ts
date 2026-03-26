@@ -54,6 +54,26 @@ const isDueOnOrBefore = (dueDate: string | null | undefined, today: string): boo
   return dueKey <= today
 }
 
+const isPendingForToday = (
+  state: ReviewState,
+  today: string,
+  learnedReviewIntervalDays: number
+): boolean => {
+  if (state.is_learned) {
+    const learnedDate = normalizeToDateKey(state.learned_at)
+    if (!learnedDate) {
+      return false
+    }
+    return addDays(learnedDate, learnedReviewIntervalDays) <= today
+  }
+
+  if (state.box < 0) {
+    return false
+  }
+
+  return isDueOnOrBefore(state.due_date, today)
+}
+
 export async function autoFillBox1(today: string): Promise<void>
 export async function autoFillBox1(_deckId: number, today: string): Promise<void>
 export async function autoFillBox1(
@@ -105,7 +125,6 @@ export async function autoFillBox1(
       return
     }
 
-    const box0CardIds = box0States.map((state) => state.card_id)
     const box0StatesByCardId = new Map(box0States.map((state) => [state.card_id, state]))
     const candidateCardIds = box0Cards
       .filter((card) => !card.suspended)
@@ -224,6 +243,24 @@ export async function buildDailySession(
   const box1: SessionCard[] = []
 
   return { box1, due }
+}
+
+export const hasPendingDailyCards = async (todayInput: string): Promise<boolean> => {
+  const today = normalizeTodayKey(todayInput)
+  const { learnedReviewIntervalDays } = getLeitnerSettings()
+  const [reviewStates, cards] = await Promise.all([db.reviewStates.toArray(), db.cards.toArray()])
+  const suspendedCardIds = new Set(
+    cards
+      .filter((card) => card.suspended && typeof card.id === 'number')
+      .map((card) => card.id as number)
+  )
+
+  return reviewStates.some((state) => {
+    if (suspendedCardIds.has(state.card_id)) {
+      return false
+    }
+    return isPendingForToday(state, today, learnedReviewIntervalDays)
+  })
 }
 
 export const applyReviewResult = async (
