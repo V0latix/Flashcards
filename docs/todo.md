@@ -1,39 +1,65 @@
-# TODO - Ameliorations app Flashcards
+# TODO — Flashcards
 
-## P0 (priorite haute)
+> Dernière mise à jour : 2026-03-26
 
-- [x] Reinitialiser completement l'etat de session quand `tag` ou `mode` change dans `src/routes/ReviewSession.tsx` (reset `index`, `goodCount`, `badCount`, `showBack`, `isDeleteOpen`).
-- [x] Corriger la securite Markdown dans `src/components/MarkdownRenderer.tsx` en retirant ou encadrant `urlTransform={(uri) => uri}`.
+---
 
-## P1 (priorite produit)
+## Corrections en cours
 
-- [x] Faire en sorte que le mode training respecte les filtres actifs (utiliser `filteredCards` ou `selectedCardIds`) dans `src/routes/Library.tsx`.
-- [x] Ajouter l'affichage de `hint_md` en session de review (bouton "Indice" + raccourci clavier) dans `src/routes/ReviewSession.tsx`.
-- [x] Implementer la suspension de cartes (`suspended`) avec actions UI et exclusion dans le moteur de session (`src/db/types.ts`, `src/leitner/engine.ts`, `src/routes/Library.tsx`).
-- [x] Finaliser la logique "box1 target" (brancher `autoFillBox1` ou simplifier les restes de code) dans `src/leitner/engine.ts`.
+### Qualité du code
 
-## P2 (qualite UX/accessibilite)
+- [ ] Découper `src/routes/Library.tsx` en hooks + sous-composants (fichier trop long, logique mélangée avec le rendu)
+- [ ] Découper `src/routes/ReviewSession.tsx` de la même façon
+- [ ] Mutualiser les helpers pipelines (`env.ts`, `supabaseAuth.ts`) entre `src/countries-pipeline/` et `src/supabase-pipeline/` (code dupliqué)
 
-- [x] Ameliorer le menu "Add" (Escape, click outside, focus management) et l'etat actif des routes dynamiques dans `src/components/AppShell.tsx`.
-- [x] Rendre la modale auth plus robuste (Escape, click backdrop, focus trap) dans `src/auth/AuthButton.tsx`.
-- [x] Internationaliser les chaines en dur restantes (`Tags`, `Image introuvable`, legende chart, etc.) dans `src/routes/Library.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/StatsPage.tsx`.
-- [x] Enrichir la page packs (description, tags, nombre de cartes, import direct) dans `src/routes/Packs.tsx`.
+### Couverture de tests
 
-## P3 (audit technique: doublons / inutile)
+- [ ] Tests manquants : `src/routes/ImportExport.tsx`
+- [ ] Tests manquants : `src/routes/PackDetail.tsx`
+- [ ] Tests manquants : `src/routes/StatsPage.tsx`
+- [ ] Tests manquants : tout le module `src/stats/` (aucun test actuellement)
+- [ ] Tests erreurs réseau : `AuthProvider`, `StreakBadge`, cycle de sync dégradé
 
-- [x] Supprimer les checks DB/Supabase au boot en production (garder uniquement en DEV) dans `src/App.tsx`.
-- [x] Supprimer ou reutiliser le code mort `listCardsByDeck` et `listCardsFiltered` dans `src/db/queries.ts`.
-- [x] Factoriser les utilitaires export JSON/media (`ExportPayload`, `blobToBase64`, `downloadJson`) entre `src/routes/ImportExport.tsx` et `src/routes/Library.tsx`.
-- [x] Factoriser les utilitaires date (`parseIsoDate`, `toDateKey`, `addDays`, `normalizeToDateKey`) partages entre `src/routes/Home.tsx`, `src/leitner/engine.ts` et `src/stats/calc.ts`.
-- [x] Extraire un composant/hook commun de filtre d'arbre de tags (actuellement duplique entre `src/routes/Library.tsx` et `src/routes/Packs.tsx`).
-- [x] Remplacer `listPublicCardCountsByPackSlug` par une agregation SQL/RPC cote Supabase (eviter de paginer toutes les lignes `public_cards`) dans `src/supabase/api.ts`.
-- [x] Nettoyer les logs debug UI encore presents (`src/App.tsx`, `src/components/MarkdownRenderer.tsx`, `src/routes/ImportExport.tsx`) avec garde `import.meta.env.DEV`.
-- [x] Passer l'action "import sample" en mode DEV-only dans `src/routes/ImportExport.tsx`.
-- [x] Finir l'i18n des chaines restantes (`Tags:` dans `src/routes/PackDetail.tsx`, texte de confirmation destructif dans `src/routes/Settings.tsx`).
+### Performance
 
-## P4 (maintenabilite / tests)
+- [ ] `listPublicCardCountsByPackSlug` pagine toutes les lignes `public_cards` — remplacer par une agrégation SQL/RPC côté Supabase (`src/supabase/api.ts`)
 
-- [ ] Ajouter des tests routes manquantes: `src/routes/ImportExport.tsx`, `src/routes/PackDetail.tsx`, `src/routes/StatsPage.tsx`.
-- [ ] Ajouter des tests auth/sync pour les erreurs reseau (AuthProvider, StreakBadge, cycle de sync).
-- [ ] Decouper `src/routes/Library.tsx` et `src/routes/ReviewSession.tsx` (hooks + sous-composants) pour reduire la complexite.
-- [ ] Mutualiser les helpers pipelines (`env.ts`, `supabaseAuth.ts`) entre `src/countries-pipeline/` et `src/supabase-pipeline/`.
+---
+
+## Features à ajouter
+
+### Haute valeur (produit)
+
+- [ ] **Génération de cartes par IA** — coller un texte, l'IA propose des paires recto/verso (API Claude ou OpenAI, configurable)
+- [ ] **Export Anki** — exporter la collection au format `.apkg` pour interopérabilité
+- [ ] **PWA** — manifest + service worker pour installation sur l'écran d'accueil et cache offline complet
+- [ ] **Statistiques avancées** — courbe de rétention, heatmap d'activité (style GitHub), distribution boîtes dans le temps
+
+### UX
+
+- [ ] **Raccourcis clavier globaux** — navigation entre pages sans souris (actuellement uniquement en session de révision)
+- [ ] **Mode sombre** — thème dark complet (les variables CSS sont déjà en place)
+- [ ] **Barre de progression de session** — visualiser le ratio cartes vues / total en cours de révision
+- [ ] **Annuler la dernière réponse** — bouton "Undo" dans la session de révision
+- [ ] **Recherche globale** — chercher une carte par son contenu depuis n'importe quelle page
+
+### Partage & Social
+
+- [ ] **Partage de decks** — générer un lien de partage d'une collection de cartes (lecture seule)
+- [ ] **Mode challenge** — session chronométrée avec score, pour un usage compétitif ou de révision intensive
+
+### Technique
+
+- [ ] **Sync delta** — n'envoyer que les cartes modifiées depuis la dernière sync (actuellement snapshot full O(n))
+- [ ] **Notifications de rappel** (PWA) — rappel quotidien si des cartes sont dues et que l'app n'a pas été ouverte
+- [ ] **Cache des images distantes** — mettre en cache localement les images des packs Supabase pour éviter les re-téléchargements
+- [ ] **Import CSV/TSV** — format simple pour importer des cartes depuis Excel ou Google Sheets
+
+---
+
+## Idées en réserve (basse priorité)
+
+- Support audio (prononciation, apprentissage des langues)
+- Mode "saisie libre" — taper la réponse au clavier au lieu de cliquer Bon/Mauvais
+- Historique des révisions consultable (qui a été revu, quand, résultat)
+- Reproduction déterministe d'une session (RNG seeded) pour le debug
