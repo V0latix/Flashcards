@@ -12,7 +12,6 @@
     "test:watch": "bash scripts/run-tests.sh watch",
     "test:ui": "bash scripts/run-tests.sh ui",
     "check": "npm run lint && tsc --noEmit && npm run test",
-    "mobile": "cd apps/mobile && npx expo start",
     "countries:build": "tsc -p tsconfig.countries.json",
     "departements:build": "tsc -p tsconfig.departements.json",
     "gen:country-svgs": "npm run countries:build && node dist-countries/generateAllSvgs.js",

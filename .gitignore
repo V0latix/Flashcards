@@ -27,8 +27,27 @@ out/
 *.sln
 *.sw?
 
+# AI assistants & agents
 CLAUDE.md
+AGENTS.md
+GEMINI.md
+COPILOT.md
+WINDSURF.md
+.claude/
+.cursor/
+.codex/
+.aider*
+.continue/
+.codeium/
+.copilot/
+.v0/
+.bolt/
+.windsurfrules
+.cursorignore
+.cursorules
 
+# Local dev
 tmp
-
-.claude
+docs
+output
+.expo/
