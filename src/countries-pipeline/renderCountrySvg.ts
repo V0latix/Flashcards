@@ -71,6 +71,17 @@ const SOUTHERN_ISLAND_ISO2 = new Set(['TF', 'HM'])
 // Small island nations shown within the Africa atlas: stay in frame with forceZone ellipse.
 const AFRICA_ISLAND_ISO2 = new Set(['SC'])
 
+// Small Antilles/Caribbean island nations: stay in the Caribbean atlas frame with forceZone ellipse,
+// like Pacific island nations in the Oceania view.
+const CARIBBEAN_ISLAND_ISO2 = new Set([
+  'AG', 'AW', 'BB', 'BL', 'BQ', 'CW', 'DM', 'GD', 'GP',
+  'KN', 'KY', 'LC', 'MF', 'MQ', 'MS', 'SX', 'TC', 'TT',
+  'VC', 'VG', 'VI'
+])
+
+// Islands shown within the North America atlas: stay in frame instead of falling back to zoom.
+const NORTH_AMERICA_ISLAND_ISO2 = new Set(['BM'])
+
 const ATLAS_REGIONS: AtlasRegion[] = [
   PACIFIC_ISLANDS_GLOBAL,
   // Prioritize a dedicated Caribbean frame so islands don't fall back to a wide Americas view.
@@ -168,6 +179,8 @@ function findTarget(countries: CountryFeature[], targetIso2: string): CountryFea
 function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   if (PACIFIC_ISLAND_ISO2.has(target.iso2)) return PACIFIC_ISLANDS_GLOBAL
   if (SOUTHERN_ISLAND_ISO2.has(target.iso2)) return SOUTHERN_INDIAN_OCEAN
+  if (CARIBBEAN_ISLAND_ISO2.has(target.iso2)) return ATLAS_REGIONS.find((r) => r.id === 'caribbean')!
+  if (NORTH_AMERICA_ISLAND_ISO2.has(target.iso2)) return ATLAS_REGIONS.find((r) => r.id === 'north_america')!
 
   // Kazakhstan's centroid falls in europe_east but the country extends to ~87°E — assign to west_asia.
   if (target.iso2 === 'KZ') return ATLAS_REGIONS.find((r) => r.id === 'west_asia')!
@@ -352,18 +365,22 @@ function renderAtlas(
   // render a local zoom that shows the immediate geographic context instead of the whole continent.
   // This covers micro-states (Monaco, Vatican, San Marino…) and tiny island nations.
   // Exceptions:
-  //   - Caribbean islands always stay in the Caribbean atlas frame for consistency.
+  //   - Caribbean/Antilles islands stay in the Caribbean atlas frame with forceZone ellipse.
   //   - Southern territories (TF, HM) stay in SOUTHERN_INDIAN_OCEAN with archipelago ellipse + markers.
   //   - Pacific island nations stay in PACIFIC_ISLANDS_GLOBAL; forceZone ensures a visible ellipse.
+  //   - Bermuda (BM) stays in the North America atlas frame.
   const targetProjectedArea = path.area(target.feature as unknown as GeoJSON.GeoJSON)
   const isPacificIsland = PACIFIC_ISLAND_ISO2.has(target.iso2)
   const isAfricaIsland = AFRICA_ISLAND_ISO2.has(target.iso2)
+  const isCaribbean = CARIBBEAN_ISLAND_ISO2.has(target.iso2)
+  const isNorthAmericaIsland = NORTH_AMERICA_ISLAND_ISO2.has(target.iso2)
   if (
     targetProjectedArea < 8 &&
     region.id !== 'caribbean' &&
     !SOUTHERN_ISLAND_ISO2.has(target.iso2) &&
     !isPacificIsland &&
-    !isAfricaIsland
+    !isAfricaIsland &&
+    !isNorthAmericaIsland
   ) {
     // Wider context for remote ocean islands so surrounding geography is visible.
     return renderZoom(countries, target.iso2, 0.3, 12, theme, marginPx)
@@ -385,9 +402,13 @@ function renderAtlas(
   const others = visible.filter((c) => c.iso2 !== targetIso2).sort((a, b) => a.iso2.localeCompare(b.iso2))
 
   // Compute target bounds early so we can draw the archipelago extent ellipse before fills.
-  // Force zone ellipse for Pacific island nations and Africa island nations.
+  // Force zone ellipse for Pacific, Africa, Caribbean island nations and North America islands.
   const targetBoundsEarly = path.bounds(target.feature as unknown as GeoJSON.GeoJSON)
-  const extentEllipse = archipelagoExtentSvg(targetBoundsEarly, targetProjectedArea, isPacificIsland || isAfricaIsland)
+  const extentEllipse = archipelagoExtentSvg(
+    targetBoundsEarly,
+    targetProjectedArea,
+    isPacificIsland || isAfricaIsland || isCaribbean || isNorthAmericaIsland
+  )
 
   const parts: string[] = []
   parts.push(
