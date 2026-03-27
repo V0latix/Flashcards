@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../auth/useAuth'
-import db from '../db'
 import { useI18n } from '../i18n/useI18n'
-import { hasPendingDailyCards } from '../leitner/engine'
+import {
+  DAILY_PROGRESS_UPDATED_EVENT,
+  DAILY_STATUS_UPDATED_EVENT,
+  getTodayKey,
+  reconcileDailyStatus
+} from '../streak/dailyStatus'
 import { supabase } from '../supabase/client'
 
 type StreakState = {
@@ -51,11 +55,13 @@ function StreakBadge() {
     }
 
     window.addEventListener('focus', triggerRefresh)
-    window.addEventListener('daily-status-updated', triggerRefresh as EventListener)
+    window.addEventListener(DAILY_STATUS_UPDATED_EVENT, triggerRefresh as EventListener)
+    window.addEventListener(DAILY_PROGRESS_UPDATED_EVENT, triggerRefresh as EventListener)
 
     return () => {
       window.removeEventListener('focus', triggerRefresh)
-      window.removeEventListener('daily-status-updated', triggerRefresh as EventListener)
+      window.removeEventListener(DAILY_STATUS_UPDATED_EVENT, triggerRefresh as EventListener)
+      window.removeEventListener(DAILY_PROGRESS_UPDATED_EVENT, triggerRefresh as EventListener)
     }
   }, [])
 
@@ -78,36 +84,14 @@ function StreakBadge() {
         setState((prev) => ({ ...prev, loading: true, error: false }))
       }
 
-      const today = toIsoDate(new Date())
-      const hasPendingCards = await hasPendingDailyCards(today)
-      if (!hasPendingCards) {
-        const reviewLogs = await db.reviewLogs.toArray()
-        const hasReviewToday = reviewLogs.some(
-          (log) => typeof log.timestamp === 'string' && log.timestamp.slice(0, 10) === today
-        )
-
-        if (hasReviewToday) {
-          const now = new Date().toISOString()
-          const { error: upsertError } = await supabase.from('daily_cards_status').upsert(
-            [
-              {
-                user_id: userId,
-                day: today,
-                done: true,
-                done_at: now
-              }
-            ],
-            { onConflict: 'user_id,day' }
-          )
-
-          if (cancelled) {
-            return
-          }
-
-          if (upsertError) {
-            console.error('streak recovery upsert failed', upsertError.message)
-          }
+      const today = getTodayKey()
+      try {
+        await reconcileDailyStatus(userId, today)
+      } catch (error) {
+        if (cancelled) {
+          return
         }
+        console.error('streak recovery upsert failed', (error as Error).message)
       }
 
       const { data, error } = await supabase

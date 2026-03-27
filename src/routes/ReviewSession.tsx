@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import db from '../db'
-import { applyReviewResult, buildDailySession, hasPendingDailyCards } from '../leitner/engine'
+import { applyReviewResult, buildDailySession } from '../leitner/engine'
 import { getLeitnerSettings } from '../leitner/settings'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -9,7 +9,7 @@ import { deleteCard, updateCard } from '../db/queries'
 import { consumeTrainingQueue, TRAINING_QUEUE_KEY } from '../utils/training'
 import { useI18n } from '../i18n/useI18n'
 import { useAuth } from '../auth/useAuth'
-import { supabase } from '../supabase/client'
+import { getTodayKey, notifyDailyProgressUpdated, reconcileDailyStatus } from '../streak/dailyStatus'
 
 type SessionCard = {
   cardId: number
@@ -74,7 +74,7 @@ const loadTrainingQueue = (): number[] => {
 function ReviewSession() {
   const { t } = useI18n()
   const { user } = useAuth()
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const today = useMemo(() => getTodayKey(), [])
   const completedSaveKey = useRef<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [sessionCardCount, setSessionCardCount] = useState(0)
@@ -255,6 +255,7 @@ function ReviewSession() {
           })
           .finally(() => {
             setPendingReviewWrites((prev) => Math.max(0, prev - 1))
+            notifyDailyProgressUpdated()
           })
       }
       setAnswers((prev) => ({
@@ -289,6 +290,7 @@ function ReviewSession() {
     setShowHint(false)
     setIsDeleting(false)
     setIsDeleteOpen(false)
+    notifyDailyProgressUpdated()
   }
 
   const handleSuspend = async () => {
@@ -316,6 +318,7 @@ function ReviewSession() {
       })
       setShowBack(false)
       setShowHint(false)
+      notifyDailyProgressUpdated()
     } catch (error) {
       console.error('suspend card failed', error)
     } finally {
@@ -340,41 +343,23 @@ function ReviewSession() {
     let cancelled = false
 
     const saveDoneStatus = async () => {
-      const hasPendingCards = await hasPendingDailyCards(today)
-      if (cancelled || hasPendingCards) {
-        return
-      }
-
       const saveKey = `${user.id}:${today}`
       if (completedSaveKey.current === saveKey) {
         return
       }
-      completedSaveKey.current = saveKey
-
-      const now = new Date().toISOString()
-      const { error } = await supabase.from('daily_cards_status').upsert(
-        [
-          {
-            user_id: user.id,
-            day: today,
-            done: true,
-            done_at: now
-          }
-        ],
-        { onConflict: 'user_id,day' }
-      )
-      if (error) {
-        completedSaveKey.current = null
+      try {
+        const didReconcile = await reconcileDailyStatus(user.id, today)
+        if (cancelled || !didReconcile) {
+          return
+        }
+        completedSaveKey.current = saveKey
+      } catch (error) {
         if (cancelled) {
           return
         }
-        console.error('daily_cards_status upsert failed', error.message)
+        console.error('daily_cards_status reconcile failed', (error as Error).message)
         return
       }
-      if (cancelled) {
-        return
-      }
-      window.dispatchEvent(new Event('daily-status-updated'))
     }
 
     void saveDoneStatus()

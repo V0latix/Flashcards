@@ -493,7 +493,7 @@ describe('ReviewSession', () => {
     })
   })
 
-  it('records daily completion when suspending the last filtered due card', async () => {
+  it('does not record daily completion when the last filtered card is only suspended', async () => {
     const today = new Date().toISOString().slice(0, 10)
 
     await seedCardWithState({
@@ -509,8 +509,9 @@ describe('ReviewSession', () => {
     await screen.findByText('Q suspend')
     fireEvent.click(screen.getByRole('button', { name: /Suspendre la carte/i }))
 
+    await screen.findByText(/Session terminée/i)
     await waitFor(() => {
-      expect(upsertMock).toHaveBeenCalledTimes(1)
+      expect(upsertMock).not.toHaveBeenCalled()
     })
   })
 })
