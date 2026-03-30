@@ -8,17 +8,17 @@
 
 ### Qualité du code
 
-- [ ] Découper `src/routes/Library.tsx` en hooks + sous-composants (fichier trop long, logique mélangée avec le rendu)
-- [ ] Découper `src/routes/ReviewSession.tsx` de la même façon
-- [ ] Mutualiser les helpers pipelines (`env.ts`, `supabaseAuth.ts`) entre `src/countries-pipeline/` et `src/supabase-pipeline/` (code dupliqué)
+- [x] Découper `src/routes/Library.tsx` en hooks + sous-composants → `src/routes/library/` (563 → ~190 lignes)
+- [x] Découper `src/routes/ReviewSession.tsx` de la même façon → `src/routes/review/` (700 → ~175 lignes)
+- [x] Mutualiser les helpers pipelines (`env.ts`, `supabaseAuth.ts`) → `src/pipeline-shared/`
 
 ### Couverture de tests
 
-- [ ] Tests manquants : `src/routes/ImportExport.tsx`
-- [ ] Tests manquants : `src/routes/PackDetail.tsx`
-- [ ] Tests manquants : `src/routes/StatsPage.tsx`
-- [ ] Tests manquants : tout le module `src/stats/` (aucun test actuellement)
-- [ ] Tests erreurs réseau : `AuthProvider`, `StreakBadge`, cycle de sync dégradé
+- [x] Tests manquants : `src/routes/ImportExport.tsx`
+- [x] Tests manquants : `src/routes/PackDetail.tsx`
+- [x] Tests manquants : `src/routes/StatsPage.tsx`
+- [x] Tests manquants : tout le module `src/stats/` (aucun test actuellement)
+- [x] Tests erreurs réseau : `AuthProvider`, `StreakBadge`, cycle de sync dégradé
 
 ### Performance
 

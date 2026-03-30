@@ -1,433 +1,184 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import MarkdownRenderer from '../components/MarkdownRenderer'
-import {
-  deleteCard,
-  deleteCardsByTag,
-  listCardsWithReviewState,
-  setCardsSuspended,
-  updateCard
-} from '../db/queries'
-import type { Card, ReviewState } from '../db/types'
-import ConfirmDialog from '../components/ConfirmDialog'
-import TagTreeFilter from '../components/TagTreeFilter'
-import { saveTrainingQueue } from '../utils/training'
-import { useI18n } from '../i18n/useI18n'
-import { blobToBase64, downloadJson, type ExportMedia, type ExportPayload } from '../utils/export'
-import db from '../db'
-
-const SUSPENDED_BOX = -1
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ConfirmDialog from "../components/ConfirmDialog";
+import TagTreeFilter from "../components/TagTreeFilter";
+import { setCardsSuspended, updateCard } from "../db/queries";
+import type { Card } from "../db/types";
+import { useI18n } from "../i18n/useI18n";
+import { saveTrainingQueue } from "../utils/training";
+import { useLibraryCards } from "./library/useLibraryCards";
+import { useLibraryFilters } from "./library/useLibraryFilters";
+import { useCardDeletion } from "./library/useCardDeletion";
+import { useTagDeletion } from "./library/useTagDeletion";
+import { useCardExport } from "./library/useCardExport";
+import BoxFilterBar from "./library/BoxFilterBar";
+import CardListItem from "./library/CardListItem";
 
 function Library() {
-  const { t, language } = useI18n()
-  const [cards, setCards] = useState<Array<{ card: Card; reviewState?: ReviewState }>>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedTag, setSelectedTag] = useState<string | null>(null)
-  const [query, setQuery] = useState('')
-  const [selectedBoxes, setSelectedBoxes] = useState<number[]>([])
-  const [openHints, setOpenHints] = useState<Record<number, boolean>>({})
-  const [visibleCount, setVisibleCount] = useState(100)
-  const [tagDeleteOpen, setTagDeleteOpen] = useState(false)
-  const [includeSubTags, setIncludeSubTags] = useState(true)
-  const [isTagDeleting, setIsTagDeleting] = useState(false)
-  const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
-  const [isCardDeleting, setIsCardDeleting] = useState(false)
-  const [exportStatus, setExportStatus] = useState('')
-  const navigate = useNavigate()
+  const { t, language } = useI18n();
+  const navigate = useNavigate();
+  const [exportStatus, setExportStatus] = useState("");
+  const [openHints, setOpenHints] = useState<Record<number, boolean>>({});
+
+  const { cards, isLoading, loadCards } = useLibraryCards();
+  const filters = useLibraryFilters(cards, () => setExportStatus(""));
+  const { handleExportSelection } = useCardExport(
+    filters.filteredCards,
+    filters.selectedCardIds,
+    filters.selectedTag,
+    setExportStatus,
+  );
+  const cardDeletion = useCardDeletion(loadCards);
+  const tagDeletion = useTagDeletion(cards, filters.selectedTag, loadCards);
 
   const formatDueDate = (value: string | null | undefined) => {
-    if (!value) {
-      return t('status.none')
-    }
-    const [year, month, day] = value.split('-').map(Number)
-    if (!year || !month || !day) {
-      return value
-    }
-    const date = new Date(Date.UTC(year, month - 1, day))
-    const locale = language === 'fr' ? 'fr-FR' : 'en-US'
+    if (!value) return t("status.none");
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return value;
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const locale = language === "fr" ? "fr-FR" : "en-US";
     return date.toLocaleDateString(locale, {
-      timeZone: 'UTC',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
-  }
-
-  const loadCards = async () => {
-    const data = await listCardsWithReviewState(0)
-    setCards(data)
-    setIsLoading(false)
-  }
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadCards()
-  }, [])
-
-  const handleDelete = (card: Card) => {
-    if (!card.id) {
-      return
-    }
-    setCardToDelete(card)
-  }
-
-  const handleSelectTag = (tag: string | null) => {
-    setSelectedTag(tag)
-    setVisibleCount(100)
-    setExportStatus('')
-  }
-
-  const toggleBoxFilter = (box: number) => {
-    setSelectedBoxes((prev) => {
-      const next = prev.includes(box) ? prev.filter((item) => item !== box) : [...prev, box]
-      return next.sort((a, b) => a - b)
-    })
-    setVisibleCount(100)
-    setExportStatus('')
-  }
-
-  const clearBoxFilter = () => {
-    setSelectedBoxes([])
-    setVisibleCount(100)
-    setExportStatus('')
-  }
-
-  const tagDeleteCount = useMemo(() => {
-    if (!selectedTag) {
-      return 0
-    }
-    return cards.filter(({ card }) =>
-      includeSubTags
-        ? card.tags.some((tag) => tag === selectedTag || tag.startsWith(`${selectedTag}/`))
-        : card.tags.some((tag) => tag === selectedTag)
-    ).length
-  }, [cards, includeSubTags, selectedTag])
-
-  const openTagDelete = () => {
-    if (!selectedTag) {
-      return
-    }
-    setTagDeleteOpen(true)
-  }
-
-  const handleDeleteByTag = async () => {
-    if (!selectedTag || isTagDeleting) {
-      return
-    }
-    setIsTagDeleting(true)
-    await deleteCardsByTag(selectedTag, includeSubTags)
-    await loadCards()
-    setIsTagDeleting(false)
-    setTagDeleteOpen(false)
-  }
-
-  const confirmDeleteCard = async () => {
-    if (!cardToDelete?.id || isCardDeleting) {
-      return
-    }
-    setIsCardDeleting(true)
-    await deleteCard(cardToDelete.id)
-    await loadCards()
-    setIsCardDeleting(false)
-    setCardToDelete(null)
-  }
-
-  const totalCardsCount = cards.length
-  const boxOptions = [0, 1, 2, 3, 4, 5]
-  const boxCounts = useMemo(() => {
-    const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-    cards.forEach(({ reviewState }) => {
-      const box = reviewState?.box ?? 0
-      if (typeof counts[box] === 'number') {
-        counts[box] += 1
-      }
-    })
-    return counts
-  }, [cards])
-  const suspendedCount = useMemo(
-    () => cards.filter(({ card }) => card.suspended).length,
-    [cards]
-  )
-
-  const filteredCards = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-    return cards.filter(({ card, reviewState }) => {
-      if (selectedTag) {
-        const hasTag = card.tags.some((tag) => {
-          const normalized = tag.trim()
-          return (
-            normalized === selectedTag ||
-            normalized.startsWith(`${selectedTag}/`)
-          )
-        })
-        if (!hasTag) {
-          return false
-        }
-      }
-
-      if (selectedBoxes.length > 0) {
-        const selectedActiveBoxes = selectedBoxes.filter((box) => box !== SUSPENDED_BOX)
-        const includeSuspended = selectedBoxes.includes(SUSPENDED_BOX)
-        if (card.suspended) {
-          if (!includeSuspended) {
-            return false
-          }
-        } else {
-          const cardBox = reviewState?.box ?? 0
-          if (selectedActiveBoxes.length === 0 || !selectedActiveBoxes.includes(cardBox)) {
-            return false
-          }
-        }
-      }
-
-      if (normalizedQuery) {
-        const haystack = `${card.front_md} ${card.back_md} ${card.tags.join(' ')}`.toLowerCase()
-        if (!haystack.includes(normalizedQuery)) {
-          return false
-        }
-      }
-
-      return true
-    })
-  }, [cards, query, selectedBoxes, selectedTag])
-
-  const visibleCards = useMemo(
-    () => filteredCards.slice(0, visibleCount),
-    [filteredCards, visibleCount]
-  )
-  const selectedCardIds = useMemo(
-    () =>
-      filteredCards
-        .map(({ card }) => card.id)
-        .filter((id): id is number => typeof id === 'number'),
-    [filteredCards]
-  )
-  const filteredSuspendedCount = useMemo(
-    () => filteredCards.filter(({ card }) => card.suspended).length,
-    [filteredCards]
-  )
-  const filteredActiveCount = filteredCards.length - filteredSuspendedCount
-  const trainingCardIds = useMemo(
-    () =>
-      filteredCards
-        .filter(({ card }) => !card.suspended)
-        .map(({ card }) => card.id)
-        .filter((id): id is number => typeof id === 'number'),
-    [filteredCards]
-  )
-
-  const handleExportSelection = async () => {
-    if (selectedCardIds.length === 0) {
-      return
-    }
-    setExportStatus(t('importExport.exportInProgress'))
-    try {
-      const deckCardIds = new Set(selectedCardIds)
-      const [media, reviewLogs] = await Promise.all([
-        db.media.where('card_id').anyOf(selectedCardIds).toArray(),
-        db.reviewLogs.where('card_id').anyOf(selectedCardIds).toArray()
-      ])
-
-      const exportMedia: ExportMedia[] = []
-      for (const item of media) {
-        const base64 = await blobToBase64(item.blob)
-        exportMedia.push({
-          card_id: item.card_id,
-          side: item.side,
-          mime: item.mime,
-          base64
-        })
-      }
-
-      const payload: ExportPayload = {
-        schema_version: 1,
-        cards: filteredCards.map(({ card }) => card),
-        reviewStates: filteredCards
-          .map(({ reviewState }) => reviewState)
-          .filter((state): state is ReviewState => Boolean(state)),
-        media: exportMedia,
-        reviewLogs: reviewLogs.filter((log) => deckCardIds.has(log.card_id))
-      }
-
-      const safeTagName = selectedTag ? selectedTag.replaceAll('/', '-') : 'all'
-      downloadJson(payload, `cards-export-${safeTagName}.json`)
-      setExportStatus(t('importExport.exportDone'))
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      setExportStatus(t('library.exportFailed', { message }))
-    }
-  }
+      timeZone: "UTC",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   const handleTraining = () => {
-    if (trainingCardIds.length === 0) {
-      return
-    }
-    saveTrainingQueue(trainingCardIds)
-    navigate('/review?mode=training')
-  }
+    if (filters.trainingCardIds.length === 0) return;
+    saveTrainingQueue(filters.trainingCardIds);
+    navigate("/review?mode=training");
+  };
 
   const handleToggleSuspended = async (card: Card) => {
-    if (!card.id) {
-      return
-    }
-    await updateCard(card.id, { suspended: !card.suspended })
-    await loadCards()
-  }
+    if (!card.id) return;
+    await updateCard(card.id, { suspended: !card.suspended });
+    await loadCards();
+  };
 
   const handleSetSuspendedForFiltered = async (suspended: boolean) => {
-    if (selectedCardIds.length === 0) {
-      return
-    }
-    await setCardsSuspended(selectedCardIds, suspended)
-    await loadCards()
-  }
+    if (filters.selectedCardIds.length === 0) return;
+    await setCardsSuspended(filters.selectedCardIds, suspended);
+    await loadCards();
+  };
 
-  const breadcrumbParts = selectedTag ? selectedTag.split('/') : []
-  const breadcrumbPaths = breadcrumbParts.map((_, index) =>
-    breadcrumbParts.slice(0, index + 1).join('/')
-  )
-
-  const handleGoUp = () => {
-    if (!selectedTag) {
-      return
-    }
-    const parts = selectedTag.split('/')
-    if (parts.length <= 1) {
-      handleSelectTag(null)
-      return
-    }
-    handleSelectTag(parts.slice(0, -1).join('/'))
-  }
-
-  const renderMarkdown = (value: string) => <MarkdownRenderer value={value} />
+  const handleToggleHint = (cardId: number) => {
+    setOpenHints((prev) => ({ ...prev, [cardId]: !prev[cardId] }));
+  };
 
   return (
     <main className="container page">
       <div className="page-header">
-        <h1>{t('library.title')}</h1>
-        <p>{t('library.subtitle')}</p>
+        <h1>{t("library.title")}</h1>
+        <p>{t("library.subtitle")}</p>
       </div>
       <p>
         <button
           type="button"
           className="btn btn-primary"
-          onClick={() => navigate('/card/new')}
+          onClick={() => navigate("/card/new")}
         >
-          {t('actions.addCard')}
+          {t("actions.addCard")}
         </button>
       </p>
       {isLoading ? (
-        <p>{t('status.loading')}</p>
+        <p>{t("status.loading")}</p>
       ) : (
         <section className="card section split">
           <div className="sidebar">
             <TagTreeFilter
-              title={t('labels.tags')}
-              allLabel={t('library.allCards')}
-              noTagsLabel={t('library.noTags')}
+              title={t("labels.tags")}
+              allLabel={t("library.allCards")}
+              noTagsLabel={t("library.noTags")}
               tagsCollection={cards.map(({ card }) => card.tags)}
-              onSelectTag={handleSelectTag}
+              onSelectTag={filters.handleSelectTag}
             />
           </div>
           <div className="panel">
             <div className="panel-header">
               <h2>
-                {selectedTag ? `${t('library.tag')}: ${selectedTag}` : t('library.allCards')}
+                {filters.selectedTag
+                  ? `${t("library.tag")}: ${filters.selectedTag}`
+                  : t("library.allCards")}
               </h2>
               <span className="chip">
-                {t('labels.total')}: {totalCardsCount}
+                {t("labels.total")}: {cards.length}
               </span>
-              {selectedTag ? (
-                <button type="button" className="btn btn-secondary" onClick={handleGoUp}>
-                  {t('actions.up')}
+              {filters.selectedTag ? (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={filters.handleGoUp}
+                >
+                  {t("actions.up")}
                 </button>
               ) : null}
               <button
                 type="button"
                 className="btn btn-primary"
                 onClick={handleTraining}
-                disabled={trainingCardIds.length === 0}
+                disabled={filters.trainingCardIds.length === 0}
               >
-                {t('actions.training')}
+                {t("actions.training")}
               </button>
               <button
                 type="button"
                 className="btn btn-secondary"
                 onClick={() => void handleExportSelection()}
-                disabled={selectedCardIds.length === 0}
+                disabled={filters.selectedCardIds.length === 0}
               >
-                {t('library.exportSelection')}
+                {t("library.exportSelection")}
               </button>
-              <div className="panel-actions">
-                <span className="chip">{t('labels.boxes')}</span>
-                <div className="filter-group">
-                  {boxOptions.map((box) => (
-                    <button
-                      key={box}
-                      type="button"
-                      className={`btn btn-secondary btn-toggle${
-                        selectedBoxes.includes(box) ? ' is-active' : ''
-                      }`}
-                      onClick={() => toggleBoxFilter(box)}
-                    >
-                      {box} ({boxCounts[box] ?? 0})
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className={`btn btn-secondary btn-toggle${
-                      selectedBoxes.includes(SUSPENDED_BOX) ? ' is-active' : ''
-                    }`}
-                    onClick={() => toggleBoxFilter(SUSPENDED_BOX)}
-                  >
-                    {t('labels.suspended')} ({suspendedCount})
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={clearBoxFilter}
-                    disabled={selectedBoxes.length === 0}
-                  >
-                    {t('library.clearBoxes')}
-                  </button>
-                </div>
-              </div>
+              <BoxFilterBar
+                selectedBoxes={filters.selectedBoxes}
+                boxCounts={filters.boxCounts}
+                suspendedCount={filters.suspendedCount}
+                onToggle={filters.toggleBoxFilter}
+                onClear={filters.clearBoxFilter}
+              />
             </div>
-            {selectedTag ? (
+            {filters.selectedTag ? (
               <div className="section">
-                <button type="button" className="btn btn-danger" onClick={openTagDelete}>
-                  {t('library.deleteByTag')}
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={tagDeletion.openTagDelete}
+                >
+                  {t("library.deleteByTag")}
                 </button>
               </div>
             ) : null}
-            {selectedCardIds.length > 0 ? (
+            {filters.selectedCardIds.length > 0 ? (
               <div className="section button-row">
                 <button
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => void handleSetSuspendedForFiltered(true)}
-                  disabled={filteredActiveCount === 0}
+                  disabled={filters.filteredActiveCount === 0}
                 >
-                  {t('actions.suspendSelection')}
+                  {t("actions.suspendSelection")}
                 </button>
                 <button
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => void handleSetSuspendedForFiltered(false)}
-                  disabled={filteredSuspendedCount === 0}
+                  disabled={filters.filteredSuspendedCount === 0}
                 >
-                  {t('actions.resumeSelection')}
+                  {t("actions.resumeSelection")}
                 </button>
               </div>
             ) : null}
-            {breadcrumbParts.length > 0 ? (
+            {filters.breadcrumbParts.length > 0 ? (
               <div className="breadcrumb">
-                {breadcrumbParts.map((part, index) => (
-                  <span key={breadcrumbPaths[index]} className="chip">
+                {filters.breadcrumbParts.map((part, index) => (
+                  <span key={filters.breadcrumbPaths[index]} className="chip">
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      onClick={() => handleSelectTag(breadcrumbPaths[index])}
+                      onClick={() =>
+                        filters.handleSelectTag(filters.breadcrumbPaths[index])
+                      }
                     >
                       {part}
                     </button>
@@ -435,129 +186,94 @@ function Library() {
                 ))}
               </div>
             ) : null}
-            <label htmlFor="search">{t('labels.search')}</label>
+            <label htmlFor="search">{t("labels.search")}</label>
             <input
               id="search"
               type="text"
-              value={query}
+              value={filters.query}
               className="input"
-              onChange={(event) => {
-                setQuery(event.target.value)
-                setVisibleCount(100)
-                setExportStatus('')
-              }}
+              onChange={(event) =>
+                filters.handleQueryChange(event.target.value)
+              }
             />
             {exportStatus ? <p>{exportStatus}</p> : null}
-            {filteredCards.length === 0 ? <p>{t('library.noCards')}</p> : null}
-            {filteredCards.length > 0 ? (
+            {filters.filteredCards.length === 0 ? (
+              <p>{t("library.noCards")}</p>
+            ) : null}
+            {filters.filteredCards.length > 0 ? (
               <ul className="card-list">
-                {visibleCards.map(({ card, reviewState }) => (
-                  <li key={card.id} className="card list-item">
-                    <Link to={`/card/${card.id}/edit`} className="markdown">
-                      <MarkdownRenderer value={card.front_md || `*${t('library.noFront')}*`} />
-                    </Link>
-                    <div className="chip">
-                      {t('labels.box')} {reviewState?.box ?? 0}
-                    </div>
-                    {card.suspended ? (
-                      <div className="chip">{t('labels.suspended')}</div>
-                    ) : null}
-                    <p>
-                      {t('labels.nextReview')}: {formatDueDate(reviewState?.due_date)}
-                    </p>
-                    {card.hint_md ? (
-                      <div className="section">
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          onClick={() =>
-                            setOpenHints((prev) => ({
-                              ...prev,
-                              [card.id ?? 0]: !prev[card.id ?? 0]
-                            }))
-                          }
-                        >
-                          {openHints[card.id ?? 0]
-                            ? t('labels.hideHint')
-                            : t('labels.showHint')}
-                        </button>
-                        {openHints[card.id ?? 0] ? (
-                          <div className="markdown">{renderMarkdown(card.hint_md)}</div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => void handleToggleSuspended(card)}
-                    >
-                      {card.suspended ? t('actions.resumeCard') : t('actions.suspendCard')}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => handleDelete(card)}
-                    >
-                      {t('actions.delete')}
-                    </button>
-                  </li>
+                {filters.visibleCards.map(({ card, reviewState }) => (
+                  <CardListItem
+                    key={card.id}
+                    card={card}
+                    reviewState={reviewState}
+                    openHints={openHints}
+                    formatDueDate={formatDueDate}
+                    onToggleHint={handleToggleHint}
+                    onToggleSuspended={handleToggleSuspended}
+                    onDelete={cardDeletion.handleDelete}
+                  />
                 ))}
               </ul>
             ) : null}
-            {filteredCards.length > visibleCount ? (
+            {filters.filteredCards.length > filters.visibleCount ? (
               <button
                 type="button"
                 className="btn btn-secondary section"
-                onClick={() => setVisibleCount((prev) => prev + 100)}
+                onClick={() => filters.setVisibleCount((prev) => prev + 100)}
               >
-                {t('actions.loadMore')}
+                {t("actions.loadMore")}
               </button>
             ) : null}
           </div>
         </section>
       )}
       <ConfirmDialog
-        open={tagDeleteOpen}
-        title={t('library.deleteByTag')}
+        open={tagDeletion.tagDeleteOpen}
+        title={t("library.deleteByTag")}
         message={
-          selectedTag
-            ? `${t('library.deleteByTag')} "${selectedTag}" ?`
-            : t('actions.delete')
+          filters.selectedTag
+            ? `${t("library.deleteByTag")} "${filters.selectedTag}" ?`
+            : t("actions.delete")
         }
-        confirmLabel={t('actions.delete')}
-        onConfirm={handleDeleteByTag}
-        onCancel={() => setTagDeleteOpen(false)}
+        confirmLabel={t("actions.delete")}
+        onConfirm={tagDeletion.handleDeleteByTag}
+        onCancel={() => tagDeletion.setTagDeleteOpen(false)}
         isDanger
-        confirmDisabled={isTagDeleting || tagDeleteCount === 0}
+        confirmDisabled={
+          tagDeletion.isTagDeleting || tagDeletion.tagDeleteCount === 0
+        }
       >
-        {selectedTag ? (
+        {filters.selectedTag ? (
           <div className="section">
             <label>
               <input
                 type="checkbox"
-                checked={includeSubTags}
-                onChange={(event) => setIncludeSubTags(event.target.checked)}
-              />{' '}
-              {t('labels.includeSubTags')}
+                checked={tagDeletion.includeSubTags}
+                onChange={(event) =>
+                  tagDeletion.setIncludeSubTags(event.target.checked)
+                }
+              />{" "}
+              {t("labels.includeSubTags")}
             </label>
             <p>
-              {t('labels.total')}: {tagDeleteCount}
+              {t("labels.total")}: {tagDeletion.tagDeleteCount}
             </p>
           </div>
         ) : null}
       </ConfirmDialog>
       <ConfirmDialog
-        open={Boolean(cardToDelete)}
-        title={t('actions.delete')}
-        message={t('review.confirmDelete')}
-        confirmLabel={t('actions.delete')}
-        onConfirm={confirmDeleteCard}
-        onCancel={() => setCardToDelete(null)}
+        open={Boolean(cardDeletion.cardToDelete)}
+        title={t("actions.delete")}
+        message={t("review.confirmDelete")}
+        confirmLabel={t("actions.delete")}
+        onConfirm={cardDeletion.confirmDeleteCard}
+        onCancel={() => cardDeletion.setCardToDelete(null)}
         isDanger
-        confirmDisabled={isCardDeleting}
+        confirmDisabled={cardDeletion.isCardDeleting}
       />
     </main>
-  )
+  );
 }
 
-export default Library
+export default Library;

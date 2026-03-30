@@ -27,7 +27,7 @@ src/
 ├── db/             # Schéma Dexie (9 versions), types Card/ReviewState/ReviewLog/Media
 ├── i18n/           # Internationalisation fr/en (provider + hook)
 ├── leitner/        # Algorithme Leitner 5 boîtes (engine, settings, config)
-├── routes/         # Pages React Router (Home, ReviewSession, Library, Packs, Stats, Settings…)
+├── routes/         # Pages React Router + hooks colocalisés (library/, review/)
 ├── stats/          # Calculs et composants de statistiques
 ├── supabase/       # Client Supabase, requêtes packs publics
 ├── supabase-pipeline/ # Scripts de seed (cartes publiques)
@@ -37,6 +37,7 @@ src/
 
 src/countries-pipeline/   # Pipeline SVG pays (Natural Earth → Supabase)
 src/departements-pipeline/ # Pipeline SVG départements français
+src/pipeline-shared/      # Helpers partagés entre pipelines (env.ts, supabaseAuth.ts)
 dist-countries/           # Compilé (pipeline pays)
 dist-departements/        # Compilé (pipeline départements)
 dist-supabase/            # Compilé (seeds Supabase)
