@@ -1,101 +1,113 @@
-import { BOX1_TARGET, INTERVAL_DAYS } from './config'
+import { BOX1_TARGET, INTERVAL_DAYS } from "./config";
 
 export type LeitnerSettings = {
-  box1Target: number
-  intervalDays: Record<number, number>
-  learnedReviewIntervalDays: number
-  reverseProbability: number
-}
+  box1Target: number;
+  intervalDays: Record<number, number>;
+  learnedReviewIntervalDays: number;
+  reverseProbability: number;
+};
 
-const STORAGE_KEY = 'leitnerSettings'
-const META_KEY = 'leitnerSettingsMeta'
+const STORAGE_KEY = "leitnerSettings";
+const META_KEY = "leitnerSettingsMeta";
 
 const getDefaultSettings = (): LeitnerSettings => ({
   box1Target: BOX1_TARGET,
   intervalDays: { ...INTERVAL_DAYS },
   learnedReviewIntervalDays: 90,
-  reverseProbability: 0
-})
+  reverseProbability: 0,
+});
 
 const toPositiveInt = (value: unknown): number | null => {
-  const parsed = typeof value === 'string' ? Number.parseInt(value, 10) : Number(value)
+  const parsed =
+    typeof value === "string" ? Number.parseInt(value, 10) : Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) {
-    return null
+    return null;
   }
-  return Math.floor(parsed)
-}
+  return Math.floor(parsed);
+};
+
+const toNonNegativeInt = (value: unknown): number | null => {
+  const parsed =
+    typeof value === "string" ? Number.parseInt(value, 10) : Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return null;
+  }
+  return Math.floor(parsed);
+};
 
 const toClampedProbability = (value: unknown): number | null => {
-  const parsed = typeof value === 'string' ? Number.parseFloat(value) : Number(value)
+  const parsed =
+    typeof value === "string" ? Number.parseFloat(value) : Number(value);
   if (!Number.isFinite(parsed)) {
-    return null
+    return null;
   }
   if (parsed < 0) {
-    return 0
+    return 0;
   }
   if (parsed > 1) {
-    return 1
+    return 1;
   }
-  return parsed
-}
+  return parsed;
+};
 
 export const getLeitnerSettings = (): LeitnerSettings => {
-  if (typeof localStorage === 'undefined') {
-    return getDefaultSettings()
+  if (typeof localStorage === "undefined") {
+    return getDefaultSettings();
   }
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return getDefaultSettings()
+      return getDefaultSettings();
     }
-    const parsed = JSON.parse(raw) as Partial<LeitnerSettings>
-    const box1Target = toPositiveInt(parsed.box1Target) ?? BOX1_TARGET
-    const intervalDays: Record<number, number> = {}
+    const parsed = JSON.parse(raw) as Partial<LeitnerSettings>;
+    const box1Target = toNonNegativeInt(parsed.box1Target) ?? BOX1_TARGET;
+    const intervalDays: Record<number, number> = {};
     for (const box of [1, 2, 3, 4, 5]) {
-      const value = parsed.intervalDays ? parsed.intervalDays[box] : undefined
-      intervalDays[box] = toPositiveInt(value) ?? INTERVAL_DAYS[box]
+      const value = parsed.intervalDays ? parsed.intervalDays[box] : undefined;
+      intervalDays[box] = toPositiveInt(value) ?? INTERVAL_DAYS[box];
     }
     const learnedReviewIntervalDays =
-      toPositiveInt(parsed.learnedReviewIntervalDays) ?? 90
-    const reverseProbability = toClampedProbability(parsed.reverseProbability) ?? 0
+      toPositiveInt(parsed.learnedReviewIntervalDays) ?? 90;
+    const reverseProbability =
+      toClampedProbability(parsed.reverseProbability) ?? 0;
     return {
       box1Target,
       intervalDays,
       learnedReviewIntervalDays,
-      reverseProbability
-    }
+      reverseProbability,
+    };
   } catch {
-    return getDefaultSettings()
+    return getDefaultSettings();
   }
-}
+};
 
 export const getLeitnerSettingsMeta = (): { updated_at: string | null } => {
-  if (typeof localStorage === 'undefined') {
-    return { updated_at: null }
+  if (typeof localStorage === "undefined") {
+    return { updated_at: null };
   }
   try {
-    const raw = localStorage.getItem(META_KEY)
+    const raw = localStorage.getItem(META_KEY);
     if (!raw) {
-      return { updated_at: null }
+      return { updated_at: null };
     }
-    const parsed = JSON.parse(raw) as { updated_at?: string }
-    return { updated_at: parsed.updated_at ?? null }
+    const parsed = JSON.parse(raw) as { updated_at?: string };
+    return { updated_at: parsed.updated_at ?? null };
   } catch {
-    return { updated_at: null }
+    return { updated_at: null };
   }
-}
+};
 
 export const setLeitnerSettingsMeta = (updatedAt: string): void => {
-  if (typeof localStorage === 'undefined') {
-    return
+  if (typeof localStorage === "undefined") {
+    return;
   }
-  localStorage.setItem(META_KEY, JSON.stringify({ updated_at: updatedAt }))
-}
+  localStorage.setItem(META_KEY, JSON.stringify({ updated_at: updatedAt }));
+};
 
 export const saveLeitnerSettings = (settings: LeitnerSettings): void => {
-  if (typeof localStorage === 'undefined') {
-    return
+  if (typeof localStorage === "undefined") {
+    return;
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
-  setLeitnerSettingsMeta(new Date().toISOString())
-}
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  setLeitnerSettingsMeta(new Date().toISOString());
+};

@@ -322,7 +322,7 @@ describe("buildDailySession — edge cases", () => {
       box: 5,
       dueDate: null,
       isLearned: true,
-      learnedAt: "2023-12-01T00:00:00.000Z",
+      learnedAt: "2024-02-01T00:00:00.000Z", // 90-day maintenance due 2024-05-01, not yet
     });
     await addCardWithState({
       front: "Normal due card",
