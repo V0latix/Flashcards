@@ -1,6 +1,6 @@
-import type { SVGProps } from 'react'
+import type { SVGProps } from "react";
 
-type IconProps = SVGProps<SVGSVGElement>
+type IconProps = SVGProps<SVGSVGElement>;
 
 export const HomeIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -9,19 +9,19 @@ export const HomeIcon = (props: IconProps) => (
       fill="currentColor"
     />
   </svg>
-)
+);
 
 export const PlayIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
     <path d="M8 5l11 7-11 7V5z" fill="currentColor" />
   </svg>
-)
+);
 
 export const PlusIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
     <path d="M11 5h2v14h-2zM5 11h14v2H5z" fill="currentColor" />
   </svg>
-)
+);
 
 export const LibraryIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -30,13 +30,16 @@ export const LibraryIcon = (props: IconProps) => (
       fill="currentColor"
     />
   </svg>
-)
+);
 
 export const ChartIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
-    <path d="M4 19h16v2H4zM6 10h3v7H6zM11 6h3v11h-3zM16 12h3v5h-3z" fill="currentColor" />
+    <path
+      d="M4 19h16v2H4zM6 10h3v7H6zM11 6h3v11h-3zM16 12h3v5h-3z"
+      fill="currentColor"
+    />
   </svg>
-)
+);
 
 export const SettingsIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -45,7 +48,16 @@ export const SettingsIcon = (props: IconProps) => (
       fill="currentColor"
     />
   </svg>
-)
+);
+
+export const SearchIcon = (props: IconProps) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+    <path
+      d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+      fill="currentColor"
+    />
+  </svg>
+);
 
 export const UserIcon = (props: IconProps) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -54,4 +66,4 @@ export const UserIcon = (props: IconProps) => (
       fill="currentColor"
     />
   </svg>
-)
+);

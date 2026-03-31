@@ -14,6 +14,7 @@ export function useReviewKeyboard(
   handleReveal: HandleReveal,
   handleAnswer: HandleAnswer,
   onToggleHint: () => void,
+  onUndo?: () => void,
 ) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -45,6 +46,17 @@ export function useReviewKeyboard(
         return;
       }
 
+      if (
+        onUndo &&
+        event.key.toLowerCase() === "z" &&
+        !event.ctrlKey &&
+        !event.metaKey
+      ) {
+        event.preventDefault();
+        onUndo();
+        return;
+      }
+
       if (!showBack) return;
 
       if (event.key === "ArrowLeft") {
@@ -72,6 +84,7 @@ export function useReviewKeyboard(
     isDone,
     isLoading,
     onToggleHint,
+    onUndo,
     showBack,
   ]);
 }

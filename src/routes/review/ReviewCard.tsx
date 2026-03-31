@@ -37,6 +37,8 @@ type Props = {
   setShowHint: React.Dispatch<React.SetStateAction<boolean>>;
   handleDelete: () => void | Promise<void>;
   handleSuspend: () => void | Promise<void>;
+  canUndo: boolean;
+  handleUndo: () => void | Promise<void>;
 };
 
 function ReviewCard({
@@ -63,6 +65,8 @@ function ReviewCard({
   setShowHint,
   handleDelete,
   handleSuspend,
+  canUndo,
+  handleUndo,
 }: Props) {
   const { t } = useI18n();
 
@@ -191,6 +195,16 @@ function ReviewCard({
               aria-keyshortcuts="H"
             >
               {showHint ? t("labels.hideHint") : t("labels.showHint")}
+            </button>
+          ) : null}
+          {canUndo ? (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => void handleUndo()}
+              aria-keyshortcuts="Z"
+            >
+              {t("review.undo")}
             </button>
           ) : null}
           {showBack ? (

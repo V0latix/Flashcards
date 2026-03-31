@@ -10,6 +10,12 @@ export const translations = {
       stats: "Stats",
       settings: "Paramètres",
     },
+    search: {
+      title: "Recherche globale",
+      placeholder: "Chercher une carte…",
+      noResults: "Aucune carte trouvée.",
+      hint: "↑↓ naviguer · Entrée ouvrir · Échap fermer",
+    },
     info: {
       aria: "Aide: flashcards et méthode de Leitner",
       title: "Comment ça marche ?",
@@ -215,6 +221,7 @@ export const translations = {
       confirmDelete: "Supprimer définitivement cette carte ?",
       confirmDeleteYes: "Supprimer",
       confirmDeleteNo: "Annuler",
+      undo: "Annuler la dernière réponse",
     },
     packs: {
       title: "Packs",
@@ -293,6 +300,12 @@ export const translations = {
       library: "Library",
       stats: "Stats",
       settings: "Settings",
+    },
+    search: {
+      title: "Global search",
+      placeholder: "Search a card…",
+      noResults: "No cards found.",
+      hint: "↑↓ navigate · Enter open · Esc close",
     },
     info: {
       aria: "Help: flashcards and Leitner method",
@@ -496,6 +509,7 @@ export const translations = {
       confirmDelete: "Delete this card permanently?",
       confirmDeleteYes: "Delete",
       confirmDeleteNo: "Cancel",
+      undo: "Undo last answer",
     },
     packs: {
       title: "Packs",

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { applyReviewResult } from "../leitner/engine";
+import { applyReviewResult, revertReviewResult } from "../leitner/engine";
+import type { ReviewState } from "../db/types";
 import { useI18n } from "../i18n/useI18n";
 import { useAuth } from "../auth/useAuth";
 import {
@@ -32,6 +33,12 @@ function ReviewSession() {
   const [goodCount, setGoodCount] = useState(0);
   const [badCount, setBadCount] = useState(0);
   const [pendingReviewWrites, setPendingReviewWrites] = useState(0);
+  const [lastAnswer, setLastAnswer] = useState<{
+    cardId: number;
+    previousState: ReviewState;
+    clientEventId: string;
+    result: "good" | "bad";
+  } | null>(null);
 
   const resetSession = useCallback(() => {
     setAnswers({});
@@ -41,6 +48,7 @@ function ReviewSession() {
     setGoodCount(0);
     setBadCount(0);
     setPendingReviewWrites(0);
+    setLastAnswer(null);
   }, []);
 
   const { cards, setCards, sessionCardCount, isLoading } = useSessionLoader(
@@ -72,12 +80,20 @@ function ReviewSession() {
       if (!currentCard) return;
       if (!isTraining) {
         setPendingReviewWrites((prev) => prev + 1);
-        void applyReviewResult(
+        applyReviewResult(
           currentCard.cardId,
           result,
           today,
           currentCard.wasReversed,
         )
+          .then((snapshot) => {
+            setLastAnswer({
+              cardId: currentCard.cardId,
+              previousState: snapshot.previousState,
+              clientEventId: snapshot.clientEventId,
+              result,
+            });
+          })
           .catch((error) => {
             console.error("applyReviewResult failed", error);
           })
@@ -99,6 +115,34 @@ function ReviewSession() {
     [currentCard, isTraining, today],
   );
 
+  const handleUndo = useCallback(async () => {
+    if (!lastAnswer || index === 0) return;
+    if (!isTraining) {
+      await revertReviewResult(
+        lastAnswer.cardId,
+        lastAnswer.previousState,
+        lastAnswer.clientEventId,
+      ).catch((error) => {
+        console.error("revertReviewResult failed", error);
+      });
+      notifyDailyProgressUpdated();
+    }
+    setIndex((prev) => prev - 1);
+    setAnswers((prev) => {
+      const next = { ...prev };
+      delete next[lastAnswer.cardId];
+      return next;
+    });
+    if (lastAnswer.result === "good") {
+      setGoodCount((prev) => Math.max(0, prev - 1));
+    } else {
+      setBadCount((prev) => Math.max(0, prev - 1));
+    }
+    setShowBack(false);
+    setShowHint(false);
+    setLastAnswer(null);
+  }, [index, isTraining, lastAnswer]);
+
   const isDone = !isLoading && index >= cards.length;
   const goodCards = cards.filter((card) => answers[card.cardId] === "good");
   const badCards = cards.filter((card) => answers[card.cardId] === "bad");
@@ -107,6 +151,7 @@ function ReviewSession() {
   const hasHint = Boolean(currentCard?.hint?.trim());
   const progressPercent =
     cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0;
+  const canUndo = index > 0 && lastAnswer !== null && !isTraining;
 
   // Save daily completion when session is done
   useEffect(() => {
@@ -150,6 +195,7 @@ function ReviewSession() {
     handleReveal,
     handleAnswer,
     () => setShowHint((prev) => !prev),
+    canUndo ? handleUndo : undefined,
   );
 
   const { frontMarkdownRef, backMarkdownRef } = useScrollReset(
@@ -196,6 +242,8 @@ function ReviewSession() {
           setShowHint={setShowHint}
           handleDelete={mutation.handleDelete}
           handleSuspend={mutation.handleSuspend}
+          canUndo={canUndo}
+          handleUndo={handleUndo}
         />
       ) : (
         <p>{t("review.empty")}</p>

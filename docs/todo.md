@@ -1,6 +1,6 @@
 # TODO — Flashcards
 
-> Dernière mise à jour : 2026-03-26
+> Dernière mise à jour : 2026-03-31
 
 ---
 
@@ -37,11 +37,11 @@
 
 ### UX
 
-- [ ] **Raccourcis clavier globaux** — navigation entre pages sans souris (actuellement uniquement en session de révision)
-- [ ] **Mode sombre** — thème dark complet (les variables CSS sont déjà en place)
-- [ ] **Barre de progression de session** — visualiser le ratio cartes vues / total en cours de révision
-- [ ] **Annuler la dernière réponse** — bouton "Undo" dans la session de révision
-- [ ] **Recherche globale** — chercher une carte par son contenu depuis n'importe quelle page
+- [x] **Raccourcis clavier globaux** — navigation entre pages sans souris (actuellement uniquement en session de révision)
+- [x] **Mode sombre** — thème dark complet (les variables CSS sont déjà en place)
+- [x] **Barre de progression de session** — visualiser le ratio cartes vues / total en cours de révision
+- [x] **Annuler la dernière réponse** — bouton "Undo" dans la session de révision
+- [x] **Recherche globale** — chercher une carte par son contenu depuis n'importe quelle page
 
 ### Partage & Social
 

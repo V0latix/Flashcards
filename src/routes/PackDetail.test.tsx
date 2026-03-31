@@ -42,8 +42,20 @@ describe("PackDetail", () => {
 
   it("renders cards after successful load", async () => {
     mockListCards.mockResolvedValue([
-      { id: "1", front_md: "Paris", back_md: "France", tags: ["geo"] },
-      { id: "2", front_md: "Berlin", back_md: "Germany", tags: ["geo"] },
+      {
+        id: "1",
+        front_md: "Paris",
+        back_md: "France",
+        tags: ["geo"],
+        pack_slug: "geo",
+      },
+      {
+        id: "2",
+        front_md: "Berlin",
+        back_md: "Germany",
+        tags: ["geo"],
+        pack_slug: "geo",
+      },
     ]);
 
     renderPage();
@@ -66,8 +78,20 @@ describe("PackDetail", () => {
 
   it("filters cards by search query", async () => {
     mockListCards.mockResolvedValue([
-      { id: "1", front_md: "Paris", back_md: "France", tags: [] },
-      { id: "2", front_md: "Berlin", back_md: "Germany", tags: [] },
+      {
+        id: "1",
+        front_md: "Paris",
+        back_md: "France",
+        tags: [],
+        pack_slug: "geo",
+      },
+      {
+        id: "2",
+        front_md: "Berlin",
+        back_md: "Germany",
+        tags: [],
+        pack_slug: "geo",
+      },
     ]);
 
     renderPage();
