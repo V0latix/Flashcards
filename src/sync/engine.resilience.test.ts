@@ -18,7 +18,6 @@ import { runInitialSync, setActiveUser, syncOnce } from "./engine";
 import {
   deleteRemoteCards,
   fetchRemoteSnapshot,
-  insertRemoteReviewLogs,
   upsertRemoteCards,
   upsertRemoteProgress,
 } from "./remoteStore";

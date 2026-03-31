@@ -22,7 +22,7 @@
 
 ### Performance
 
-- [ ] `listPublicCardCountsByPackSlug` pagine toutes les lignes `public_cards` — remplacer par une agrégation SQL/RPC côté Supabase (`src/supabase/api.ts`)
+- [x] `listPublicCardCountsByPackSlug` pagine toutes les lignes `public_cards` — remplacer par une agrégation SQL/RPC côté Supabase (`src/supabase/api.ts`)
 
 ---
 
@@ -53,7 +53,7 @@
 - [ ] **Sync delta** — n'envoyer que les cartes modifiées depuis la dernière sync (actuellement snapshot full O(n))
 - [ ] **Notifications de rappel** (PWA) — rappel quotidien si des cartes sont dues et que l'app n'a pas été ouverte
 - [ ] **Cache des images distantes** — mettre en cache localement les images des packs Supabase pour éviter les re-téléchargements
-- [ ] **Import CSV/TSV** — format simple pour importer des cartes depuis Excel ou Google Sheets
+- [x] **Import CSV/TSV** — format simple pour importer des cartes depuis Excel ou Google Sheets
 
 ---
 
