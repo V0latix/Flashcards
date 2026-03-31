@@ -32,7 +32,7 @@
 
 - [ ] **Génération de cartes par IA** — coller un texte, l'IA propose des paires recto/verso (API Claude ou OpenAI, configurable)
 - [x] **Export/Import Anki** — exporter et importer la collection au format `.apkg` pour interopérabilité
-- [ ] **PWA** — manifest + service worker pour installation sur l'écran d'accueil et cache offline complet
+- [x] **PWA** — manifest + service worker pour installation sur l'écran d'accueil et cache offline complet
 - [x] **Statistiques avancées** — courbe de rétention, heatmap d'activité (style GitHub), distribution boîtes dans le temps
 
 ### UX
