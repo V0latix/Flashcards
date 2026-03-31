@@ -10,6 +10,12 @@ import {
   type ExportMedia,
   type ExportPayload,
 } from "../utils/export";
+import {
+  downloadApkg,
+  exportApkg,
+  importApkg,
+  type AnkiCard,
+} from "../utils/anki";
 
 function ImportExport() {
   const { t } = useI18n();
@@ -92,6 +98,49 @@ function ImportExport() {
 
     downloadJson(payload);
     setStatus(t("importExport.exportDone"));
+  };
+
+  const handleExportAnki = async () => {
+    setStatus(t("importExport.exportAnkiInProgress"));
+    const cards = await db.cards.toArray();
+    const ankiCards: AnkiCard[] = cards.map((card) => ({
+      front: card.front_md,
+      back: card.back_md,
+      tags: card.tags ?? [],
+    }));
+    const blob = await exportApkg(ankiCards);
+    downloadApkg(blob);
+    setStatus(t("importExport.exportAnkiDone"));
+  };
+
+  const handleImportAnki = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const buffer = await file.arrayBuffer();
+      const ankiCards = await importApkg(buffer);
+      if (ankiCards.length === 0) {
+        setStatus(t("importExport.ankiImportEmpty"));
+        return;
+      }
+      await runImport(
+        ankiCards.map((c) => ({
+          front_md: c.front,
+          back_md: c.back,
+          tags: c.tags,
+        })),
+      );
+      setStatus(t("importExport.ankiImportDone", { count: ankiCards.length }));
+    } catch (error) {
+      setStatus(
+        t("importExport.ankiImportError", {
+          message: (error as Error).message,
+        }),
+      );
+    }
+    event.target.value = "";
   };
 
   const parsePayload = (payload: unknown) => {
@@ -443,6 +492,20 @@ function ImportExport() {
             {t("importExport.importSample")}
           </button>
         ) : null}
+      </section>
+      <section>
+        <button type="button" onClick={handleExportAnki}>
+          {t("importExport.exportAnki")}
+        </button>
+      </section>
+      <section>
+        <label htmlFor="import-apkg">{t("importExport.importAnki")}</label>
+        <input
+          id="import-apkg"
+          type="file"
+          accept=".apkg"
+          onChange={handleImportAnki}
+        />
       </section>
       {status ? <p>{status}</p> : null}
       {summary ? (

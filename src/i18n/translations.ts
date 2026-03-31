@@ -241,6 +241,13 @@ export const translations = {
       importCsvTsv: "Importer un fichier CSV/TSV",
       csvUnsupported:
         "Fichier CSV/TSV invalide : colonnes front/back introuvables",
+      exportAnki: "Exporter en Anki (.apkg)",
+      importAnki: "Importer un fichier Anki (.apkg)",
+      exportAnkiInProgress: "Export Anki en cours...",
+      exportAnkiDone: "Export Anki terminé.",
+      ankiImportDone: "Import Anki terminé : {{count}} cartes importées.",
+      ankiImportEmpty: "Aucune carte valide trouvée dans le fichier Anki.",
+      ankiImportError: "Erreur lors de l'import Anki : {{message}}",
     },
     packDetail: {
       title: "Pack",
@@ -500,6 +507,13 @@ export const translations = {
       importError: "Import error: {{message}}",
       importCsvTsv: "Import CSV/TSV file",
       csvUnsupported: "Invalid CSV/TSV file: front/back columns not found",
+      exportAnki: "Export to Anki (.apkg)",
+      importAnki: "Import Anki file (.apkg)",
+      exportAnkiInProgress: "Exporting to Anki...",
+      exportAnkiDone: "Anki export complete.",
+      ankiImportDone: "Anki import complete: {{count}} cards imported.",
+      ankiImportEmpty: "No valid cards found in the Anki file.",
+      ankiImportError: "Error importing Anki file: {{message}}",
     },
     packDetail: {
       title: "Pack",

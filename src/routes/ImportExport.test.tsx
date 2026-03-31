@@ -11,6 +11,11 @@ vi.mock("../utils/export", async (importOriginal) => {
   const original = await importOriginal<typeof import("../utils/export")>();
   return { ...original, downloadJson: vi.fn() };
 });
+vi.mock("../utils/anki", () => ({
+  exportApkg: vi.fn(() => Promise.resolve(new Blob(["apkg"]))),
+  downloadApkg: vi.fn(),
+  importApkg: vi.fn(() => Promise.resolve([])),
+}));
 
 const renderPage = () =>
   render(
@@ -26,7 +31,7 @@ const uploadJson = (payload: unknown) => {
   const file = new File([json], "deck.json", { type: "application/json" });
   // jsdom doesn't implement File.prototype.text() — polyfill it
   Object.defineProperty(file, "text", { value: () => Promise.resolve(json) });
-  const input = screen.getByLabelText(/importer/i);
+  const input = screen.getByLabelText(/importer un pool/i);
   fireEvent.change(input, { target: { files: [file] } });
 };
 
@@ -40,9 +45,9 @@ describe("ImportExport", () => {
     renderPage();
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /exporter/i }),
+      screen.getByRole("button", { name: /exporter le pool/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/importer/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/importer un pool/i)).toBeInTheDocument();
   });
 
   it("imports cards from array format and inserts them into DB", async () => {
@@ -132,7 +137,7 @@ describe("ImportExport", () => {
     Object.defineProperty(file, "text", {
       value: () => Promise.resolve("not-json!!!"),
     });
-    const input = screen.getByLabelText(/importer/i);
+    const input = screen.getByLabelText(/importer un pool/i);
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
@@ -164,7 +169,7 @@ describe("ImportExport", () => {
   it("exports call downloadJson", async () => {
     const { downloadJson } = await import("../utils/export");
     renderPage();
-    fireEvent.click(screen.getByRole("button", { name: /exporter/i }));
+    fireEvent.click(screen.getByRole("button", { name: /exporter le pool/i }));
 
     await waitFor(() => {
       expect(downloadJson).toHaveBeenCalledTimes(1);
