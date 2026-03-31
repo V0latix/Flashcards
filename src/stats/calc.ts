@@ -1,170 +1,180 @@
-import type { Card, ReviewLog, ReviewState } from '../db/types'
-import type { BoxDistribution, DailyReviewAgg, TagAgg } from './types'
-import { addDays, parseDateKey, toDateKey } from '../utils/date'
+import type { Card, ReviewLog, ReviewState } from "../db/types";
+import type {
+  ActivityDay,
+  BoxDistribution,
+  BoxRetentionStat,
+  DailyReviewAgg,
+  TagAgg,
+} from "./types";
+import { addDays, parseDateKey, toDateKey } from "../utils/date";
 
 const getPeriodKeys = (days: number, todayKey: string): string[] => {
-  const keys: string[] = []
-  const todayDate = parseDateKey(todayKey)
+  const keys: string[] = [];
+  const todayDate = parseDateKey(todayKey);
   for (let i = days - 1; i >= 0; i -= 1) {
-    const date = new Date(todayDate)
-    date.setUTCDate(todayDate.getUTCDate() - i)
-    keys.push(toDateKey(date))
+    const date = new Date(todayDate);
+    date.setUTCDate(todayDate.getUTCDate() - i);
+    keys.push(toDateKey(date));
   }
-  return keys
-}
+  return keys;
+};
 
 const buildPrefixes = (tags: string[]): string[] => {
-  const prefixes = new Set<string>()
+  const prefixes = new Set<string>();
   tags.forEach((tag) => {
     const parts = tag
-      .split('/')
+      .split("/")
       .map((part) => part.trim())
-      .filter(Boolean)
+      .filter(Boolean);
     if (parts.length === 0) {
-      return
+      return;
     }
     for (let i = 0; i < parts.length; i += 1) {
-      prefixes.add(parts.slice(0, i + 1).join('/'))
+      prefixes.add(parts.slice(0, i + 1).join("/"));
     }
-  })
-  return Array.from(prefixes)
-}
+  });
+  return Array.from(prefixes);
+};
 
 export type GlobalSummary = {
-  totalCards: number
-  dueToday: number
-  learnedCount: number
-  reviewsToday: number
-  successRate7d: number | null
-}
+  totalCards: number;
+  dueToday: number;
+  learnedCount: number;
+  reviewsToday: number;
+  successRate7d: number | null;
+};
 
 export const calcGlobalSummary = (
   cards: Card[],
   reviewStates: ReviewState[],
   reviewLogs: ReviewLog[],
   todayKey: string,
-  learnedReviewIntervalDays: number
+  learnedReviewIntervalDays: number,
 ): GlobalSummary => {
-  const stateByCard = new Map<number, ReviewState>()
-  reviewStates.forEach((state) => stateByCard.set(state.card_id, state))
+  const stateByCard = new Map<number, ReviewState>();
+  reviewStates.forEach((state) => stateByCard.set(state.card_id, state));
 
-  let dueToday = 0
-  let learnedCount = 0
+  let dueToday = 0;
+  let learnedCount = 0;
   reviewStates.forEach((state) => {
     if (state.is_learned) {
-      learnedCount += 1
+      learnedCount += 1;
       if (state.learned_at) {
-        const learnedDate = toDateKey(new Date(state.learned_at))
-        const learnedDue = addDays(learnedDate, learnedReviewIntervalDays)
+        const learnedDate = toDateKey(new Date(state.learned_at));
+        const learnedDue = addDays(learnedDate, learnedReviewIntervalDays);
         if (learnedDue <= todayKey) {
-          dueToday += 1
+          dueToday += 1;
         }
       }
-      return
+      return;
     }
     if (state.box >= 2 && state.due_date && state.due_date <= todayKey) {
-      dueToday += 1
+      dueToday += 1;
     }
-  })
+  });
 
   const reviewsToday = reviewLogs.filter(
-    (log) => toDateKey(log.timestamp) === todayKey
-  ).length
+    (log) => toDateKey(log.timestamp) === todayKey,
+  ).length;
 
-  const sevenDays = getPeriodKeys(7, todayKey)
-  const recentLogs = reviewLogs.filter((log) => sevenDays.includes(toDateKey(log.timestamp)))
-  const goodLogs = recentLogs.filter((log) => log.result === 'good')
+  const sevenDays = getPeriodKeys(7, todayKey);
+  const recentLogs = reviewLogs.filter((log) =>
+    sevenDays.includes(toDateKey(log.timestamp)),
+  );
+  const goodLogs = recentLogs.filter((log) => log.result === "good");
   const successRate7d =
     recentLogs.length === 0
       ? null
-      : Number((goodLogs.length / recentLogs.length).toFixed(2))
+      : Number((goodLogs.length / recentLogs.length).toFixed(2));
 
   return {
     totalCards: cards.length,
     dueToday,
     learnedCount,
     reviewsToday,
-    successRate7d
-  }
-}
+    successRate7d,
+  };
+};
 
 export const calcDailyReviews = (
   reviewLogs: ReviewLog[],
   days: 7 | 30 | 90,
-  todayKey: string
+  todayKey: string,
 ): DailyReviewAgg[] => {
-  const keys = getPeriodKeys(days, todayKey)
-  const byDay = new Map<string, { good: number; bad: number }>()
-  keys.forEach((key) => byDay.set(key, { good: 0, bad: 0 }))
+  const keys = getPeriodKeys(days, todayKey);
+  const byDay = new Map<string, { good: number; bad: number }>();
+  keys.forEach((key) => byDay.set(key, { good: 0, bad: 0 }));
 
   reviewLogs.forEach((log) => {
-    const key = toDateKey(log.timestamp)
-    const entry = byDay.get(key)
+    const key = toDateKey(log.timestamp);
+    const entry = byDay.get(key);
     if (!entry) {
-      return
+      return;
     }
-    if (log.result === 'good') {
-      entry.good += 1
+    if (log.result === "good") {
+      entry.good += 1;
     } else {
-      entry.bad += 1
+      entry.bad += 1;
     }
-  })
+  });
 
   return keys.map((key) => {
-    const entry = byDay.get(key) ?? { good: 0, bad: 0 }
+    const entry = byDay.get(key) ?? { good: 0, bad: 0 };
     return {
       date: key,
       good: entry.good,
       bad: entry.bad,
-      total: entry.good + entry.bad
-    }
-  })
-}
+      total: entry.good + entry.bad,
+    };
+  });
+};
 
-export const calcBoxDistribution = (reviewStates: ReviewState[]): BoxDistribution => {
-  const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+export const calcBoxDistribution = (
+  reviewStates: ReviewState[],
+): BoxDistribution => {
+  const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
   reviewStates.forEach((state) => {
-    counts[state.box] = (counts[state.box] ?? 0) + 1
-  })
-  const total = Object.values(counts).reduce((sum, value) => sum + value, 0)
-  return { counts, total }
-}
+    counts[state.box] = (counts[state.box] ?? 0) + 1;
+  });
+  const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
+  return { counts, total };
+};
 
 export const calcTagTreeAgg = (
   cards: Card[],
   reviewStates: ReviewState[],
   reviewLogs: ReviewLog[],
   todayKey: string,
-  learnedReviewIntervalDays: number
+  learnedReviewIntervalDays: number,
 ): Record<string, TagAgg> => {
-  const stateByCard = new Map<number, ReviewState>()
-  reviewStates.forEach((state) => stateByCard.set(state.card_id, state))
+  const stateByCard = new Map<number, ReviewState>();
+  reviewStates.forEach((state) => stateByCard.set(state.card_id, state));
 
-  const prefixesByCard = new Map<number, string[]>()
+  const prefixesByCard = new Map<number, string[]>();
   cards.forEach((card) => {
-    const cardId = card.id
+    const cardId = card.id;
     if (!cardId) {
-      return
+      return;
     }
-    prefixesByCard.set(cardId, buildPrefixes(card.tags))
-  })
+    prefixesByCard.set(cardId, buildPrefixes(card.tags));
+  });
 
   const aggMap = new Map<
     string,
     {
-      cardIds: Set<number>
-      boxSum: number
-      dueCount: number
-      learnedCount: number
-      good: number
-      bad: number
+      cardIds: Set<number>;
+      boxSum: number;
+      dueCount: number;
+      learnedCount: number;
+      good: number;
+      bad: number;
     }
-  >()
+  >();
 
   const ensureAgg = (path: string) => {
-    const existing = aggMap.get(path)
+    const existing = aggMap.get(path);
     if (existing) {
-      return existing
+      return existing;
     }
     const created = {
       cardIds: new Set<number>(),
@@ -172,70 +182,157 @@ export const calcTagTreeAgg = (
       dueCount: 0,
       learnedCount: 0,
       good: 0,
-      bad: 0
-    }
-    aggMap.set(path, created)
-    return created
-  }
+      bad: 0,
+    };
+    aggMap.set(path, created);
+    return created;
+  };
 
   cards.forEach((card) => {
-    const cardId = card.id
+    const cardId = card.id;
     if (!cardId) {
-      return
+      return;
     }
-    const prefixes = prefixesByCard.get(cardId) ?? []
-    const state = stateByCard.get(cardId)
-    const box = state?.box ?? 0
-    const isLearned = Boolean(state?.is_learned)
-    let isDue = false
+    const prefixes = prefixesByCard.get(cardId) ?? [];
+    const state = stateByCard.get(cardId);
+    const box = state?.box ?? 0;
+    const isLearned = Boolean(state?.is_learned);
+    let isDue = false;
     if (state) {
       if (isLearned && state.learned_at) {
-        const learnedDate = toDateKey(new Date(state.learned_at))
-        const learnedDue = addDays(learnedDate, learnedReviewIntervalDays)
-        isDue = learnedDue <= todayKey
-      } else if (state.box >= 2 && state.due_date && state.due_date <= todayKey) {
-        isDue = true
+        const learnedDate = toDateKey(new Date(state.learned_at));
+        const learnedDue = addDays(learnedDate, learnedReviewIntervalDays);
+        isDue = learnedDue <= todayKey;
+      } else if (
+        state.box >= 2 &&
+        state.due_date &&
+        state.due_date <= todayKey
+      ) {
+        isDue = true;
       }
     }
     prefixes.forEach((prefix) => {
-      const agg = ensureAgg(prefix)
+      const agg = ensureAgg(prefix);
       if (!agg.cardIds.has(cardId)) {
-        agg.cardIds.add(cardId)
-        agg.boxSum += box
+        agg.cardIds.add(cardId);
+        agg.boxSum += box;
         if (isDue) {
-          agg.dueCount += 1
+          agg.dueCount += 1;
         }
         if (isLearned) {
-          agg.learnedCount += 1
+          agg.learnedCount += 1;
         }
       }
-    })
-  })
+    });
+  });
 
   reviewLogs.forEach((log) => {
-    const prefixes = prefixesByCard.get(log.card_id) ?? []
+    const prefixes = prefixesByCard.get(log.card_id) ?? [];
     prefixes.forEach((prefix) => {
-      const agg = ensureAgg(prefix)
-      if (log.result === 'good') {
-        agg.good += 1
+      const agg = ensureAgg(prefix);
+      if (log.result === "good") {
+        agg.good += 1;
       } else {
-        agg.bad += 1
+        agg.bad += 1;
       }
-    })
-  })
+    });
+  });
 
-  const result: Record<string, TagAgg> = {}
+  const result: Record<string, TagAgg> = {};
   aggMap.forEach((agg, tagPath) => {
-    const reviewsTotal = agg.good + agg.bad
+    const reviewsTotal = agg.good + agg.bad;
     result[tagPath] = {
       tagPath,
       cardsCount: agg.cardIds.size,
       dueCount: agg.dueCount,
-      successRate: reviewsTotal === 0 ? null : Number((agg.good / reviewsTotal).toFixed(2)),
-      avgBox: agg.cardIds.size === 0 ? 0 : Number((agg.boxSum / agg.cardIds.size).toFixed(2)),
-      learnedCount: agg.learnedCount
-    }
-  })
+      successRate:
+        reviewsTotal === 0
+          ? null
+          : Number((agg.good / reviewsTotal).toFixed(2)),
+      avgBox:
+        agg.cardIds.size === 0
+          ? 0
+          : Number((agg.boxSum / agg.cardIds.size).toFixed(2)),
+      learnedCount: agg.learnedCount,
+    };
+  });
 
-  return result
-}
+  return result;
+};
+
+// ---------------------------------------------------------------------------
+// Activity Heatmap
+// ---------------------------------------------------------------------------
+
+const HEATMAP_DAYS = 365;
+
+const getActivityLevel = (count: number): 0 | 1 | 2 | 3 | 4 => {
+  if (count === 0) return 0;
+  if (count <= 3) return 1;
+  if (count <= 7) return 2;
+  if (count <= 14) return 3;
+  return 4;
+};
+
+/**
+ * Build a 365-day activity array for the GitHub-style heatmap.
+ * The last entry is `todayKey`; the first entry is 364 days earlier.
+ */
+export const calcActivityHeatmap = (
+  reviewLogs: ReviewLog[],
+  todayKey: string,
+): ActivityDay[] => {
+  const keys = getPeriodKeys(HEATMAP_DAYS, todayKey);
+  const countByDay = new Map<string, number>();
+  keys.forEach((k) => countByDay.set(k, 0));
+
+  reviewLogs.forEach((log) => {
+    const key = toDateKey(log.timestamp);
+    const prev = countByDay.get(key);
+    if (prev !== undefined) {
+      countByDay.set(key, prev + 1);
+    }
+  });
+
+  return keys.map((date) => {
+    const count = countByDay.get(date) ?? 0;
+    return { date, count, level: getActivityLevel(count) };
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Retention by Leitner Box
+// ---------------------------------------------------------------------------
+
+/**
+ * For each Leitner box, compute the success rate of reviews that originated
+ * from that box (using `previous_box` from review logs).
+ * Returns one entry per box 0–5, sorted ascending.
+ */
+export const calcRetentionByBox = (
+  reviewLogs: ReviewLog[],
+): BoxRetentionStat[] => {
+  const byBox = new Map<number, { good: number; total: number }>();
+  for (let box = 0; box <= 5; box += 1) {
+    byBox.set(box, { good: 0, total: 0 });
+  }
+
+  reviewLogs.forEach((log) => {
+    const box = log.previous_box ?? 0;
+    const entry = byBox.get(box) ?? { good: 0, total: 0 };
+    entry.total += 1;
+    if (log.result === "good") {
+      entry.good += 1;
+    }
+    byBox.set(box, entry);
+  });
+
+  return Array.from(byBox.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([box, { good, total }]) => ({
+      box,
+      totalReviews: total,
+      goodCount: good,
+      successRate: total === 0 ? null : Number((good / total).toFixed(2)),
+    }));
+};

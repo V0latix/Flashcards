@@ -174,6 +174,21 @@ export const translations = {
       reviewTag: "Réviser ce tag",
       boxDistribution: "Distribution des boîtes",
       weakTags: "Tags à renforcer",
+      heatmapTitle: "Activité (365 jours)",
+      heatmapSummary: "{{total}} révisions sur {{days}} jours actifs.",
+      heatmapLess: "Moins",
+      heatmapMore: "Plus",
+      reviewsUnit: "révisions",
+      dow: {
+        mon: "L",
+        wed: "M",
+        fri: "V",
+      },
+      retentionTitle: "Rétention par boîte",
+      retentionSubtitle:
+        "Taux de réussite des révisions, selon la boîte de départ.",
+      retentionHint:
+        "Un taux élevé en boîte 1 signifie que les nouvelles cartes sont bien acquises rapidement.",
     },
     markdown: {
       imageAlt: "Image",
@@ -441,6 +456,20 @@ export const translations = {
       reviewTag: "Review this tag",
       boxDistribution: "Box distribution",
       weakTags: "Weak tags",
+      heatmapTitle: "Activity (365 days)",
+      heatmapSummary: "{{total}} reviews across {{days}} active days.",
+      heatmapLess: "Less",
+      heatmapMore: "More",
+      reviewsUnit: "reviews",
+      dow: {
+        mon: "M",
+        wed: "W",
+        fri: "F",
+      },
+      retentionTitle: "Retention by box",
+      retentionSubtitle: "Success rate of reviews, by starting box.",
+      retentionHint:
+        "A high rate in box 1 means new cards are mastered quickly.",
     },
     markdown: {
       imageAlt: "Image",
