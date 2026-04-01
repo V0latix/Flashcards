@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { TagAgg } from "../stats/types";
 import { useStats } from "../stats/hooks";
 import { useI18n } from "../i18n/useI18n";
+import { saveTrainingQueue } from "../utils/training";
 import ActivityHeatmap from "./stats/ActivityHeatmap";
 import RetentionChart from "./stats/RetentionChart";
 
@@ -95,12 +96,6 @@ const Chart = ({
               </div>
             ))}
           </div>
-          <p>
-            {t("stats.chartLegend", {
-              good: t("review.good").toLowerCase(),
-              bad: t("review.bad").toLowerCase(),
-            })}
-          </p>
         </>
       )}
     </div>
@@ -109,6 +104,7 @@ const Chart = ({
 
 function StatsPage() {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [periodDays, setPeriodDays] = useState<7 | 30 | 90>(7);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -117,6 +113,21 @@ function StatsPage() {
   >({});
   const stats = useStats(periodDays);
   const minReviewsForWeakTag = 10;
+
+  const handleReviewTag = (tagPath: string) => {
+    const cardIds = stats.cards
+      .filter(
+        (card) =>
+          card.id !== undefined &&
+          card.tags.some(
+            (tag) => tag === tagPath || tag.startsWith(`${tagPath}/`),
+          ),
+      )
+      .map((card) => card.id as number);
+    if (cardIds.length === 0) return;
+    saveTrainingQueue(cardIds);
+    navigate("/review?mode=training");
+  };
 
   const tagTree = useMemo(() => buildTagTree(stats.tagAgg), [stats.tagAgg]);
 
@@ -456,12 +467,13 @@ function StatsPage() {
                       ? t("status.none")
                       : `${Math.round(tag.successRate * 100)}%`}
                   </p>
-                  <Link
-                    to={`/review?tag=${encodeURIComponent(tag.tagPath)}`}
+                  <button
+                    type="button"
                     className="btn btn-primary"
+                    onClick={() => handleReviewTag(tag.tagPath)}
                   >
                     {t("stats.reviewTag")}
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
