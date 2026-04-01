@@ -7,6 +7,7 @@ import { useAuth } from "../auth/useAuth";
 import {
   getTodayKey,
   notifyDailyProgressUpdated,
+  notifyDailyStatusUpdated,
   reconcileDailyStatus,
 } from "../streak/dailyStatus";
 import { useReviewFilters } from "./review/useReviewFilters";
@@ -171,6 +172,7 @@ function ReviewSession() {
         const didReconcile = await reconcileDailyStatus(user.id, today);
         if (cancelled || !didReconcile) return;
         completedSaveKey.current = saveKey;
+        notifyDailyStatusUpdated();
       } catch (error) {
         if (cancelled) return;
         console.error(

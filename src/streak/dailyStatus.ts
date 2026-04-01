@@ -21,6 +21,10 @@ const dispatchBrowserEvent = (name: string) => {
   window.dispatchEvent(new Event(name))
 }
 
+export const notifyDailyStatusUpdated = () => {
+  dispatchBrowserEvent(DAILY_STATUS_UPDATED_EVENT)
+}
+
 export const reconcileDailyStatus = async (userId: string, day: string): Promise<boolean> => {
   const hasPendingCards = await hasPendingDailyCards(day)
   if (hasPendingCards) {
@@ -49,7 +53,6 @@ export const reconcileDailyStatus = async (userId: string, day: string): Promise
     throw new Error(error.message)
   }
 
-  dispatchBrowserEvent(DAILY_STATUS_UPDATED_EVENT)
   return true
 }
 
