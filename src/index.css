@@ -74,6 +74,10 @@ body {
   background-color: #f7f7f5;
 }
 
+:root[data-theme="dark"] .card {
+  background: var(--surface);
+}
+
 :root[data-theme="dark"] body {
   background-color: #0d0d0b;
   color: var(--text);
@@ -107,7 +111,8 @@ h3 {
 
 h1 {
   font-size: 2.2rem;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
 h2 {
@@ -135,7 +140,7 @@ ul {
   top: 0;
   z-index: 10;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
 }
 
 :root[data-theme="dark"] .app-header {
@@ -569,8 +574,8 @@ ul {
 }
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #fff;
+  border: 2px solid var(--border);
   border-radius: 0;
   padding: 18px;
   box-shadow: var(--shadow);
@@ -610,11 +615,11 @@ ul {
 
 .btn {
   border-radius: 0;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   padding: 10px 16px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
   cursor: pointer;
   transition:
     background 0.1s ease,
@@ -639,8 +644,9 @@ ul {
 }
 
 .btn-secondary:hover {
-  background: var(--surface-muted);
-  border-color: var(--primary);
+  background: var(--border);
+  color: #fff;
+  border-color: var(--border);
 }
 
 .btn-danger {
@@ -657,7 +663,7 @@ ul {
 .input,
 .textarea {
   width: 100%;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 0;
   padding: 10px 12px;
   font-size: 0.95rem;
