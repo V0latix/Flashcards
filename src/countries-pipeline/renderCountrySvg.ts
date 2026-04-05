@@ -393,9 +393,17 @@ function perIslandRingsSvg(
     const rx = Math.max(MIN_RING_R, w / 2 + ISLAND_PAD);
     const ry = Math.max(MIN_RING_R, h / 2 + ISLAND_PAD);
 
+    const cxs = cx.toFixed(1);
+    const cys = cy.toFixed(1);
+    const rxs = rx.toFixed(1);
+    const rys = ry.toFixed(1);
+    // White halo underneath for contrast against any background color.
     rings.push(
-      `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" ` +
-        `fill="none" stroke="#F97316" stroke-width="2.5" opacity="0.9"/>`,
+      `<ellipse cx="${cxs}" cy="${cys}" rx="${rxs}" ry="${rys}" fill="none" stroke="white" stroke-width="5.5" opacity="0.6"/>`,
+    );
+    // Orange ring on top.
+    rings.push(
+      `<ellipse cx="${cxs}" cy="${cys}" rx="${rxs}" ry="${rys}" fill="#F97316" fill-opacity="0.08" stroke="#F97316" stroke-width="3.5" opacity="1"/>`,
     );
   }
 
