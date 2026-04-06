@@ -1,10 +1,25 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useAuth } from "../auth/useAuth";
 import { I18nProvider } from "../i18n/I18nProvider";
+import {
+  notifyDailyStatusUpdated,
+  reconcileDailyStatus,
+} from "../streak/dailyStatus";
 import StatsPage from "./StatsPage";
 
 vi.mock("../stats/hooks", () => ({ useStats: vi.fn() }));
+vi.mock("../auth/useAuth", () => ({ useAuth: vi.fn() }));
+vi.mock("../streak/dailyStatus", () => ({
+  getTodayKey: () => "2026-04-05",
+  reconcileDailyStatus: vi.fn(),
+  notifyDailyStatusUpdated: vi.fn(),
+}));
+
+const mockUseAuth = vi.mocked(useAuth);
+const mockReconcileDailyStatus = vi.mocked(reconcileDailyStatus);
+const mockNotifyDailyStatusUpdated = vi.mocked(notifyDailyStatusUpdated);
 
 const emptyStats = {
   isLoading: false,
@@ -38,6 +53,15 @@ const renderPage = () =>
 describe("StatsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({
+      user: { id: "user-1" } as never,
+      session: null,
+      loading: false,
+      signInWithProvider: vi.fn(),
+      signInWithEmail: vi.fn(),
+      signOut: vi.fn(),
+    });
+    mockReconcileDailyStatus.mockResolvedValue(false);
   });
 
   it("renders while loading", async () => {
@@ -133,5 +157,27 @@ describe("StatsPage", () => {
     await waitFor(() => {
       expect(screen.getByText("geo")).toBeInTheDocument();
     });
+  });
+
+  it("tries to reconcile daily status when stats show reviews today", async () => {
+    const { useStats } = vi.mocked(await import("../stats/hooks"));
+    mockReconcileDailyStatus.mockResolvedValue(true);
+    useStats.mockReturnValue({
+      ...emptyStats,
+      global: {
+        ...emptyStats.global,
+        reviewsToday: 12,
+      },
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(mockReconcileDailyStatus).toHaveBeenCalledWith(
+        "user-1",
+        "2026-04-05",
+      );
+    });
+    expect(mockNotifyDailyStatusUpdated).toHaveBeenCalled();
   });
 });

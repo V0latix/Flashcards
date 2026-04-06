@@ -1,8 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
 import type { TagAgg } from "../stats/types";
 import { useStats } from "../stats/hooks";
 import { useI18n } from "../i18n/useI18n";
+import {
+  getTodayKey,
+  notifyDailyStatusUpdated,
+  reconcileDailyStatus,
+} from "../streak/dailyStatus";
 import { saveTrainingQueue } from "../utils/training";
 import ActivityHeatmap from "./stats/ActivityHeatmap";
 import RetentionChart from "./stats/RetentionChart";
@@ -104,7 +110,9 @@ const Chart = ({
 
 function StatsPage() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const reconciledKeyRef = useRef<string | null>(null);
   const [periodDays, setPeriodDays] = useState<7 | 30 | 90>(7);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -113,6 +121,44 @@ function StatsPage() {
   >({});
   const stats = useStats(periodDays);
   const minReviewsForWeakTag = 10;
+
+  useEffect(() => {
+    if (stats.isLoading || stats.error || !user || stats.global.reviewsToday === 0) {
+      return;
+    }
+
+    const today = getTodayKey();
+    const reconcileKey = `${user.id}:${today}`;
+    if (reconciledKeyRef.current === reconcileKey) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const reconcile = async () => {
+      try {
+        const didReconcile = await reconcileDailyStatus(user.id, today);
+        if (cancelled || !didReconcile) {
+          return;
+        }
+        reconciledKeyRef.current = reconcileKey;
+        notifyDailyStatusUpdated();
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        console.error(
+          "stats daily_cards_status reconcile failed",
+          (error as Error).message,
+        );
+      }
+    };
+
+    void reconcile();
+    return () => {
+      cancelled = true;
+    };
+  }, [stats.error, stats.global.reviewsToday, stats.isLoading, user]);
 
   const handleReviewTag = (tagPath: string) => {
     const cardIds = stats.cards
