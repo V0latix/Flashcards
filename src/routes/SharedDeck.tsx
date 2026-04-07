@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchSharedDeck, type SharedDeck } from "../supabase/sharedDecks";
+import {
+  fetchSharedDeck,
+  type SharedDeck as SharedDeckData,
+} from "../supabase/sharedDecks";
 import db from "../db";
 import { markLocalChange } from "../sync/queue";
 import { useI18n } from "../i18n/useI18n";
@@ -8,7 +11,7 @@ import { useI18n } from "../i18n/useI18n";
 function SharedDeck() {
   const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
-  const [deck, setDeck] = useState<SharedDeck | null>(null);
+  const [deck, setDeck] = useState<SharedDeckData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [importDone, setImportDone] = useState(false);
