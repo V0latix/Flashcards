@@ -1631,3 +1631,58 @@ ul {
   text-align: right;
   margin: 0;
 }
+
+/* ── Share deck modal ───────────────────────────── */
+.share-modal {
+  max-width: 480px;
+}
+
+.share-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.share-modal-header h3 {
+  margin: 0;
+}
+
+.share-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted, var(--muted));
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.share-modal-close:hover {
+  background: var(--color-surface-raised, var(--border));
+}
+
+.share-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-link-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.share-modal-success {
+  color: var(--color-success, #22c55e);
+  font-weight: 500;
+  margin: 0;
+}
+
+.share-modal-error {
+  color: var(--color-danger, #ef4444);
+  font-size: 0.9rem;
+  margin: 0;
+}
