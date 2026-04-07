@@ -534,7 +534,6 @@ function renderAtlas(
   );
   const isPacificIsland = PACIFIC_ISLAND_ISO2.has(target.iso2);
   const isAfricaIsland = AFRICA_ISLAND_ISO2.has(target.iso2);
-  const isCaribbean = CARIBBEAN_ISLAND_ISO2.has(target.iso2);
   const isNorthAmericaIsland = NORTH_AMERICA_ISLAND_ISO2.has(target.iso2);
   const isIndianOceanIsland = INDIAN_OCEAN_ISLAND_ISO2.has(target.iso2);
   if (
