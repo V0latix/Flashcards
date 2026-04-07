@@ -45,14 +45,13 @@
 
 ### Partage & Social
 
-- [ ] **Partage de decks** — générer un lien de partage d'une collection de cartes (lecture seule)
-- [ ] **Mode challenge** — session chronométrée avec score, pour un usage compétitif ou de révision intensive
+- [x] **Partage de decks** — générer un lien de partage d'une collection de cartes (lecture seule) et qui ouvre dirrectement l'appli web
 
 ### Technique
 
-- [ ] **Sync delta** — n'envoyer que les cartes modifiées depuis la dernière sync (actuellement snapshot full O(n))
-- [ ] **Notifications de rappel** (PWA) — rappel quotidien si des cartes sont dues et que l'app n'a pas été ouverte
-- [ ] **Cache des images distantes** — mettre en cache localement les images des packs Supabase pour éviter les re-téléchargements
+- [x] **Sync delta** — n'envoyer que les cartes modifiées depuis la dernière sync (actuellement snapshot full O(n))
+- [x] **Notifications de rappel** (PWA) — rappel quotidien si des cartes sont dues et que l'app n'a pas été ouverte
+- [x] **Cache des images distantes** — mettre en cache localement les images des packs Supabase pour éviter les re-téléchargements
 - [x] **Import CSV/TSV** — format simple pour importer des cartes depuis Excel ou Google Sheets
 
 ---

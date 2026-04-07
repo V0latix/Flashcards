@@ -1,103 +1,129 @@
-import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import ConfirmDialog from '../components/ConfirmDialog'
-import { deleteAllCards } from '../db/queries'
-import { getLeitnerSettings, saveLeitnerSettings } from '../leitner/settings'
-import { markLocalChange } from '../sync/queue'
-import { getStoredTheme, setTheme, type ThemeMode } from '../theme'
-import { useI18n } from '../i18n/useI18n'
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { deleteAllCards } from "../db/queries";
+import { getLeitnerSettings, saveLeitnerSettings } from "../leitner/settings";
+import {
+  getPermission,
+  isNotificationsEnabled,
+  isNotificationsSupported,
+  requestPermission,
+  setNotificationsEnabled,
+} from "../notifications/service";
+import { markLocalChange } from "../sync/queue";
+import { getStoredTheme, setTheme, type ThemeMode } from "../theme";
+import { useI18n } from "../i18n/useI18n";
 
 function Settings() {
-  const { t, language, setLanguage } = useI18n()
-  const deleteConfirmToken = t('settings.confirmDeleteToken')
-  const defaultBox1Target = 10
+  const { t, language, setLanguage } = useI18n();
+  const deleteConfirmToken = t("settings.confirmDeleteToken");
+  const defaultBox1Target = 10;
   const defaultIntervals = {
     1: 1,
     2: 3,
     3: 7,
     4: 15,
-    5: 30
-  }
-  const defaultLearnedInterval = 90
-  const minLearnedInterval = 7
-  const maxLearnedInterval = 3650
+    5: 30,
+  };
+  const defaultLearnedInterval = 90;
+  const minLearnedInterval = 7;
+  const maxLearnedInterval = 3650;
 
-  const initialSettings = useMemo(() => getLeitnerSettings(), [])
-  const [box1Target, setBox1Target] = useState(initialSettings.box1Target)
+  const initialSettings = useMemo(() => getLeitnerSettings(), []);
+  const [box1Target, setBox1Target] = useState(initialSettings.box1Target);
   const [intervals, setIntervals] = useState<Record<number, number>>({
-    ...initialSettings.intervalDays
-  })
+    ...initialSettings.intervalDays,
+  });
   const [learnedReviewIntervalDays, setLearnedReviewIntervalDays] = useState(
-    initialSettings.learnedReviewIntervalDays
-  )
+    initialSettings.learnedReviewIntervalDays,
+  );
   const [reverseProbability, setReverseProbability] = useState(
-    initialSettings.reverseProbability
-  )
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getStoredTheme())
-  const [status, setStatus] = useState<string | null>(null)
-  const [dangerOpen, setDangerOpen] = useState(false)
-  const [dangerText, setDangerText] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
-  const navigate = useNavigate()
-  const isDeleteConfirmed = dangerText === deleteConfirmToken
+    initialSettings.reverseProbability,
+  );
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getStoredTheme());
+  const [status, setStatus] = useState<string | null>(null);
+  const [dangerOpen, setDangerOpen] = useState(false);
+  const [dangerText, setDangerText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(() =>
+    isNotificationsEnabled(),
+  );
+  const [notifStatus, setNotifStatus] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const isDeleteConfirmed = dangerText === deleteConfirmToken;
+
+  const handleToggleNotifications = async (enabled: boolean) => {
+    if (enabled && getPermission() !== "granted") {
+      const perm = await requestPermission();
+      if (perm !== "granted") {
+        setNotifStatus(t("notifications.permissionDenied"));
+        return;
+      }
+    }
+    setNotificationsEnabled(enabled);
+    setNotifEnabled(enabled);
+    setNotifStatus(enabled ? t("notifications.permissionGranted") : null);
+  };
 
   const handleSave = (event: React.FormEvent) => {
-    event.preventDefault()
+    event.preventDefault();
     const values = [
       box1Target,
       intervals[1],
       intervals[2],
       intervals[3],
       intervals[4],
-      intervals[5]
-    ]
+      intervals[5],
+    ];
     if (values.some((value) => !Number.isFinite(value) || value <= 0)) {
-      setStatus(t('settings.positiveNumbers'))
-      return
+      setStatus(t("settings.positiveNumbers"));
+      return;
     }
     if (
       learnedReviewIntervalDays < minLearnedInterval ||
       learnedReviewIntervalDays > maxLearnedInterval
     ) {
       setStatus(
-        t('settings.learnedIntervalBounds', {
+        t("settings.learnedIntervalBounds", {
           min: minLearnedInterval,
-          max: maxLearnedInterval
-        })
-      )
-      return
+          max: maxLearnedInterval,
+        }),
+      );
+      return;
     }
     saveLeitnerSettings({
       box1Target,
       intervalDays: { ...intervals },
       learnedReviewIntervalDays,
-      reverseProbability
-    })
-    markLocalChange()
-    setStatus(t('settings.saved'))
-  }
+      reverseProbability,
+    });
+    markLocalChange();
+    setStatus(t("settings.saved"));
+  };
 
   return (
     <main className="container page">
       <div className="page-header">
-        <h1>{t('settings.title')}</h1>
-        <p>{t('settings.subtitle')}</p>
+        <h1>{t("settings.title")}</h1>
+        <p>{t("settings.subtitle")}</p>
       </div>
       <section className="card section">
-        <h2>{t('labels.appearance')}</h2>
+        <h2>{t("labels.appearance")}</h2>
         <div className="section">
           <label className="theme-toggle" htmlFor="theme-toggle">
-            <span>{t('labels.darkMode')}</span>
+            <span>{t("labels.darkMode")}</span>
             <span className="theme-switch">
               <input
                 id="theme-toggle"
                 type="checkbox"
                 className="theme-input"
-                checked={themeMode === 'dark'}
+                checked={themeMode === "dark"}
                 onChange={(event) => {
-                  const nextTheme: ThemeMode = event.target.checked ? 'dark' : 'light'
-                  setThemeMode(nextTheme)
-                  setTheme(nextTheme)
+                  const nextTheme: ThemeMode = event.target.checked
+                    ? "dark"
+                    : "light";
+                  setThemeMode(nextTheme);
+                  setTheme(nextTheme);
                 }}
               />
               <span className="theme-track" aria-hidden="true">
@@ -113,22 +139,50 @@ function Settings() {
           </label>
         </div>
         <div className="section">
-          <label htmlFor="language-select">{t('labels.language')}</label>
+          <label htmlFor="language-select">{t("labels.language")}</label>
           <select
             id="language-select"
             className="input"
             value={language}
-            onChange={(event) => setLanguage(event.target.value === 'en' ? 'en' : 'fr')}
+            onChange={(event) =>
+              setLanguage(event.target.value === "en" ? "en" : "fr")
+            }
           >
             <option value="fr">Français</option>
             <option value="en">English</option>
           </select>
         </div>
       </section>
+      {isNotificationsSupported() ? (
+        <section className="card section">
+          <h2>{t("notifications.title")}</h2>
+          <p>{t("notifications.subtitle")}</p>
+          <div className="section">
+            <label className="theme-toggle" htmlFor="notif-toggle">
+              <span>{t("notifications.enable")}</span>
+              <span className="theme-switch">
+                <input
+                  id="notif-toggle"
+                  type="checkbox"
+                  className="theme-input"
+                  checked={notifEnabled}
+                  onChange={(event) =>
+                    void handleToggleNotifications(event.target.checked)
+                  }
+                />
+                <span className="theme-track" aria-hidden="true">
+                  <span className="theme-thumb" />
+                </span>
+              </span>
+            </label>
+          </div>
+          {notifStatus ? <p>{notifStatus}</p> : null}
+        </section>
+      ) : null}
       <form className="card section" onSubmit={handleSave}>
-        <h2>{t('settings.review')}</h2>
+        <h2>{t("settings.review")}</h2>
         <div className="section">
-          <label htmlFor="box1Target">{t('settings.box1Target')}</label>
+          <label htmlFor="box1Target">{t("settings.box1Target")}</label>
           <input
             id="box1Target"
             type="number"
@@ -139,11 +193,11 @@ function Settings() {
           />
         </div>
         <div className="section">
-          <h2>{t('labels.intervals')}</h2>
+          <h2>{t("labels.intervals")}</h2>
           {[1, 2, 3, 4, 5].map((box) => (
             <div key={box} className="section">
               <label htmlFor={`interval-${box}`}>
-                {t('labels.box')} {box}
+                {t("labels.box")} {box}
               </label>
               <input
                 id={`interval-${box}`}
@@ -154,7 +208,7 @@ function Settings() {
                 onChange={(event) =>
                   setIntervals((prev) => ({
                     ...prev,
-                    [box]: Number(event.target.value)
+                    [box]: Number(event.target.value),
                   }))
                 }
               />
@@ -162,7 +216,9 @@ function Settings() {
           ))}
         </div>
         <div className="section">
-          <label htmlFor="learnedReviewIntervalDays">{t('labels.learnedReview')}</label>
+          <label htmlFor="learnedReviewIntervalDays">
+            {t("labels.learnedReview")}
+          </label>
           <input
             id="learnedReviewIntervalDays"
             type="number"
@@ -170,12 +226,14 @@ function Settings() {
             max={maxLearnedInterval}
             value={learnedReviewIntervalDays}
             className="input"
-            onChange={(event) => setLearnedReviewIntervalDays(Number(event.target.value))}
+            onChange={(event) =>
+              setLearnedReviewIntervalDays(Number(event.target.value))
+            }
           />
-          <p>{t('settings.learnedIntervalHelp')}</p>
+          <p>{t("settings.learnedIntervalHelp")}</p>
         </div>
         <div className="section">
-          <label htmlFor="reverseProbability">{t('labels.reverseQA')}</label>
+          <label htmlFor="reverseProbability">{t("labels.reverseQA")}</label>
           <input
             id="reverseProbability"
             type="range"
@@ -183,63 +241,69 @@ function Settings() {
             max={100}
             value={Math.round(reverseProbability * 100)}
             className="input"
-            onChange={(event) => setReverseProbability(Number(event.target.value) / 100)}
+            onChange={(event) =>
+              setReverseProbability(Number(event.target.value) / 100)
+            }
           />
           <p>{Math.round(reverseProbability * 100)}%</p>
         </div>
         <button type="submit" className="btn btn-primary">
-          {t('actions.save')}
+          {t("actions.save")}
         </button>
         <button
           type="button"
           className="btn btn-secondary"
           onClick={() => {
-            setBox1Target(defaultBox1Target)
-            setIntervals({ ...defaultIntervals })
-            setLearnedReviewIntervalDays(defaultLearnedInterval)
-            setReverseProbability(0)
-            setStatus(t('settings.defaultRestored'))
-            markLocalChange()
+            setBox1Target(defaultBox1Target);
+            setIntervals({ ...defaultIntervals });
+            setLearnedReviewIntervalDays(defaultLearnedInterval);
+            setReverseProbability(0);
+            setStatus(t("settings.defaultRestored"));
+            markLocalChange();
           }}
         >
-          {t('actions.restoreDefaults')}
+          {t("actions.restoreDefaults")}
         </button>
         {status ? <p>{status}</p> : null}
       </form>
       <section className="card section">
-        <h2>{t('settings.dangerZone')}</h2>
-        <p>{t('settings.dangerDesc')}</p>
-        <button type="button" className="btn btn-danger" onClick={() => setDangerOpen(true)}>
-          {t('settings.deleteAll')}
+        <h2>{t("settings.dangerZone")}</h2>
+        <p>{t("settings.dangerDesc")}</p>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={() => setDangerOpen(true)}
+        >
+          {t("settings.deleteAll")}
         </button>
       </section>
       <ConfirmDialog
         open={dangerOpen}
-        title={t('settings.deleteAllTitle')}
-        message={t('settings.deleteAllMessage')}
-        confirmLabel={t('actions.delete')}
+        title={t("settings.deleteAllTitle")}
+        message={t("settings.deleteAllMessage")}
+        confirmLabel={t("actions.delete")}
         onConfirm={async () => {
           if (isDeleting || !isDeleteConfirmed) {
-            return
+            return;
           }
-          setIsDeleting(true)
-          await deleteAllCards()
-          setStatus(t('settings.deletedDone'))
-          setIsDeleting(false)
-          setDangerOpen(false)
-          setDangerText('')
-          setTimeout(() => navigate('/'), 300)
+          setIsDeleting(true);
+          await deleteAllCards();
+          setStatus(t("settings.deletedDone"));
+          setIsDeleting(false);
+          setDangerOpen(false);
+          setDangerText("");
+          setTimeout(() => navigate("/"), 300);
         }}
         onCancel={() => {
-          setDangerOpen(false)
-          setDangerText('')
+          setDangerOpen(false);
+          setDangerText("");
         }}
         isDanger
         confirmDisabled={isDeleting || !isDeleteConfirmed}
       >
         <div className="section">
           <label htmlFor="dangerInput">
-            {t('settings.confirmDelete', { token: deleteConfirmToken })}
+            {t("settings.confirmDelete", { token: deleteConfirmToken })}
           </label>
           <input
             id="dangerInput"
@@ -251,7 +315,7 @@ function Settings() {
         </div>
       </ConfirmDialog>
     </main>
-  )
+  );
 }
 
-export default Settings
+export default Settings;

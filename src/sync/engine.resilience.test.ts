@@ -399,6 +399,99 @@ describe("sync engine — pending deletes", () => {
     const uniqueIds = [...new Set(deletedIds)];
     expect(deletedIds).toHaveLength(uniqueIds.length);
   });
+
+  it("restores pendingDeletes queue when deleteRemoteCards fails", async () => {
+    const { enqueueRemoteDelete, setActiveUser: _setActiveUser } =
+      await import("./engine");
+    _setActiveUser("user-1");
+
+    vi.mocked(deleteRemoteCards).mockRejectedValue(new Error("Network error"));
+    // fetchRemoteSnapshot should not be reached since delete throws first
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
+
+    enqueueRemoteDelete("cloud-to-retry");
+
+    await syncOnce("user-1", false); // swallowed internally
+
+    // Second sync should re-attempt the same delete
+    vi.mocked(deleteRemoteCards).mockResolvedValue(undefined as never);
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
+
+    await syncOnce("user-1", false);
+
+    const secondCallIds = vi.mocked(deleteRemoteCards).mock.calls[1]?.[1] ?? [];
+    expect(secondCallIds).toContain("cloud-to-retry");
+  });
+});
+
+describe("sync engine — delta mode guard", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    await resetDb();
+  });
+
+  it("does not re-upload an already-synced card absent from the delta snapshot", async () => {
+    // Simulate a card that was synced on a previous full sync
+    const now = "2026-01-01T00:00:00.000Z";
+    await db.cards.add({
+      front_md: "Synced card",
+      back_md: "A",
+      tags: [],
+      created_at: now,
+      updated_at: now,
+      source_type: "manual" as const,
+      source_id: null,
+      source_ref: null,
+      cloud_id: "cloud-synced-1",
+      synced_at: now, // already synced — must NOT be re-uploaded in delta mode
+    });
+
+    // Set lastSyncAt so syncOnce enters delta mode
+    localStorage.setItem("flashcards_last_sync_at", now);
+
+    // Delta snapshot comes back empty (card not modified since lastSyncAt)
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
+    vi.mocked(upsertRemoteCards).mockResolvedValue(undefined as never);
+
+    await syncOnce("user-1", true);
+
+    // The already-synced card must NOT have been uploaded
+    const uploadedCards = vi
+      .mocked(upsertRemoteCards)
+      .mock.calls.flatMap((call) => call[0]);
+    const resurrected = uploadedCards.find((c) => c.id === "cloud-synced-1");
+    expect(resurrected).toBeUndefined();
+  });
+
+  it("still uploads a brand-new local card (no synced_at) in delta mode", async () => {
+    const now = "2026-01-01T00:00:00.000Z";
+    await db.cards.add({
+      front_md: "New local card",
+      back_md: "A",
+      tags: [],
+      created_at: now,
+      updated_at: now,
+      source_type: "manual" as const,
+      source_id: null,
+      source_ref: null,
+      cloud_id: null, // no cloud_id yet → will be assigned before upload
+      synced_at: null, // never synced
+    });
+
+    localStorage.setItem("flashcards_last_sync_at", now);
+
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
+    vi.mocked(upsertRemoteCards).mockResolvedValue(undefined as never);
+
+    await syncOnce("user-1", true);
+
+    const uploadedCards = vi
+      .mocked(upsertRemoteCards)
+      .mock.calls.flatMap((call) => call[0]);
+    expect(uploadedCards).toHaveLength(1);
+    expect(uploadedCards[0].front_md).toBe("New local card");
+  });
 });
 
 describe("sync engine — large dataset regression", () => {

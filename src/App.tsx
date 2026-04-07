@@ -1,67 +1,78 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './auth/AuthProvider'
-import db from './db'
-import AppShell from './components/AppShell'
-import { healthCheckSupabase } from './supabase/health'
-import { supabaseClient } from './utils/supabase'
-import { useSync } from './sync/useSync'
-import { I18nProvider } from './i18n/I18nProvider'
-import CardEditor from './routes/CardEditor'
-import Home from './routes/Home'
-import ImportExport from './routes/ImportExport'
-import Library from './routes/Library'
-import PackDetail from './routes/PackDetail'
-import Packs from './routes/Packs'
-import ReviewSession from './routes/ReviewSession'
-import Settings from './routes/Settings'
-import StatsPage from './routes/StatsPage'
+import { useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./auth/AuthProvider";
+import db from "./db";
+import AppShell from "./components/AppShell";
+import { healthCheckSupabase } from "./supabase/health";
+import { supabaseClient } from "./utils/supabase";
+import { useSync } from "./sync/useSync";
+import { useNotifications } from "./notifications/useNotifications";
+import { I18nProvider } from "./i18n/I18nProvider";
+import CardEditor from "./routes/CardEditor";
+import Home from "./routes/Home";
+import ImportExport from "./routes/ImportExport";
+import Library from "./routes/Library";
+import PackDetail from "./routes/PackDetail";
+import Packs from "./routes/Packs";
+import ReviewSession from "./routes/ReviewSession";
+import Settings from "./routes/Settings";
+import SharedDeck from "./routes/SharedDeck";
+import StatsPage from "./routes/StatsPage";
 
 function SyncGate() {
-  useSync()
-  return null
+  useSync();
+  return null;
+}
+
+function NotifGate() {
+  useNotifications();
+  return null;
 }
 
 function App() {
   useEffect(() => {
     if (!import.meta.env.DEV) {
-      return
+      return;
     }
 
     const runDbCheck = async () => {
       try {
-        await db.open()
-        const count = await db.cards.count()
-        console.log('DB OK, cards=', count)
+        await db.open();
+        const count = await db.cards.count();
+        console.log("DB OK, cards=", count);
       } catch (error) {
-        console.error('DB ERROR', error)
+        console.error("DB ERROR", error);
       }
-    }
+    };
 
-    void runDbCheck()
+    void runDbCheck();
 
     const runSupabaseCheck = async () => {
       try {
-        const { error } = await supabaseClient.from('packs').select('slug').limit(1)
+        const { error } = await supabaseClient
+          .from("packs")
+          .select("slug")
+          .limit(1);
         if (error) {
-          console.error('Supabase check error', error.message)
-          return
+          console.error("Supabase check error", error.message);
+          return;
         }
-        console.log('Supabase check ok')
+        console.log("Supabase check ok");
       } catch (error) {
-        console.error('Supabase check failed', error)
+        console.error("Supabase check failed", error);
       }
-    }
+    };
 
-    void runSupabaseCheck()
+    void runSupabaseCheck();
 
-    void healthCheckSupabase()
-  }, [])
+    void healthCheckSupabase();
+  }, []);
 
   return (
     <I18nProvider>
       <AuthProvider>
         <SyncGate />
+        <NotifGate />
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AppShell>
             <Routes>
@@ -75,13 +86,14 @@ function App() {
               <Route path="/stats" element={<StatsPage />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/import-export" element={<ImportExport />} />
+              <Route path="/share/:id" element={<SharedDeck />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AppShell>
         </BrowserRouter>
       </AuthProvider>
     </I18nProvider>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -7,6 +7,37 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et [Se
 
 ---
 
+## [0.4.1] — 2026-04-06
+
+### ✨ Nouvelles fonctionnalités
+- **Partage de decks** — création d'un lien de partage depuis la bibliothèque (`/share/:id`) ; n'importe qui peut importer les cartes en un clic, avec déduplication automatique et rapport d'import
+- **Notifications Web Push** — rappel quotidien si des cartes sont dues ; opt-in depuis les réglages, garde once-per-day, hook `useNotifications` monté au démarrage
+- **PWA** — manifest + service worker Workbox, cache offline complet des assets et images Supabase (`c6ff76f`)
+- **Undo dernière réponse** — annuler la dernière réponse pendant une session de révision (`964c108`)
+- **Raccourcis clavier globaux** — navigation au clavier dans toute l'app (`964c108`)
+- **Recherche globale** — barre de recherche rapide accessible partout (`964c108`)
+- **Import/Export Anki** — import de paquets `.apkg` et export vers Anki (`5ea7584`)
+- **Stats avancées** — onglets supplémentaires, streaks sur la page stats (`8ce2121`, `8e46c29`)
+
+### 🐛 Corrections
+- **Delta resurrection bug (critique)** — en mode delta, les cartes synchronisées absentes du snapshot partiel n'étaient plus ré-uploadées à tort (résurrection sur suppression multi-appareils)
+- **Perte de `pendingDeletes`** — la file des suppressions distantes est maintenant restaurée en cas d'échec de `deleteRemoteCards`
+- **Import bloqué après erreur** — le bouton d'import reste actif après une erreur (retry possible)
+- Fix badge streak — boucle de refresh infinie (`a737aaf`)
+
+### ⚡ Améliorations
+- **Sync delta** — `syncOnce` envoie un filtre `gte(updated_at, since - 30s)` pour les syncs incrémentales (moins de données transférées, protection contre le décalage d'horloge)
+- Amélioration du rendu SVG des nations insulaires : anneaux par île au lieu d'une ellipse globale (`139426d`)
+- Nouvelles localisations pays (`cb59172`, `b21a9e6`)
+
+### 🧪 Tests
+- Tests `SharedDeck` : chargement, not-found, erreur réseau, import, retry après erreur (5 tests)
+- Tests `notifications/service` : permission, garde once-per-day, cas `Notification` manquant (11 tests)
+- Tests `sync/remoteStore` delta : `gte` appelé avec `since`, absent si full snapshot (2 tests)
+- Tests `sync/engine` delta & résistance : delta guard (card synced non re-uploadée), full-sync (card synced re-uploadée), restauration `pendingDeletes` (3 tests)
+
+---
+
 ## [0.4.0] — 2026-03-30
 
 ### ✨ Nouvelles fonctionnalités
@@ -140,7 +171,8 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et [Se
 
 ---
 
-[Unreleased]: ../../compare/v0.4.0...HEAD
+[Unreleased]: ../../compare/v0.5.0...HEAD
+[0.5.0]: ../../compare/v0.4.0...v0.5.0
 [0.4.0]: ../../compare/v0.3.0...v0.4.0
 [0.3.0]: ../../compare/v0.2.0...v0.3.0
 [0.2.0]: ../../compare/v0.1.0...v0.2.0

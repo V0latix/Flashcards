@@ -1,84 +1,91 @@
 # Flashcards Leitner
 
-Application de revision espacee (web + mobile) basee sur la methode de Leitner, avec edition Markdown/LaTeX, stockage local, synchronisation cloud optionnelle, et catalogue de packs publics via Supabase.
+Application de révision espacée (web) basée sur la méthode de Leitner, avec édition Markdown/LaTeX, stockage local-first, synchronisation cloud optionnelle (delta), partage de decks, notifications push et catalogue de packs publics via Supabase.
 
 ## Sommaire
-- [Apercu](#apercu)
-- [Fonctionnalites](#fonctionnalites)
+- [Aperçu](#aperçu)
+- [Fonctionnalités](#fonctionnalités)
 - [Stack technique](#stack-technique)
-- [Comment lapplication fonctionne pas a pas](#comment-lapplication-fonctionne-pas-a-pas)
-- [Architecture des donnees](#architecture-des-donnees)
-- [Demarrage rapide web](#demarrage-rapide-web)
-- [Demarrage rapide mobile expo](#demarrage-rapide-mobile-expo)
-- [Variables denvironnement](#variables-denvironnement)
+- [Comment l'application fonctionne pas à pas](#comment-lapplication-fonctionne-pas-à-pas)
+- [Architecture des données](#architecture-des-données)
+- [Démarrage rapide web](#démarrage-rapide-web)
+- [Variables d'environnement](#variables-denvironnement)
 - [Scripts utiles](#scripts-utiles)
 - [Pipelines de contenu et geo](#pipelines-de-contenu-et-geo)
 - [Tests](#tests)
-- [Deploiement](#deploiement)
+- [Déploiement](#déploiement)
 - [Structure du projet](#structure-du-projet)
 - [Limites connues](#limites-connues)
 - [Licence](#licence)
 
-## Apercu
-Le projet est organise en monorepo avec:
-- une app web React/Vite (`src/`),
-- une app mobile Expo (`apps/mobile/`),
-- un moteur Leitner deterministe (boites 0 a 5),
-- un stockage local-first (IndexedDB sur web, AsyncStorage sur mobile),
-- une sync optionnelle vers Supabase apres connexion,
-- des scripts de generation/import de packs publics.
+## Aperçu
 
-## Fonctionnalites
-- Sessions de revision quotidiennes avec progression Leitner.
+Application web React/Vite 100 % locale (IndexedDB), avec :
+- un moteur Leitner déterministe (boîtes 0 à 5),
+- une sync optionnelle vers Supabase (delta incrémental, last-write-wins),
+- le partage de decks via lien public,
+- des notifications Web Push quotidiennes,
+- des scripts de génération/import de packs publics.
+
+## Fonctionnalités
+- Sessions de révision quotidiennes avec progression Leitner.
+- **Undo** de la dernière réponse pendant une session.
+- **Raccourcis clavier globaux** et **recherche globale**.
 - Support Markdown + KaTeX (formules) sur front/back.
-- Tags hierarchiques (`Maths/Algebre`, `Geo/Europe/...`).
-- Import/export JSON (avec media et logs).
-- Bibliotheque avec filtres par tags, texte et boites.
+- Tags hiérarchiques (`Maths/Algèbre`, `Geo/Europe/...`).
+- Import/export JSON (avec média et logs) + **import/export Anki (`.apkg`)**.
+- Import CSV/TSV.
+- Bibliothèque avec filtres par tags, texte et boîtes.
+- **Partage de decks** — générer un lien `/share/:id`, importable par n'importe qui.
 - Packs publics Supabase importables en local (idempotent).
-- Dashboard stats (volume, progression, boites, tags, taux de reussite).
-- Parametres Leitner: intervalles, objectif quotidien, maintenance learned, reverse Q/A.
-- Sync cloud optionnelle (auth + fusion locale/distante).
+- Dashboard stats avancé (volume, progression, boîtes, tags, streaks, taux de réussite).
+- Paramètres Leitner : intervalles, objectif quotidien, maintenance learned, reverse Q/A.
+- Sync cloud optionnelle : sync complète au login puis **delta incrémentale** (filtre `updated_at >= lastSync - 30s`).
+- **Notifications Web Push** — rappel quotidien si des cartes sont dues (opt-in).
+- **PWA** — installable, cache offline complet.
+- Dark mode.
+- Internationalisation français/anglais.
 
 ## Stack technique
-- Frontend web: React 19, TypeScript, Vite, React Router.
-- Mobile: React Native + Expo.
-- Stockage local web: Dexie (IndexedDB).
-- Stockage local mobile: AsyncStorage.
-- Backend externe: Supabase (auth, tables user_*, packs publics).
-- Tests: Vitest + Testing Library.
+- Frontend web : React 19, TypeScript strict, Vite, React Router 7.
+- Stockage local web : Dexie (IndexedDB).
+- Backend externe : Supabase (auth, tables `user_*`, `shared_decks`, packs publics).
+- PWA : `vite-plugin-pwa` + Workbox.
+- Tests : Vitest + React Testing Library + `fake-indexeddb`.
 
-## Comment lapplication fonctionne pas a pas
+## Comment l'application fonctionne pas à pas
 
-### 1) Creation ou import des cartes
-- Une carte creee manuellement ou importee est stockee localement.
-- Un `ReviewState` est cree automatiquement avec `box=0` et `due_date=null`.
-- Les packs publics importes sont marques avec `source_type='supabase_public'` pour eviter les doublons.
+### 1) Création ou import des cartes
+- Une carte créée manuellement ou importée est stockée localement.
+- Un `ReviewState` est créé automatiquement avec `box=0` et `due_date=null`.
+- Les packs publics importés sont marqués avec `source_type='supabase_public'` pour éviter les doublons.
 
 ### 2) Construction de la session du jour
 - Le moteur charge les `ReviewState` locaux.
-- Il complete la Boite 1 chaque jour jusqua `box1Target` en promouvant des cartes `box=0` (si disponibles), avec `due_date=today`.
-- Il selectionne les cartes dues (`box>=1` et `due_date <= today`).
+- Il complète la Boîte 1 chaque jour jusqu'à `box1Target` en promouvant des cartes `box=0` (si disponibles), avec `due_date=today`.
+- Il sélectionne les cartes dues (`box>=1` et `due_date <= today`).
 - Il ajoute aussi les cartes `learned` dues en maintenance (`learned_at + learnedReviewIntervalDays <= today`).
 
-### 3) Deroulement dune carte en session
-- La question est affichee, puis la reponse apres action utilisateur.
-- Selon `reverseProbability`, front/back peuvent etre inverses aleatoirement.
-- Lutilisateur repond `Good` ou `Bad`.
+### 3) Déroulement d'une carte en session
+- La question est affichée, puis la réponse après action utilisateur.
+- Selon `reverseProbability`, front/back peuvent être inversés aléatoirement.
+- L'utilisateur répond `Good` ou `Bad`. Il peut **annuler** la dernière réponse.
 
-### 4) Mise a jour Leitner apres reponse
-- `Good`: promotion de boite (jusqua 5).
-- `Good` depuis la boite 5: carte marquee `learned`, sortie du flux standard.
-- `Bad`: retour en boite 1.
-- Chaque reponse cree un `ReviewLog`.
+### 4) Mise à jour Leitner après réponse
+- `Good` : promotion de boîte (jusqu'à 5).
+- `Good` depuis la boîte 5 : carte marquée `learned`, sortie du flux standard.
+- `Bad` : retour en boîte 1.
+- Chaque réponse crée un `ReviewLog`.
 
 ### 5) Stats et visualisation
-- Les stats sont calculees depuis les donnees locales (cartes, review states, logs).
-- Les ecrans montrent: due du jour, repartition par boites, progression 7/30 jours, perf par tags.
+- Les stats sont calculées depuis les données locales (cartes, review states, logs).
+- Les écrans montrent : due du jour, répartition par boîtes, progression 7/30 jours, perf par tags, streaks.
 
 ### 6) Synchronisation cloud optionnelle
-- Si lutilisateur se connecte (Supabase Auth), la sync est activee.
-- Sync initiale au login, puis toutes les 15 secondes et au focus.
-- Strategie de merge: local-first defensive + upserts distants (`user_cards`, `user_progress`, `user_review_log`, `user_settings`).
+- Si l'utilisateur se connecte (Supabase Auth), la sync est activée.
+- **Sync complète** au premier login (snapshot total).
+- **Sync delta** ensuite : seules les lignes modifiées depuis `lastSyncAt - 30s` sont récupérées côté remote, et seules les cartes nouvelles (sans `cloud_id`) sont poussées — les cartes déjà synchronisées absentes du snapshot delta sont ignorées (pas de résurrection).
+- Sync toutes les 15 secondes (debounce) + au focus fenêtre.
 
 ```mermaid
 flowchart LR
@@ -91,25 +98,26 @@ flowchart LR
   F --> H["Write ReviewLog"]
   G --> H["Write ReviewLog"]
   H --> I["Update Stats"]
-  H --> J["Optional Cloud Sync (if logged in)"]
+  H --> J["Optional Cloud Sync (delta, if logged in)"]
 ```
 
-## Architecture des donnees
+## Architecture des données
 
 ### Web (IndexedDB / Dexie)
-- `cards`: contenu des cartes + metadata source/sync.
-- `reviewStates`: etat Leitner courant par carte.
-- `reviewLogs`: historique des reponses.
-- `media`: blobs associes aux cartes.
+- `cards` : contenu des cartes + metadata source/sync.
+- `reviewStates` : état Leitner courant par carte.
+- `reviewLogs` : historique des réponses.
+- `media` : blobs associés aux cartes.
 
-### Mobile (AsyncStorage)
-- Snapshot structure (`cards`, `reviewStates`, `reviewLogs`, `packs`) versionne.
-- Meme logique Leitner appliquee cote app mobile.
+### Supabase (cloud, optionnel)
+- `user_cards`, `user_progress`, `user_review_log`, `user_settings` : sync utilisateur.
+- `shared_decks` : decks partagés publiquement (lecture publique, écriture propriétaire).
+- `packs`, `public_cards` : packs publics.
 
-## Demarrage rapide web
+## Démarrage rapide web
 
-### Prerequis
-- Node.js 20+ recommande.
+### Prérequis
+- Node.js 20+ recommandé.
 - npm.
 - Un projet Supabase (URL + anon key) pour packs/auth/sync.
 
@@ -119,7 +127,7 @@ npm install
 ```
 
 ### Configuration
-Creer `/.env.local`:
+Créer `/.env.local` :
 ```bash
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
@@ -130,70 +138,41 @@ VITE_SUPABASE_ANON_KEY=<anon-key>
 npm run dev
 ```
 
-### Verification manuelle (5 minutes)
-1. Ouvrir lapp web.
+### Vérification manuelle (5 minutes)
+1. Ouvrir l'app web.
 2. Aller dans `Packs`, ouvrir un pack, cliquer `Import`.
-3. Aller dans `Library` et verifier les cartes.
-4. Lancer `Review`, repondre a quelques cartes.
-5. Ouvrir `Stats` puis `Settings` pour verifier la persistance.
+3. Aller dans `Library` et vérifier les cartes.
+4. Lancer `Review`, répondre à quelques cartes.
+5. Ouvrir `Stats` puis `Settings` pour vérifier la persistance.
 
-## Demarrage rapide mobile (Expo)
-
-### Prerequis
-- Expo Go installe sur iOS/Android.
-
-### Lancer
-```bash
-npm run mobile
-```
-
-Equivalent:
-```bash
-cd apps/mobile
-npx expo start -c
-```
-
-### Smoke check mobile
-1. Ouvrir le QR code dans Expo Go.
-2. `Home` puis `Play Session`.
-3. `Settings` -> `Open Media Test`.
-4. `Packs` -> ouvrir un pack -> `Download pack`.
-5. Verifier dans `Library`.
-
-## Variables denvironnement
+## Variables d'environnement
 
 ### App web (`.env.local`)
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
-### App mobile (EAS secrets ou env Expo)
-- `EXPO_PUBLIC_SUPABASE_URL`
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-
 ### Pipelines Node (`.env`)
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_DB_URL` (requis pour certaines operations SQL/seed)
+- `SUPABASE_DB_URL` (requis pour certaines opérations SQL/seed)
 - `COUNTRIES_EXCLUDE_ANTARCTICA=1` (optionnel)
 
-### Gardes de securite (operations destructives)
+### Gardes de sécurité (opérations destructives)
 - `ALLOW_DESTRUCTIVE_SUPABASE=1`
 - `ALLOW_DESTRUCTIVE_COUNTRIES=1`
 
 ## Scripts utiles
 
-### Developpement
-- `npm run dev`: demarre lapp web.
-- `npm run build`: build TypeScript + Vite.
-- `npm run preview`: sert le build.
-- `npm run lint`: lint ESLint.
-- `npm run mobile`: demarre lapp mobile Expo.
+### Développement
+- `npm run dev` : démarre l'app web.
+- `npm run build` : build TypeScript + Vite.
+- `npm run preview` : sert le build.
+- `npm run lint` : lint ESLint.
 
-### Qualite
-- `npm run test`: tests unitaires.
-- `npm run test:watch`: tests en watch.
-- `npm run test:ui`: interface Vitest.
-- `npm run check`: lint + typecheck + tests.
+### Qualité
+- `npm run test` : tests unitaires.
+- `npm run test:watch` : tests en watch.
+- `npm run check` : lint + typecheck + tests.
 
 ### Packs publics Supabase
 - `npm run supabase:build`
@@ -202,19 +181,18 @@ npx expo start -c
 - `npm run seed:departements-pack`
 - `npm run pipeline:geo-pack`
 
-### Pipelines geographiques
+### Pipelines géographiques
 - `npm run pipeline:countries`
 - `npm run pipeline:departements`
 - `npm run pipeline:departements-pack`
 
 ## Pipelines de contenu et geo
 
-### Pipeline pays (SVG -> Storage -> table `countries`)
-1. Generation SVG (`out/svg/{ISO2}.svg` + `out/preview.html`).
+### Pipeline pays (SVG → Storage → table `countries`)
+1. Génération SVG (`out/svg/{ISO2}.svg` + `out/preview.html`).
 2. Upload vers bucket Supabase `country-maps`.
 3. Seed/upsert SQL de `public.countries`.
 
-Commandes:
 ```bash
 npm run gen:country-svgs
 npm run upload:country-svgs
@@ -223,7 +201,7 @@ npm run seed:countries
 npm run pipeline:countries
 ```
 
-### Pipeline departements
+### Pipeline départements
 ```bash
 npm run gen:departement-svgs
 npm run upload:departement-svgs
@@ -232,47 +210,50 @@ npm run pipeline:departements
 ```
 
 ## Tests
-Voir `docs/testing.md`.
 
-Commandes principales:
+Commandes principales :
 ```bash
 npm run test
 npm run check
 ```
 
-Couverture actuelle:
-- moteur Leitner,
-- logique de sync,
-- composants Markdown/media,
-- smoke tests des routes principales.
+Couverture actuelle :
+- Moteur Leitner (algorithme, intervalles, `is_learned`).
+- Logique de sync (delta guard, delta resurrection, `pendingDeletes`, résistance réseau).
+- Composants Markdown/media.
+- Smoke tests des routes principales.
+- SharedDeck (import, déduplication, retry après erreur).
+- Notifications (permission, garde once-per-day).
 
-## Deploiement
+## Déploiement
 
 ### Web (GitHub Pages)
-- Workflow: `/.github/workflows/deploy-web.yml`
-- URL: <https://v0latix.github.io/Flashcards/>
-- Secrets requis: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
-
-### Mobile (TestFlight)
-Voir `docs/mobile-release.md`.
+- Workflow : `/.github/workflows/deploy-web.yml`
+- URL : <https://v0latix.github.io/Flashcards/>
+- Secrets requis : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 
 ## Structure du projet
 ```text
 .
-├── src/                     # app web (routes, db, leitner, sync)
-├── apps/mobile/             # app Expo
-├── supabase/                # migrations / seed SQL
-├── packs/                   # packs JSON locaux
-├── docs/                    # specs, tests, release notes
-├── src/countries-pipeline/  # generation & seed geo pays
-├── src/departements-pipeline/
-└── src/supabase-pipeline/   # seed packs publics
+├── src/
+│   ├── routes/          # Pages React Router (Library, Review, Stats, SharedDeck…)
+│   ├── leitner/         # Moteur Leitner + settings
+│   ├── sync/            # Sync engine (delta + full) + remoteStore
+│   ├── db/              # Schéma Dexie + migrations
+│   ├── notifications/   # Service notifications + hook
+│   ├── supabase/        # Client Supabase + sharedDecks + auth
+│   ├── i18n/            # Traductions fr/en
+│   └── supabase-pipeline/ # Seeds packs publics
+├── supabase/            # Migrations SQL
+├── packs/               # Packs JSON locaux
+├── docs/                # Specs, ADRs, contexte projet
+├── src/countries-pipeline/
+└── src/departements-pipeline/
 ```
 
 ## Limites connues
-- Pas de vraie suite E2E complete (tests majoritairement unit/smoke).
-- Les appels Supabase ne sont pas executes en reseau reel pendant les tests.
-- Le rendu LaTeX mobile depend dun chargement reseau (WebView + KaTeX CDN).
+- Pas de vraie suite E2E complète (tests majoritairement unit/smoke).
+- Les appels Supabase ne sont pas exécutés en réseau réel pendant les tests.
 
 ## Licence
 MIT. Voir `LICENSE`.

@@ -5,6 +5,8 @@ import TagTreeFilter from "../components/TagTreeFilter";
 import { setCardsSuspended, updateCard } from "../db/queries";
 import type { Card } from "../db/types";
 import { useI18n } from "../i18n/useI18n";
+import { useAuth } from "../auth/useAuth";
+import { createSharedDeck } from "../supabase/sharedDecks";
 import { saveTrainingQueue } from "../utils/training";
 import { useLibraryCards } from "./library/useLibraryCards";
 import { useLibraryFilters } from "./library/useLibraryFilters";
@@ -17,8 +19,14 @@ import CardListItem from "./library/CardListItem";
 function Library() {
   const { t, language } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [exportStatus, setExportStatus] = useState("");
   const [openHints, setOpenHints] = useState<Record<number, boolean>>({});
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareTitle, setShareTitle] = useState("");
+  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
 
   const { cards, isLoading, loadCards } = useLibraryCards();
   const filters = useLibraryFilters(cards, () => setExportStatus(""));
@@ -65,6 +73,35 @@ function Library() {
 
   const handleToggleHint = (cardId: number) => {
     setOpenHints((prev) => ({ ...prev, [cardId]: !prev[cardId] }));
+  };
+
+  const handleShare = async () => {
+    if (!user) {
+      setShareStatus(t("sharedDeck.shareLoginRequired"));
+      return;
+    }
+    if (!shareTitle.trim()) return;
+    setIsSharing(true);
+    setShareStatus(null);
+    try {
+      const cards = filters.filteredCards
+        .filter(({ card }) => filters.selectedCardIds.includes(card.id ?? -1))
+        .map(({ card }) => card);
+      const id = await createSharedDeck(
+        user.id,
+        shareTitle.trim(),
+        cards,
+        filters.selectedTag,
+      );
+      const base = window.location.origin + import.meta.env.BASE_URL;
+      setShareLink(`${base}share/${id}`);
+    } catch (err) {
+      setShareStatus(
+        t("sharedDeck.shareError", { message: (err as Error).message }),
+      );
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   return (
@@ -129,6 +166,19 @@ function Library() {
                 disabled={filters.selectedCardIds.length === 0}
               >
                 {t("library.exportSelection")}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShareOpen(true);
+                  setShareLink(null);
+                  setShareStatus(null);
+                  setShareTitle("");
+                }}
+                disabled={filters.selectedCardIds.length === 0}
+              >
+                {t("sharedDeck.shareTitle")}
               </button>
               <BoxFilterBar
                 selectedBoxes={filters.selectedBoxes}
@@ -197,6 +247,69 @@ function Library() {
               }
             />
             {exportStatus ? <p>{exportStatus}</p> : null}
+            {shareOpen ? (
+              <div className="section card">
+                <p>
+                  <strong>{t("sharedDeck.shareTitleLabel")}</strong>
+                </p>
+                <input
+                  type="text"
+                  className="input"
+                  value={shareTitle}
+                  onChange={(e) => setShareTitle(e.target.value)}
+                  placeholder={t("sharedDeck.shareTitleLabel")}
+                />
+                {shareLink ? (
+                  <div className="section">
+                    <label>{t("sharedDeck.shareLinkLabel")}</label>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        className="input"
+                        readOnly
+                        value={shareLink}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() =>
+                          void navigator.clipboard.writeText(shareLink)
+                        }
+                      >
+                        {t("sharedDeck.shareCopy")}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="section button-row">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => void handleShare()}
+                      disabled={isSharing || !shareTitle.trim()}
+                    >
+                      {isSharing
+                        ? t("sharedDeck.shareCreating")
+                        : t("sharedDeck.shareConfirm")}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShareOpen(false)}
+                    >
+                      {t("sharedDeck.shareCancel")}
+                    </button>
+                  </div>
+                )}
+                {shareStatus ? <p>{shareStatus}</p> : null}
+              </div>
+            ) : null}
             {filters.filteredCards.length === 0 ? (
               <p>{t("library.noCards")}</p>
             ) : null}

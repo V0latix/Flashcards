@@ -1,164 +1,203 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import db from '../db'
-import { resetDb } from '../test/utils'
-import { runInitialSync, syncOnce } from './engine'
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import db from "../db";
+import { resetDb } from "../test/utils";
+import { runInitialSync, syncOnce } from "./engine";
 import {
   fetchRemoteSnapshot,
   upsertRemoteCards,
-  upsertRemoteProgress
-} from './remoteStore'
+  upsertRemoteProgress,
+} from "./remoteStore";
 
-vi.mock('./remoteStore', () => ({
+vi.mock("./remoteStore", () => ({
   fetchRemoteSnapshot: vi.fn(),
   upsertRemoteCards: vi.fn(),
   upsertRemoteProgress: vi.fn(),
   upsertRemoteSettings: vi.fn(),
   insertRemoteReviewLogs: vi.fn(),
-  deleteRemoteCards: vi.fn()
-}))
+  deleteRemoteCards: vi.fn(),
+}));
 
 const emptyRemote = {
   cards: [],
   progress: [],
   settings: null,
-  reviewLogs: []
-}
+  reviewLogs: [],
+};
 
-describe('sync engine', () => {
+describe("sync engine", () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
-    localStorage.clear()
-    await resetDb()
-  })
+    vi.clearAllMocks();
+    localStorage.clear();
+    await resetDb();
+  });
 
-  it('pushes local cards to remote when remote is empty', async () => {
-    const now = new Date('2026-01-01T00:00:00.000Z').toISOString()
+  it("pushes local cards to remote when remote is empty", async () => {
+    const now = new Date("2026-01-01T00:00:00.000Z").toISOString();
     const cardId = await db.cards.add({
-      front_md: 'Q',
-      back_md: 'A',
+      front_md: "Q",
+      back_md: "A",
       tags: [],
       created_at: now,
       updated_at: now,
       source_type: null,
       source_id: null,
       source_ref: null,
-      cloud_id: null
-    })
+      cloud_id: null,
+    });
     await db.reviewStates.add({
       card_id: cardId,
       box: 0,
       due_date: null,
       is_learned: false,
       learned_at: null,
-      updated_at: now
-    })
+      updated_at: now,
+    });
 
-    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote)
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
 
-    await runInitialSync('user-1')
+    await runInitialSync("user-1");
 
-    expect(upsertRemoteCards).toHaveBeenCalledTimes(1)
-    const cardsPayload = vi.mocked(upsertRemoteCards).mock.calls[0][0]
-    expect(cardsPayload).toHaveLength(1)
-    expect(cardsPayload[0].user_id).toBe('user-1')
-    expect(cardsPayload[0].source_type).toBe('manual')
-    expect(cardsPayload[0].suspended).toBe(false)
+    expect(upsertRemoteCards).toHaveBeenCalledTimes(1);
+    const cardsPayload = vi.mocked(upsertRemoteCards).mock.calls[0][0];
+    expect(cardsPayload).toHaveLength(1);
+    expect(cardsPayload[0].user_id).toBe("user-1");
+    expect(cardsPayload[0].source_type).toBe("manual");
+    expect(cardsPayload[0].suspended).toBe(false);
 
-    expect(upsertRemoteProgress).toHaveBeenCalledTimes(1)
-    const progressPayload = vi.mocked(upsertRemoteProgress).mock.calls[0][0]
-    expect(progressPayload).toHaveLength(1)
-    expect(progressPayload[0].card_id).toBe(cardsPayload[0].id)
+    expect(upsertRemoteProgress).toHaveBeenCalledTimes(1);
+    const progressPayload = vi.mocked(upsertRemoteProgress).mock.calls[0][0];
+    expect(progressPayload).toHaveLength(1);
+    expect(progressPayload[0].card_id).toBe(cardsPayload[0].id);
 
-    const stored = await db.cards.get(cardId)
-    expect(stored?.cloud_id).toBeTruthy()
-  })
+    const stored = await db.cards.get(cardId);
+    expect(stored?.cloud_id).toBeTruthy();
+  });
 
-  it('re-upserts local cards missing remotely if unchanged since last sync', async () => {
-    const updatedAt = '2025-12-31T00:00:00.000Z'
+  it("does NOT re-upload a synced card absent from the delta snapshot (prevents resurrection)", async () => {
+    // A card already synced to remote. In delta mode, its absence from the
+    // partial snapshot means "unchanged", not "deleted" — must not be re-uploaded.
+    const updatedAt = "2025-12-31T00:00:00.000Z";
     const cardId = await db.cards.add({
-      front_md: 'Q',
-      back_md: 'A',
+      front_md: "Q",
+      back_md: "A",
       tags: [],
       created_at: updatedAt,
       updated_at: updatedAt,
-      source_type: 'manual',
+      source_type: "manual",
       source_id: null,
       source_ref: null,
-      cloud_id: 'cloud-1',
-      synced_at: updatedAt
-    })
+      cloud_id: "cloud-1",
+      synced_at: updatedAt,
+    });
     await db.reviewStates.add({
       card_id: cardId,
       box: 1,
       due_date: null,
       is_learned: false,
       learned_at: null,
-      updated_at: updatedAt
-    })
+      updated_at: updatedAt,
+    });
 
-    localStorage.setItem('flashcards_last_sync_at', '2026-01-01T00:00:00.000Z')
-    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote)
+    // lastSyncAt is set → syncOnce enters delta mode
+    localStorage.setItem("flashcards_last_sync_at", "2026-01-01T00:00:00.000Z");
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
 
-    await syncOnce('user-1', true)
+    await syncOnce("user-1", true);
 
-    const count = await db.cards.count()
-    expect(count).toBe(1)
+    const cardsPayload = vi
+      .mocked(upsertRemoteCards)
+      .mock.calls.flatMap((c) => c[0]);
+    const resurrected = cardsPayload.find((c) => c.id === "cloud-1");
+    expect(resurrected).toBeUndefined();
+  });
 
-    const cardsPayload = vi.mocked(upsertRemoteCards).mock.calls[0]?.[0] ?? []
-    expect(cardsPayload).toHaveLength(1)
-    expect(cardsPayload[0].id).toBe('cloud-1')
-  })
-
-  it('prefers remote card when remote updated_at is newer', async () => {
-    const localUpdatedAt = '2025-12-01T00:00:00.000Z'
-    const remoteUpdatedAt = '2026-01-01T00:00:00.000Z'
+  it("re-upserts local cards missing from a FULL remote snapshot (defensive against API caps)", async () => {
+    // Full sync (runInitialSync / no lastSyncAt): a synced card absent from the
+    // remote snapshot is defensively re-uploaded (API row cap / network gap).
+    const updatedAt = "2025-12-31T00:00:00.000Z";
     const cardId = await db.cards.add({
-      front_md: 'Local Q',
-      back_md: 'Local A',
+      front_md: "Q",
+      back_md: "A",
+      tags: [],
+      created_at: updatedAt,
+      updated_at: updatedAt,
+      source_type: "manual",
+      source_id: null,
+      source_ref: null,
+      cloud_id: "cloud-1",
+      synced_at: updatedAt,
+    });
+    await db.reviewStates.add({
+      card_id: cardId,
+      box: 1,
+      due_date: null,
+      is_learned: false,
+      learned_at: null,
+      updated_at: updatedAt,
+    });
+
+    // No lastSyncAt → runInitialSync does a full merge (isDelta = false)
+    vi.mocked(fetchRemoteSnapshot).mockResolvedValue(emptyRemote);
+
+    await runInitialSync("user-1");
+
+    const cardsPayload = vi
+      .mocked(upsertRemoteCards)
+      .mock.calls.flatMap((c) => c[0]);
+    const uploaded = cardsPayload.find((c) => c.id === "cloud-1");
+    expect(uploaded).toBeDefined();
+  });
+
+  it("prefers remote card when remote updated_at is newer", async () => {
+    const localUpdatedAt = "2025-12-01T00:00:00.000Z";
+    const remoteUpdatedAt = "2026-01-01T00:00:00.000Z";
+    const cardId = await db.cards.add({
+      front_md: "Local Q",
+      back_md: "Local A",
       tags: [],
       created_at: localUpdatedAt,
       updated_at: localUpdatedAt,
-      source_type: 'manual',
+      source_type: "manual",
       source_id: null,
       source_ref: null,
-      cloud_id: 'cloud-1',
-      synced_at: localUpdatedAt
-    })
+      cloud_id: "cloud-1",
+      synced_at: localUpdatedAt,
+    });
     await db.reviewStates.add({
       card_id: cardId,
       box: 0,
       due_date: null,
       is_learned: false,
       learned_at: null,
-      updated_at: localUpdatedAt
-    })
+      updated_at: localUpdatedAt,
+    });
 
     vi.mocked(fetchRemoteSnapshot).mockResolvedValue({
       cards: [
         {
-          id: 'cloud-1',
-          user_id: 'user-1',
-          source_type: 'manual',
+          id: "cloud-1",
+          user_id: "user-1",
+          source_type: "manual",
           source_ref: null,
           source_public_id: null,
           suspended: true,
-          front_md: 'Remote Q',
-          back_md: 'Remote A',
+          front_md: "Remote Q",
+          back_md: "Remote A",
           tags: [],
           created_at: localUpdatedAt,
-          updated_at: remoteUpdatedAt
-        }
+          updated_at: remoteUpdatedAt,
+        },
       ],
       progress: [],
       settings: null,
-      reviewLogs: []
-    })
+      reviewLogs: [],
+    });
 
-    await syncOnce('user-1', true)
+    await syncOnce("user-1", true);
 
-    const updated = await db.cards.get(cardId)
-    expect(updated?.front_md).toBe('Remote Q')
-    expect(updated?.back_md).toBe('Remote A')
-    expect(updated?.suspended).toBe(true)
-  })
-})
+    const updated = await db.cards.get(cardId);
+    expect(updated?.front_md).toBe("Remote Q");
+    expect(updated?.back_md).toBe("Remote A");
+    expect(updated?.suspended).toBe(true);
+  });
+});

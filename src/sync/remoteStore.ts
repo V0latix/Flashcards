@@ -16,6 +16,8 @@ async function fetchAllByUser<T>(
   table: "user_cards" | "user_progress" | "user_review_log",
   userId: string,
   orderColumn: string,
+  since?: string | null,
+  sinceColumn?: string,
 ): Promise<T[]> {
   const rows: T[] = [];
   let from = 0;
@@ -23,12 +25,20 @@ async function fetchAllByUser<T>(
   // Supabase/PostgREST often enforces a max rows cap per request (commonly 1000).
   // We page through results to avoid truncated snapshots.
   while (true) {
-    const { data, error } = await supabase
+    let query = supabase
       .from(table)
       .select("*")
       .eq("user_id", userId)
-      .order(orderColumn, { ascending: true })
-      .range(from, from + PAGE_SIZE - 1);
+      .order(orderColumn, { ascending: true });
+
+    if (since && sinceColumn) {
+      // Use gte (inclusive) so rows written at exactly the boundary timestamp are
+      // not silently missed. The DELTA_OVERLAP_MS applied by the caller absorbs
+      // broader clock skew between devices.
+      query = query.gte(sinceColumn, since);
+    }
+
+    const { data, error } = await query.range(from, from + PAGE_SIZE - 1);
 
     if (error) {
       throw new Error(error.message);
@@ -49,16 +59,29 @@ async function fetchAllByUser<T>(
 
 export const fetchRemoteSnapshot = async (
   userId: string,
+  since?: string | null,
 ): Promise<RemoteSnapshot> => {
   const [cards, progress, settingsRes, reviewLogs] = await Promise.all([
-    fetchAllByUser<RemoteCard>("user_cards", userId, "id"),
-    fetchAllByUser<RemoteProgress>("user_progress", userId, "card_id"),
+    fetchAllByUser<RemoteCard>("user_cards", userId, "id", since, "updated_at"),
+    fetchAllByUser<RemoteProgress>(
+      "user_progress",
+      userId,
+      "card_id",
+      since,
+      "updated_at",
+    ),
     supabase
       .from("user_settings")
       .select("*")
       .eq("user_id", userId)
       .maybeSingle(),
-    fetchAllByUser<RemoteReviewLog>("user_review_log", userId, "id"),
+    fetchAllByUser<RemoteReviewLog>(
+      "user_review_log",
+      userId,
+      "id",
+      since,
+      "created_at",
+    ),
   ]);
 
   if (settingsRes.error && settingsRes.error.code !== "PGRST116") {
