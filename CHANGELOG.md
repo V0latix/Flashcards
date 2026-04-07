@@ -5,6 +5,18 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/) et [Se
 
 ## [Unreleased]
 
+### ✨ Nouvelles fonctionnalités
+- **Partage via modal** — le partage de deck s'ouvre désormais dans une modale overlay (backdrop cliquable, bouton ✕, focus auto, submit sur Entrée) au lieu d'un bloc inline dans la bibliothèque
+
+### 🐛 Corrections
+- **Re-entrancy partage** — `handleSubmit` est maintenant protégé contre les soumissions multiples (guard `isCreating || link`, `<form onSubmit>` au lieu de `onKeyDown` manuel) ; un seul deck est créé même sous key-repeat ou clics rapides
+- **Clipboard silencieux** — `writeText` est maintenant dans un `try/catch` ; en cas d'échec (permission refusée, API absente) un message d'erreur s'affiche sous le lien plutôt qu'un rejet non géré
+
+### 🧪 Tests
+- Re-entrancy : 3 clics rapides sur le bouton pendant une requête en vol → `onConfirm` appelé une seule fois
+- Submit via `Enter` → soumission déclenchée correctement par le `form onSubmit`
+- Clipboard rejeté → message d'erreur visible, bouton de copie toujours actif
+
 ---
 
 ## [0.4.1] — 2026-04-06
