@@ -61,11 +61,18 @@ const SOUTHEAST_ASIA: AtlasRegion = {
   frame: [90, -18, 146, 24],
 };
 
+const COMOROS_CONTEXT: AtlasRegion = {
+  id: "comoros_context",
+  refLon: 44,
+  // Regional window for Comoros: shows the 3 islands clearly separated in the Mozambique Channel.
+  frame: [39, -16, 52, -7],
+};
+
 const NEW_ZEALAND_CONTEXT: AtlasRegion = {
   id: "new_zealand_context",
-  refLon: 173,
-  // Rectangular context window around New Zealand to avoid the previous oversized oval extent.
-  frame: [156, -53, 191, -28],
+  refLon: 160,
+  // Wide Oceania frame: shows Australia + New Zealand + surrounding Pacific.
+  frame: [105, -55, 200, 15],
 };
 
 const PACIFIC_ISLAND_ISO2 = new Set([
@@ -97,7 +104,7 @@ const PACIFIC_ISLAND_ISO2 = new Set([
 const SOUTHERN_ISLAND_ISO2 = new Set(["TF", "HM"]);
 
 // Small island nations shown within the Africa atlas: stay in frame with forceZone ellipse.
-const AFRICA_ISLAND_ISO2 = new Set(["SC"]);
+const AFRICA_ISLAND_ISO2 = new Set(["KM", "SC", "SH"]);
 
 // Maldives needs a dedicated Indian Ocean context frame.
 const INDIAN_OCEAN_ISLAND_ISO2 = new Set(["MV"]);
@@ -253,6 +260,7 @@ function selectRegionForTarget(target: CountryFeature): AtlasRegion {
   if (SOUTHERN_ISLAND_ISO2.has(target.iso2)) return SOUTHERN_INDIAN_OCEAN;
   if (INDIAN_OCEAN_ISLAND_ISO2.has(target.iso2)) return NORTH_INDIAN_OCEAN;
   if (SOUTHEAST_ASIA_ISO2.has(target.iso2)) return SOUTHEAST_ASIA;
+  if (target.iso2 === "KM") return COMOROS_CONTEXT;
   if (target.iso2 === "NZ") return NEW_ZEALAND_CONTEXT;
   if (CARIBBEAN_ISLAND_ISO2.has(target.iso2))
     return ATLAS_REGIONS.find((r) => r.id === "caribbean")!;
