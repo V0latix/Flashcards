@@ -5,7 +5,7 @@ import { I18nProvider } from "../i18n/I18nProvider";
 import ShareDeckModal from "./ShareDeckModal";
 
 const renderModal = (
-  onConfirm = vi.fn<[string], Promise<string>>(),
+  onConfirm = vi.fn<(title: string) => Promise<string>>(),
   onClose = vi.fn(),
   cardCount = 3,
 ) =>
@@ -34,7 +34,7 @@ describe("ShareDeckModal", () => {
 
   it("calls onConfirm with trimmed title and shows the returned link", async () => {
     const onConfirm = vi
-      .fn<[string], Promise<string>>()
+      .fn<(title: string) => Promise<string>>()
       .mockResolvedValue("https://example.com/share/abc");
     renderModal(onConfirm);
 
@@ -56,7 +56,7 @@ describe("ShareDeckModal", () => {
 
   it("shows error message when onConfirm throws and confirm button stays enabled for retry", async () => {
     const onConfirm = vi
-      .fn<[string], Promise<string>>()
+      .fn<(title: string) => Promise<string>>()
       .mockRejectedValue(new Error("Network error"));
     renderModal(onConfirm);
 
@@ -90,7 +90,7 @@ describe("ShareDeckModal", () => {
 
   it("Enter key submits the form (via form onSubmit)", async () => {
     const onConfirm = vi
-      .fn<[string], Promise<string>>()
+      .fn<(title: string) => Promise<string>>()
       .mockResolvedValue("https://example.com/share/x");
     renderModal(onConfirm);
 
@@ -103,7 +103,7 @@ describe("ShareDeckModal", () => {
 
   it("rapid Enter presses do not create duplicate decks (re-entrancy guard)", async () => {
     let resolveFirst!: (v: string) => void;
-    const onConfirm = vi.fn<[string], Promise<string>>(
+    const onConfirm = vi.fn<(title: string) => Promise<string>>(
       () =>
         new Promise<string>((res) => {
           resolveFirst = res;
@@ -129,7 +129,7 @@ describe("ShareDeckModal", () => {
 
   it("copy button updates label after successful copy", async () => {
     const onConfirm = vi
-      .fn<[string], Promise<string>>()
+      .fn<(title: string) => Promise<string>>()
       .mockResolvedValue("https://example.com/share/xyz");
     Object.assign(navigator, {
       clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
@@ -151,7 +151,7 @@ describe("ShareDeckModal", () => {
 
   it("shows copy error message when clipboard write is rejected", async () => {
     const onConfirm = vi
-      .fn<[string], Promise<string>>()
+      .fn<(title: string) => Promise<string>>()
       .mockResolvedValue("https://example.com/share/fail");
     Object.assign(navigator, {
       clipboard: {
