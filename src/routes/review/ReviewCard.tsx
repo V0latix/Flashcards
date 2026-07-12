@@ -159,77 +159,81 @@ function ReviewCard({
           ) : null}
         </div>
         <aside className="review-session-actions">
-          {!showBack ? (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleReveal}
-            >
-              {t("review.revealBack")}
-            </button>
-          ) : (
-            <div className="review-answer-buttons">
+          <div className="review-primary-actions">
+            {!showBack ? (
               <button
                 type="button"
-                style={{ order: 1 }}
                 className="btn btn-primary"
-                onClick={() => handleAnswer("good")}
+                onClick={handleReveal}
               >
-                {t("review.good")}
+                {t("review.revealBack")}
               </button>
+            ) : (
+              <div className="review-answer-buttons">
+                <button
+                  type="button"
+                  style={{ order: 1 }}
+                  className="btn btn-primary"
+                  onClick={() => handleAnswer("good")}
+                >
+                  {t("review.good")}
+                </button>
+                <button
+                  type="button"
+                  style={{ order: 2 }}
+                  className="btn btn-secondary"
+                  onClick={() => handleAnswer("bad")}
+                >
+                  {t("review.bad")}
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="review-secondary-actions">
+            {hasHint ? (
               <button
                 type="button"
-                style={{ order: 2 }}
                 className="btn btn-secondary"
-                onClick={() => handleAnswer("bad")}
+                onClick={() => setShowHint((prev) => !prev)}
+                aria-keyshortcuts="H"
               >
-                {t("review.bad")}
+                {showHint ? t("labels.hideHint") : t("labels.showHint")}
               </button>
-            </div>
-          )}
-          {hasHint ? (
+            ) : null}
+            {canUndo ? (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => void handleUndo()}
+                aria-keyshortcuts="Z"
+              >
+                {t("review.undo")}
+              </button>
+            ) : null}
+            {showBack ? (
+              <Link
+                to={`/card/${currentCard.cardId}/edit`}
+                className="btn btn-secondary"
+              >
+                {t("review.editCard")}
+              </Link>
+            ) : null}
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setShowHint((prev) => !prev)}
-              aria-keyshortcuts="H"
+              onClick={() => void handleSuspend()}
+              disabled={isSuspending || isDeleting}
             >
-              {showHint ? t("labels.hideHint") : t("labels.showHint")}
+              {t("actions.suspendCard")}
             </button>
-          ) : null}
-          {canUndo ? (
             <button
               type="button"
-              className="btn btn-secondary"
-              onClick={() => void handleUndo()}
-              aria-keyshortcuts="Z"
+              className="btn btn-danger"
+              onClick={() => setIsDeleteOpen(true)}
             >
-              {t("review.undo")}
+              {t("review.deleteCard")}
             </button>
-          ) : null}
-          {showBack ? (
-            <Link
-              to={`/card/${currentCard.cardId}/edit`}
-              className="btn btn-secondary"
-            >
-              {t("review.editCard")}
-            </Link>
-          ) : null}
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => void handleSuspend()}
-            disabled={isSuspending || isDeleting}
-          >
-            {t("actions.suspendCard")}
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger"
-            onClick={() => setIsDeleteOpen(true)}
-          >
-            {t("review.deleteCard")}
-          </button>
+          </div>
         </aside>
       </div>
 

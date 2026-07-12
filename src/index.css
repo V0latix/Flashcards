@@ -901,6 +901,13 @@ ul {
   gap: 10px;
 }
 
+.review-primary-actions,
+.review-secondary-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .review-session-actions .btn {
   width: 100%;
 }
@@ -1343,6 +1350,34 @@ ul {
 
   .bottom-nav {
     display: flex;
+  }
+
+  /* Keep BON/FAUX (and Reveal) reachable on mobile: pin the primary
+     actions in a bar above the bottom nav, secondary actions scroll. */
+  .review-primary-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    z-index: 15;
+    flex-direction: row;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .review-primary-actions > .btn,
+  .review-answer-buttons {
+    flex: 1;
+  }
+
+  .review-answer-buttons {
+    flex-direction: row;
+  }
+
+  /* Reserve space so the last secondary button clears the fixed bar. */
+  .review-session {
+    padding-bottom: 84px;
   }
 }
 
