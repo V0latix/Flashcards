@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { applyReviewResult, revertReviewResult } from "../leitner/engine";
 import type { ReviewState } from "../db/types";
 import { useI18n } from "../i18n/useI18n";
@@ -207,6 +207,9 @@ function ReviewSession() {
 
   return (
     <main className="container page review-page">
+      <Link to="/" className="review-exit" aria-label={t("nav.home")}>
+        ←
+      </Link>
       {isLoading ? (
         <p>{t("status.loading")}</p>
       ) : isDone ? (

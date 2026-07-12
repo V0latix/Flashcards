@@ -56,6 +56,8 @@ function AppShell({ children }: AppShellProps) {
   const pendingGRef = useRef(false);
   const pendingGTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isHome = location.pathname === "/";
+  const isReview =
+    location.pathname === "/review" || location.pathname.startsWith("/review/");
   const { t } = useI18n();
 
   const isActive = (path: string) =>
@@ -173,7 +175,11 @@ function AppShell({ children }: AppShellProps) {
   }, [addOpen, closeAddMenu]);
 
   return (
-    <div className={isHome ? "app-shell app-shell-home" : "app-shell"}>
+    <div
+      className={`app-shell${isHome ? " app-shell-home" : ""}${
+        isReview ? " app-shell-review" : ""
+      }`}
+    >
       {!isHome ? (
         <header className="app-header">
           <div className="app-header-inner">
