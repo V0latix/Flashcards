@@ -28,6 +28,8 @@
 - AutoFill Box 1 par tirage aleatoire uniforme depuis Box 0.
 - Ordre des cartes melange au demarrage de la session.
 - UI minimale avec layout centre, styles de base et navigation header/bottom.
+- Revision mobile: bottom-nav masquee pendant la session, boutons BON/FAUX epingles en barre fixe en bas, bouton retour en haut a gauche.
+- Simplification interne: `buildDailySession`/`autoFillBox1` reduits a la seule signature `(today)` (surcharge `deckId` morte supprimee).
 
 ### Fixed
 - Diagnostics IndexedDB au demarrage.

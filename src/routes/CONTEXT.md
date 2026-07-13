@@ -9,7 +9,7 @@ Pages React Router. Chaque fichier = une route. Contient la UI et orchestre les 
 ```
 src/routes/
 ├── Home.tsx / Home.test.tsx           → Dashboard : session du jour, streak, stats rapides
-├── ReviewSession.tsx / *.test.tsx     → Player de révision (orchestrateur léger, ~175 lignes)
+├── ReviewSession.tsx / *.test.tsx     → Player de révision (orchestrateur léger, ~260 lignes)
 ├── Library.tsx / Library.test.tsx     → Navigateur de cartes (orchestrateur léger, ~190 lignes)
 ├── CardEditor.tsx / CardEditor.test.tsx → Formulaire création/édition carte (Markdown preview)
 ├── Packs.tsx / Packs.test.tsx         → Liste des packs publics Supabase
@@ -58,5 +58,6 @@ src/routes/
 ## Points d'attention
 
 - `ReviewSession` doit appeler `applyReviewResult` avec `today` calculé côté client — pas de Date côté serveur
+- En révision sur mobile, la bottom-nav globale est masquée (classe `app-shell-review`) et les boutons BON/FAUX sont épinglés en barre fixe en bas ; un bouton retour (`.review-exit`) en haut à gauche sert de sortie. Actions primaires/secondaires séparées dans `ReviewCard` (`.review-primary-actions` / `.review-secondary-actions`)
 - `CardEditor` reçoit `id` optionnel en param — mode création vs édition dans le même composant
 - `PackDetail` vérifie `source_type='supabase_public'` pour l'idempotence à l'import

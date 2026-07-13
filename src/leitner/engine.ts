@@ -77,19 +77,8 @@ const isPendingForToday = (
   return isDueOnOrBefore(state.due_date, today);
 };
 
-export async function autoFillBox1(today: string): Promise<void>;
-export async function autoFillBox1(
-  _deckId: number,
-  today: string,
-): Promise<void>;
-export async function autoFillBox1(
-  todayOrDeckId: string | number,
-  maybeToday?: string,
-): Promise<void> {
-  const today =
-    typeof todayOrDeckId === "string"
-      ? normalizeTodayKey(todayOrDeckId)
-      : normalizeTodayKey(maybeToday ?? "");
+export async function autoFillBox1(todayInput: string): Promise<void> {
+  const today = normalizeTodayKey(todayInput);
   const { box1Target } = getLeitnerSettings();
 
   await db.transaction("rw", db.cards, db.reviewStates, async () => {
@@ -173,19 +162,8 @@ export async function autoFillBox1(
 
 export async function buildDailySession(
   todayInput: string,
-): Promise<DailySession>;
-export async function buildDailySession(
-  _deckId: number,
-  todayInput: string,
-): Promise<DailySession>;
-export async function buildDailySession(
-  todayOrDeckId: string | number,
-  maybeToday?: string,
 ): Promise<DailySession> {
-  const today =
-    typeof todayOrDeckId === "string"
-      ? normalizeTodayKey(todayOrDeckId)
-      : normalizeTodayKey(maybeToday ?? "");
+  const today = normalizeTodayKey(todayInput);
 
   await autoFillBox1(today);
 

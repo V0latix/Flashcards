@@ -53,7 +53,7 @@ describe('autoFillBox1', () => {
       dueDate: null
     })
 
-    await autoFillBox1(1, today)
+    await autoFillBox1(today)
 
     const introducedState = await db.reviewStates.where({ box: 0 }).first()
     expect(introducedState?.due_date).toBe('2024-01-10')
@@ -88,7 +88,7 @@ describe('autoFillBox1', () => {
       suspended: true
     })
 
-    await autoFillBox1(1, today)
+    await autoFillBox1(today)
 
     const activeState = await db.reviewStates.get(activeId)
     const suspendedState = await db.reviewStates.get(suspendedId)
@@ -120,7 +120,7 @@ describe('autoFillBox1', () => {
       })
     }
 
-    await autoFillBox1(1, today)
+    await autoFillBox1(today)
 
     const dueBox1States = (await db.reviewStates.where({ box: 1 }).toArray()).filter(
       (state) => state.due_date === today
@@ -171,7 +171,7 @@ describe('autoFillBox1', () => {
     const originalRandom = Math.random
     Math.random = () => 0
 
-    await autoFillBox1(1, today)
+    await autoFillBox1(today)
 
     Math.random = originalRandom
 
@@ -218,7 +218,7 @@ describe('autoFillBox1', () => {
       dueDate: null
     })
 
-    await autoFillBox1(1, today)
+    await autoFillBox1(today)
 
     const promotedState = await db.reviewStates.get(promotedId)
     expect(promotedState?.box).toBe(0)
@@ -256,7 +256,7 @@ describe('autoFillBox1', () => {
       })
     }
 
-    const session = await buildDailySession(1, today)
+    const session = await buildDailySession(today)
     const dueTodayStates = (await db.reviewStates.where({ box: 0 }).toArray()).filter(
       (state) => state.due_date === today
     )
@@ -266,7 +266,7 @@ describe('autoFillBox1', () => {
   })
 
   it('returns empty session when no cards exist', async () => {
-    const session = await buildDailySession(1, '2024-03-01')
+    const session = await buildDailySession('2024-03-01')
     expect(session.box1).toHaveLength(0)
     expect(session.due).toHaveLength(0)
   })
@@ -287,7 +287,7 @@ describe('autoFillBox1', () => {
       dueDate: null
     })
 
-    const session = await buildDailySession(1, '2024-03-01')
+    const session = await buildDailySession('2024-03-01')
     expect(session.due.length).toBeGreaterThan(0)
   })
 })
@@ -522,7 +522,7 @@ describe('buildDailySession', () => {
       learnedAt: '2023-12-01T10:00:00.000Z'
     })
 
-    const session = await buildDailySession(1, today)
+    const session = await buildDailySession(today)
 
     expect(session.box1).toHaveLength(0)
     expect(session.due).toHaveLength(13)
@@ -550,7 +550,7 @@ describe('buildDailySession', () => {
       suspended: true
     })
 
-    const session = await buildDailySession(1, today)
+    const session = await buildDailySession(today)
     const dueFronts = session.due.map((entry) => entry.card.front_md)
 
     expect(dueFronts).toContain('Due active')

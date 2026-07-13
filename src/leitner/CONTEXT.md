@@ -18,7 +18,6 @@ src/leitner/
 ## Patterns utilisés
 
 - **Déterminisme** : toutes les fonctions reçoivent `today: string` en paramètre — jamais `new Date()` en interne → testabilité totale
-- **Surcharge de signature** : `autoFillBox1(today)` et `autoFillBox1(deckId, today)` pour compatibilité avec l'ancien modèle avec decks
 
 ## Dépendances clés
 
